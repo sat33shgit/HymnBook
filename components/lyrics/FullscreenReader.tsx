@@ -39,6 +39,8 @@ export function FullscreenReader({
   const { resolvedTheme } = useTheme();
   const startXRef = useRef(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   const activeTranslation = translations.find(
     (t) => t.languageCode === activeLanguage
@@ -71,11 +73,21 @@ export function FullscreenReader({
       }
     }
 
-    // We do not auto-close the reader when the browser exits native
-    // fullscreen (e.g., due to keyboard opening or browser UI). Closing the
-    // reader should be an explicit action (the X button). Still attempt to
-    // exit native fullscreen when the reader unmounts.
+    const onFsChange = () => {
+      const fsElem = (document as any).fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement;
+      if (!fsElem) {
+        // Native fullscreen was exited by the user — close the reader.
+        onCloseRef.current();
+      }
+    };
+
+    document.addEventListener("fullscreenchange", onFsChange);
+    document.addEventListener("webkitfullscreenchange", onFsChange as EventListener);
+
     return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      document.removeEventListener("webkitfullscreenchange", onFsChange as EventListener);
+
       const exit = (document as any).exitFullscreen || (document as any).webkitExitFullscreen || (document as any).msExitFullscreen;
       if (exit && ((document as any).fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement)) {
         try {
@@ -85,7 +97,29 @@ export function FullscreenReader({
         }
       }
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
+
+  const handleClose = useCallback(() => {
+    const exit =
+      (document as any).exitFullscreen ||
+      (document as any).webkitExitFullscreen ||
+      (document as any).msExitFullscreen;
+    const fsElem =
+      (document as any).fullscreenElement ||
+      (document as any).webkitFullscreenElement ||
+      (document as any).msFullscreenElement;
+
+    if (exit && fsElem) {
+      // Exiting native fullscreen will fire fullscreenchange → onCloseRef
+      try {
+        (exit as Function).call(document);
+      } catch {
+        onClose();
+      }
+    } else {
+      onClose();
+    }
+  }, [onClose]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     startXRef.current = e.touches[0].clientX;
@@ -141,7 +175,7 @@ export function FullscreenReader({
           <Button
             variant="ghost"
             size="icon"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Exit fullscreen"
             className={topControlButtonClass}
             style={{ color: isDark ? "#fff" : "#000" }}
