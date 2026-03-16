@@ -14,11 +14,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.email || !credentials?.password) return null;
 
         const adminEmail = process.env.ADMIN_EMAIL;
-        const adminPasswordHash = process.env.ADMIN_PASSWORD;
+        // Normalize ADMIN_PASSWORD in case the value was stored with escaped dollar
+        // signs (e.g. "\$2b\$...") which can happen when exporting from some
+        // shells or tools. Convert "\$" → "$" so bcrypt compare works.
+        const rawAdminPassword = process.env.ADMIN_PASSWORD ?? "";
+        const adminPasswordHash = rawAdminPassword.replace(/\\\$/g, "$");
 
         if (!adminEmail || !adminPasswordHash) return null;
 
-        if (credentials.email !== adminEmail) return null;
+        if (!adminEmail) return null;
+        if (String(credentials.email).toLowerCase() !== String(adminEmail).toLowerCase())
+          return null;
 
         const isValid = await compare(
           credentials.password as string,
