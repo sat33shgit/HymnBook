@@ -10,12 +10,14 @@ import type { SongListItem } from "@/types";
 
 interface SearchPageClientProps {
   initialSongs: SongListItem[];
+  totalSongs: number;
   initialTotalPages: number;
   categories: string[];
 }
 
 function SearchContent({
   initialSongs,
+  totalSongs,
   initialTotalPages,
   categories,
 }: SearchPageClientProps) {
@@ -98,18 +100,23 @@ function SearchContent({
       <div className="mx-auto max-w-3xl px-4 py-8">
         <h1 className="mb-6 font-heading text-3xl font-bold">Search Songs</h1>
         <SearchBar value={query} onChange={handleQueryChange} autoFocus />
-
-        <div className="mt-8">
-          {loading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-24 rounded-lg" />
-              ))}
-            </div>
-          ) : searched ? (
-            <SearchResults results={results} query={q} />
-          ) : null}
+        <div className="mt-3 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
+          Total songs: {totalSongs}
         </div>
+
+        {(loading || searched) && (
+          <div className="mt-4">
+            {loading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-24 rounded-lg" />
+                ))}
+              </div>
+            ) : (
+              <SearchResults results={results} query={q} />
+            )}
+          </div>
+        )}
       </div>
 
       {!searched && (
@@ -127,6 +134,7 @@ function SearchContent({
 
 export function SearchPageClient({
   initialSongs,
+  totalSongs,
   initialTotalPages,
   categories,
 }: SearchPageClientProps) {
@@ -141,6 +149,7 @@ export function SearchPageClient({
     >
       <SearchContent
         initialSongs={initialSongs}
+        totalSongs={totalSongs}
         initialTotalPages={initialTotalPages}
         categories={categories}
       />

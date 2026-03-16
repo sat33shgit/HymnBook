@@ -247,6 +247,8 @@ export async function getSongById(id: number) {
 }
 
 export async function getMostViewedSongs(limit = 5) {
+  const safeLimit = Math.min(Math.max(limit, 1), 20);
+
   return unstable_cache(
     async () => {
       const songRows = await db
@@ -254,7 +256,7 @@ export async function getMostViewedSongs(limit = 5) {
         .from(songs)
         .where(eq(songs.isPublished, true))
         .orderBy(desc(songs.viewCount), desc(songs.createdAt))
-        .limit(limit);
+        .limit(safeLimit);
 
       const songIds = songRows.map((s) => s.id);
       const translations =
@@ -288,7 +290,7 @@ export async function getMostViewedSongs(limit = 5) {
         };
       });
     },
-    ["getMostViewedSongs", String(limit)],
+    ["getMostViewedSongs", String(safeLimit)],
     {
       revalidate: CACHE_TTL.mostViewed,
       tags: [CACHE_TAGS.mostViewed, CACHE_TAGS.songs],

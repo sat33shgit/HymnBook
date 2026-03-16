@@ -10,6 +10,7 @@ export const revalidate = 300;
 
 export default async function SearchPage() {
   let initialSongs: Awaited<ReturnType<typeof getSongs>>["data"] = [];
+  let totalSongs = 0;
   let initialTotalPages = 0;
   let categories: string[] = [];
 
@@ -19,6 +20,7 @@ export default async function SearchPage() {
       getCategories(),
     ]);
     initialSongs = songsResult.data;
+    totalSongs = songsResult.total;
     initialTotalPages = songsResult.totalPages;
     categories = cats;
   } catch {
@@ -28,6 +30,7 @@ export default async function SearchPage() {
   return (
     <SearchPageClient
       initialSongs={initialSongs}
+      totalSongs={totalSongs}
       initialTotalPages={initialTotalPages}
       categories={categories}
     />
