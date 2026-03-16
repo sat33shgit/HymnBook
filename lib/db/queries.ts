@@ -176,6 +176,8 @@ export async function getSongs({
         };
       });
 
+      data.sort((a, b) => a.title.localeCompare(b.title));
+
       return {
         data,
         total,
