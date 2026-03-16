@@ -35,7 +35,7 @@ export function SongCard({ song, index = 0 }: SongCardProps) {
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
       <Card
-        className="group h-full cursor-pointer bg-muted/30 transition-colors transition-shadow hover:bg-muted/40 hover:shadow-lg"
+        className="group h-full cursor-pointer bg-[var(--card-surface)] transition-colors transition-shadow hover:shadow-lg"
         onClick={() => router.push(`/songs/${song.slug}`)}
         role="link"
         tabIndex={0}

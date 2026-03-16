@@ -26,7 +26,7 @@ export function SearchBar({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="pl-10 pr-4"
+        className="pl-10 pr-4 bg-[var(--card-surface)]"
         autoFocus={autoFocus}
         aria-label="Search songs"
       />
