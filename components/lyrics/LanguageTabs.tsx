@@ -1,7 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-
 interface LanguageTabsProps {
   languages: { code: string; nativeName: string }[];
   activeLanguage: string;

@@ -43,28 +43,6 @@ export interface SongListItem {
   languages: string[];
 }
 
-export interface SearchResult {
-  songId: number;
-  slug: string;
-  title: string;
-  matchedLanguage: string;
-  matchedText: string;
-  category: string | null;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-export interface ApiError {
-  error: string;
-  details?: unknown[];
-}
-
 export type FontSize = "S" | "M" | "L" | "XL";
 
 export const FONT_SIZE_MAP: Record<FontSize, number> = {
