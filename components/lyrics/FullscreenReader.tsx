@@ -7,7 +7,7 @@ import { LanguageTabs } from "./LanguageTabs";
 import { LyricsText } from "./LyricsText";
 import type { FontSize, SongTranslation } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import { useTheme } from "next-themes";
 
 
@@ -38,6 +38,7 @@ export function FullscreenReader({
 }: FullscreenReaderProps) {
   const { resolvedTheme } = useTheme();
   const startXRef = useRef(0);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const activeTranslation = translations.find(
     (t) => t.languageCode === activeLanguage
@@ -48,6 +49,53 @@ export function FullscreenReader({
   const showEnglishInPlace = canShowEnglishTranslation && showEnglishTranslation;
 
   // Fullscreen uses the `fontSize` passed from normal mode; no local size controls.
+
+  // Request native fullscreen when the reader opens. Exit on close or when
+  // the user exits fullscreen (listen to fullscreenchange).
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const el = containerRef.current ?? document.documentElement;
+
+    const request =
+      (el as any).requestFullscreen ||
+      (el as any).webkitRequestFullscreen ||
+      (el as any).msRequestFullscreen;
+
+    if (request) {
+      try {
+        // Try to enter native fullscreen; may fail if browser disallows.
+        (request as Function).call(el);
+      } catch (e) {
+        // ignore errors (will remain in-app fullscreen)
+      }
+    }
+
+    const onFsChange = () => {
+      const fsElem = (document as any).fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement;
+      if (!fsElem) {
+        // If native fullscreen was exited by the user, close the reader.
+        onClose();
+      }
+    };
+
+    document.addEventListener("fullscreenchange", onFsChange);
+    document.addEventListener("webkitfullscreenchange", onFsChange as EventListener);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      document.removeEventListener("webkitfullscreenchange", onFsChange as EventListener);
+
+      const exit = (document as any).exitFullscreen || (document as any).webkitExitFullscreen || (document as any).msExitFullscreen;
+      if (exit && ((document as any).fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement)) {
+        try {
+          (exit as Function).call(document);
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
+  }, [isOpen, onClose]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     startXRef.current = e.touches[0].clientX;
@@ -83,6 +131,7 @@ export function FullscreenReader({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.2 }}
+        ref={containerRef}
         className="fixed inset-0 z-[9999] flex flex-col"
         style={{
           backgroundColor: isDark ? "#000" : "#fff",
