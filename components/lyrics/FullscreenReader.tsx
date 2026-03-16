@@ -14,7 +14,6 @@ interface FullscreenReaderProps {
   isOpen: boolean;
   onClose: () => void;
   translations: SongTranslation[];
-  languages: { code: string; nativeName: string }[];
   activeLanguage: string;
   title: string;
   showEnglishTranslation: boolean;
