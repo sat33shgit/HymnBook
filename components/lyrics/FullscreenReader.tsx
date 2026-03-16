@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Sun, Moon, Minus, Plus } from "lucide-react";
+import { X, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { LanguageTabs } from "./LanguageTabs";
@@ -8,6 +8,7 @@ import { LyricsText } from "./LyricsText";
 import type { FontSize, SongTranslation } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useTheme } from "next-themes";
 
 const SIZES: FontSize[] = ["S", "M", "L", "XL"];
 
@@ -34,7 +35,7 @@ export function FullscreenReader({
   showEnglishTranslation,
   onToggleEnglishTranslation,
 }: FullscreenReaderProps) {
-  const [bgMode, setBgMode] = useState<"white" | "black">("white");
+  const { resolvedTheme } = useTheme();
   const [fontSize, setFontSize] = useState<FontSize>(() => {
     if (typeof window !== "undefined") {
       return (localStorage.getItem("hymnbook_fs_fontsize") as FontSize) || "M";
@@ -88,7 +89,10 @@ export function FullscreenReader({
 
   if (!isOpen) return null;
 
-  const isDark = bgMode === "black";
+  const isDark = resolvedTheme === "dark";
+  const topControlButtonClass = isDark
+    ? "bg-transparent hover:bg-white/10 active:bg-white/15"
+    : "bg-transparent hover:bg-black/10 active:bg-black/15";
 
   return (
     <AnimatePresence>
@@ -110,22 +114,14 @@ export function FullscreenReader({
       >
         {/* Top controls */}
         <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: isDark ? "#333" : "#e5e5e5" }}>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setBgMode(isDark ? "white" : "black")}
-              aria-label={`Switch to ${isDark ? "light" : "dark"} background`}
-              style={{ color: isDark ? "#fff" : "#000" }}
-            >
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
+          <div className="flex items-center gap-1">
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => cycleFontSize("down")}
                 aria-label="Decrease font size"
+                className={topControlButtonClass}
                 style={{ color: isDark ? "#fff" : "#000" }}
               >
                 <Minus className="h-4 w-4" />
@@ -136,6 +132,7 @@ export function FullscreenReader({
                 size="icon"
                 onClick={() => cycleFontSize("up")}
                 aria-label="Increase font size"
+                className={topControlButtonClass}
                 style={{ color: isDark ? "#fff" : "#000" }}
               >
                 <Plus className="h-4 w-4" />
@@ -147,6 +144,7 @@ export function FullscreenReader({
             size="icon"
             onClick={onClose}
             aria-label="Exit fullscreen"
+            className={topControlButtonClass}
             style={{ color: isDark ? "#fff" : "#000" }}
           >
             <X className="h-5 w-5" />
