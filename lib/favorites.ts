@@ -1,4 +1,19 @@
 const STORAGE_KEY = "hymnbook_favorites";
+const DEVICE_ID_KEY = "hymnbook_device_id";
+
+/**
+ * Get or create a stable anonymous device identifier so we can persist
+ * favorites to the DB without requiring user authentication.
+ */
+export function getDeviceId(): string {
+  if (typeof window === "undefined") return "";
+  let id = localStorage.getItem(DEVICE_ID_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(DEVICE_ID_KEY, id);
+  }
+  return id;
+}
 
 export function getLocalFavorites(): number[] {
   if (typeof window === "undefined") return [];
@@ -8,6 +23,10 @@ export function getLocalFavorites(): number[] {
   } catch {
     return [];
   }
+}
+
+export function setLocalFavorites(ids: number[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
 }
 
 export function addLocalFavorite(songId: number): number[] {
