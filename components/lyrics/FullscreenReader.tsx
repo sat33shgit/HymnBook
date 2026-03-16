@@ -71,21 +71,11 @@ export function FullscreenReader({
       }
     }
 
-    const onFsChange = () => {
-      const fsElem = (document as any).fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement;
-      if (!fsElem) {
-        // If native fullscreen was exited by the user, close the reader.
-        onClose();
-      }
-    };
-
-    document.addEventListener("fullscreenchange", onFsChange);
-    document.addEventListener("webkitfullscreenchange", onFsChange as EventListener);
-
+    // We do not auto-close the reader when the browser exits native
+    // fullscreen (e.g., due to keyboard opening or browser UI). Closing the
+    // reader should be an explicit action (the X button). Still attempt to
+    // exit native fullscreen when the reader unmounts.
     return () => {
-      document.removeEventListener("fullscreenchange", onFsChange);
-      document.removeEventListener("webkitfullscreenchange", onFsChange as EventListener);
-
       const exit = (document as any).exitFullscreen || (document as any).webkitExitFullscreen || (document as any).msExitFullscreen;
       if (exit && ((document as any).fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement)) {
         try {
