@@ -1,28 +1,64 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import {
-  getLocalFavorites,
   addLocalFavorite,
   removeLocalFavorite,
 } from "@/lib/favorites";
 
-export function useFavorites() {
-  const [favorites, setFavorites] = useState<number[]>([]);
+const EMPTY_FAVORITES: number[] = [];
 
-  useEffect(() => {
-    setFavorites(getLocalFavorites());
-  }, []);
+let cachedRawFavorites: string | null = null;
+let cachedFavorites: number[] = EMPTY_FAVORITES;
+
+function getFavoritesSnapshot() {
+  if (typeof window === "undefined") {
+    return EMPTY_FAVORITES;
+  }
+
+  const raw = localStorage.getItem("hymnbook_favorites") ?? "[]";
+  if (raw === cachedRawFavorites) {
+    return cachedFavorites;
+  }
+
+  cachedRawFavorites = raw;
+  try {
+    const parsed = JSON.parse(raw);
+    cachedFavorites = Array.isArray(parsed)
+      ? parsed.filter((id): id is number => typeof id === "number")
+      : EMPTY_FAVORITES;
+  } catch {
+    cachedFavorites = EMPTY_FAVORITES;
+  }
+
+  return cachedFavorites;
+}
+
+function subscribeFavorites(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener("favorites-updated", onStoreChange as EventListener);
+
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener("favorites-updated", onStoreChange as EventListener);
+  };
+}
+
+export function useFavorites() {
+  const favorites = useSyncExternalStore(
+    subscribeFavorites,
+    getFavoritesSnapshot,
+    () => EMPTY_FAVORITES
+  );
 
   const toggleFavorite = useCallback((songId: number) => {
-    setFavorites((prev) => {
-      if (prev.includes(songId)) {
-        return removeLocalFavorite(songId);
-      } else {
-        return addLocalFavorite(songId);
-      }
-    });
-  }, []);
+    if (favorites.includes(songId)) {
+      removeLocalFavorite(songId);
+    } else {
+      addLocalFavorite(songId);
+    }
+    window.dispatchEvent(new Event("favorites-updated"));
+  }, [favorites]);
 
   const isFavorite = useCallback(
     (songId: number) => favorites.includes(songId),

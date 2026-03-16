@@ -1,11 +1,10 @@
 import { getSongs, getCategories } from "@/lib/db/queries";
 import { HomeClient } from "./HomeClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function HomePage() {
   let initialSongs: Awaited<ReturnType<typeof getSongs>>['data'] = [];
-  let initialTotal = 0;
   let initialTotalPages = 0;
   let categories: string[] = [];
 
@@ -15,7 +14,6 @@ export default async function HomePage() {
       getCategories(),
     ]);
     initialSongs = songsResult.data;
-    initialTotal = songsResult.total;
     initialTotalPages = songsResult.totalPages;
     categories = cats;
   } catch {
@@ -25,7 +23,6 @@ export default async function HomePage() {
   return (
     <HomeClient
       initialSongs={initialSongs}
-      initialTotal={initialTotal}
       initialTotalPages={initialTotalPages}
       categories={categories}
     />

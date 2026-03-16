@@ -1,28 +1,50 @@
 import { db } from "./index";
 import { songs, songTranslations, languages, userFavorites } from "./schema";
-import { eq, sql, and, desc, asc, ilike, count } from "drizzle-orm";
+import { eq, sql, and, desc, asc, count } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
+import { CACHE_TAGS, CACHE_TTL, songIdTag, songSlugTag } from "@/lib/cache";
 
 // ─── Languages ───────────────────────────────────────────────
 
 export async function getLanguages(activeOnly = false) {
-  const query = db
-    .select()
-    .from(languages)
-    .orderBy(asc(languages.sortOrder));
+  const cacheKey = activeOnly ? "active" : "all";
 
-  if (activeOnly) {
-    return query.where(eq(languages.isActive, true));
-  }
-  return query;
+  return unstable_cache(
+    async () => {
+      const query = db
+        .select()
+        .from(languages)
+        .orderBy(asc(languages.sortOrder));
+
+      if (activeOnly) {
+        return query.where(eq(languages.isActive, true));
+      }
+      return query;
+    },
+    ["getLanguages", cacheKey],
+    {
+      revalidate: CACHE_TTL.languages,
+      tags: [CACHE_TAGS.languages],
+    }
+  )();
 }
 
 export async function getLanguageByCode(code: string) {
-  const result = await db
-    .select()
-    .from(languages)
-    .where(eq(languages.code, code))
-    .limit(1);
-  return result[0] ?? null;
+  return unstable_cache(
+    async () => {
+      const result = await db
+        .select()
+        .from(languages)
+        .where(eq(languages.code, code))
+        .limit(1);
+      return result[0] ?? null;
+    },
+    ["getLanguageByCode", code],
+    {
+      revalidate: CACHE_TTL.languages,
+      tags: [CACHE_TAGS.languages],
+    }
+  )();
 }
 
 export async function createLanguage(data: {
@@ -80,111 +102,145 @@ export async function getSongs({
   category?: string;
   publishedOnly?: boolean;
 } = {}) {
-  const offset = (page - 1) * limit;
+  const cacheKey = [
+    "getSongs",
+    `page:${page}`,
+    `limit:${limit}`,
+    `category:${category ?? "all"}`,
+    `publishedOnly:${publishedOnly ? "1" : "0"}`,
+  ];
 
-  const conditions = [];
-  if (publishedOnly) {
-    conditions.push(eq(songs.isPublished, true));
-  }
-  if (category) {
-    conditions.push(eq(songs.category, category));
-  }
+  return unstable_cache(
+    async () => {
+      const offset = (page - 1) * limit;
 
-  const whereClause =
-    conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : and(...conditions)
-      : undefined;
+      const conditions = [];
+      if (publishedOnly) {
+        conditions.push(eq(songs.isPublished, true));
+      }
+      if (category) {
+        conditions.push(eq(songs.category, category));
+      }
 
-  const [songRows, totalResult] = await Promise.all([
-    db
-      .select()
-      .from(songs)
-      .where(whereClause)
-      .orderBy(desc(songs.createdAt))
-      .limit(limit)
-      .offset(offset),
-    db
-      .select({ count: count() })
-      .from(songs)
-      .where(whereClause),
-  ]);
+      const whereClause =
+        conditions.length > 0
+          ? conditions.length === 1
+            ? conditions[0]
+            : and(...conditions)
+          : undefined;
 
-  const total = totalResult[0]?.count ?? 0;
-
-  // Get translations for these songs
-  const songIds = songRows.map((s) => s.id);
-  const translations =
-    songIds.length > 0
-      ? await db
+      const [songRows, totalResult] = await Promise.all([
+        db
           .select()
-          .from(songTranslations)
-          .where(
-            sql`${songTranslations.songId} = ANY(${sql.raw(
-              `ARRAY[${songIds.join(",")}]`
-            )})`
-          )
-      : [];
+          .from(songs)
+          .where(whereClause)
+          .orderBy(desc(songs.createdAt))
+          .limit(limit)
+          .offset(offset),
+        db
+          .select({ count: count() })
+          .from(songs)
+          .where(whereClause),
+      ]);
 
-  const data = songRows.map((song) => {
-    const songTrans = translations.filter((t) => t.songId === song.id);
-    const englishTitle =
-      songTrans.find((t) => t.languageCode === "en")?.title ?? "Untitled";
-    return {
-      id: song.id,
-      slug: song.slug,
-      category: song.category,
-      defaultLang: song.defaultLang,
-      isPublished: song.isPublished,
-      title: englishTitle,
-      languages: songTrans.map((t) => t.languageCode),
-    };
-  });
+      const total = totalResult[0]?.count ?? 0;
 
-  return {
-    data,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit),
-  };
+      const songIds = songRows.map((s) => s.id);
+      const translations =
+        songIds.length > 0
+          ? await db
+              .select()
+              .from(songTranslations)
+              .where(
+                sql`${songTranslations.songId} = ANY(${sql.raw(
+                  `ARRAY[${songIds.join(",")}]`
+                )})`
+              )
+          : [];
+
+      const data = songRows.map((song) => {
+        const songTrans = translations.filter((t) => t.songId === song.id);
+        const englishTitle =
+          songTrans.find((t) => t.languageCode === "en")?.title ?? "Untitled";
+        return {
+          id: song.id,
+          slug: song.slug,
+          category: song.category,
+          defaultLang: song.defaultLang,
+          isPublished: song.isPublished,
+          title: englishTitle,
+          languages: songTrans.map((t) => t.languageCode),
+        };
+      });
+
+      return {
+        data,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      };
+    },
+    cacheKey,
+    {
+      revalidate: CACHE_TTL.songs,
+      tags: [CACHE_TAGS.songs, CACHE_TAGS.categories],
+    }
+  )();
 }
 
 export async function getSongBySlug(slug: string) {
-  const songRows = await db
-    .select()
-    .from(songs)
-    .where(eq(songs.slug, slug))
-    .limit(1);
+  return unstable_cache(
+    async () => {
+      const songRows = await db
+        .select()
+        .from(songs)
+        .where(eq(songs.slug, slug))
+        .limit(1);
 
-  if (!songRows[0]) return null;
+      if (!songRows[0]) return null;
 
-  const song = songRows[0];
-  const translations = await db
-    .select()
-    .from(songTranslations)
-    .where(eq(songTranslations.songId, song.id));
+      const song = songRows[0];
+      const translations = await db
+        .select()
+        .from(songTranslations)
+        .where(eq(songTranslations.songId, song.id));
 
-  return { ...song, translations };
+      return { ...song, translations };
+    },
+    ["getSongBySlug", slug],
+    {
+      revalidate: CACHE_TTL.song,
+      tags: [CACHE_TAGS.songs, songSlugTag(slug)],
+    }
+  )();
 }
 
 export async function getSongById(id: number) {
-  const songRows = await db
-    .select()
-    .from(songs)
-    .where(eq(songs.id, id))
-    .limit(1);
+  return unstable_cache(
+    async () => {
+      const songRows = await db
+        .select()
+        .from(songs)
+        .where(eq(songs.id, id))
+        .limit(1);
 
-  if (!songRows[0]) return null;
+      if (!songRows[0]) return null;
 
-  const song = songRows[0];
-  const translations = await db
-    .select()
-    .from(songTranslations)
-    .where(eq(songTranslations.songId, song.id));
+      const song = songRows[0];
+      const translations = await db
+        .select()
+        .from(songTranslations)
+        .where(eq(songTranslations.songId, song.id));
 
-  return { ...song, translations };
+      return { ...song, translations };
+    },
+    ["getSongById", String(id)],
+    {
+      revalidate: CACHE_TTL.song,
+      tags: [CACHE_TAGS.songs, songIdTag(id)],
+    }
+  )();
 }
 
 export async function createSong(data: {
@@ -272,21 +328,39 @@ export async function deleteSong(id: number) {
 }
 
 export async function getCategories() {
-  const result = await db
-    .selectDistinct({ category: songs.category })
-    .from(songs)
-    .where(eq(songs.isPublished, true))
-    .orderBy(asc(songs.category));
-  return result
-    .map((r) => r.category)
-    .filter((c): c is string => c !== null);
+  return unstable_cache(
+    async () => {
+      const result = await db
+        .selectDistinct({ category: songs.category })
+        .from(songs)
+        .where(eq(songs.isPublished, true))
+        .orderBy(asc(songs.category));
+      return result
+        .map((r) => r.category)
+        .filter((c): c is string => c !== null);
+    },
+    ["getCategories"],
+    {
+      revalidate: CACHE_TTL.categories,
+      tags: [CACHE_TAGS.categories, CACHE_TAGS.songs],
+    }
+  )();
 }
 
 export async function getAllSlugs() {
-  return db
-    .select({ slug: songs.slug })
-    .from(songs)
-    .where(eq(songs.isPublished, true));
+  return unstable_cache(
+    async () => {
+      return db
+        .select({ slug: songs.slug })
+        .from(songs)
+        .where(eq(songs.isPublished, true));
+    },
+    ["getAllSlugs"],
+    {
+      revalidate: CACHE_TTL.slugs,
+      tags: [CACHE_TAGS.slugs, CACHE_TAGS.songs],
+    }
+  )();
 }
 
 // ─── Search ──────────────────────────────────────────────────
@@ -295,42 +369,51 @@ export async function searchSongs(query: string, lang?: string) {
   const sanitized = query.replace(/[^\w\s\u0C00-\u0C7F\u0900-\u097F\u0B80-\u0BFF\u0D00-\u0D7F]/g, " ").trim();
   if (!sanitized) return [];
 
-  const langCondition = lang
-    ? sql`AND st.language_code = ${lang}`
-    : sql``;
+  return unstable_cache(
+    async () => {
+      const langCondition = lang
+        ? sql`AND st.language_code = ${lang}`
+        : sql``;
 
-  const results = await db.execute(sql`
-    SELECT
-      s.id as song_id,
-      s.slug,
-      st.title,
-      st.language_code as matched_language,
-      s.category,
-      ts_headline('english', st.lyrics, plainto_tsquery('english', ${sanitized}),
-        'MaxWords=30, MinWords=10, StartSel=<mark>, StopSel=</mark>'
-      ) as matched_text
-    FROM song_translations st
-    JOIN songs s ON s.id = st.song_id
-    WHERE s.is_published = true
-      ${langCondition}
-      AND (
-        st.search_vector @@ plainto_tsquery('english', ${sanitized})
-        OR st.title ILIKE ${"%" + sanitized + "%"}
-        OR st.lyrics ILIKE ${"%" + sanitized + "%"}
-      )
-    ORDER BY
-      ts_rank(st.search_vector, plainto_tsquery('english', ${sanitized})) DESC
-    LIMIT 50
-  `);
+      const results = await db.execute(sql`
+        SELECT
+          s.id as song_id,
+          s.slug,
+          st.title,
+          st.language_code as matched_language,
+          s.category,
+          ts_headline('english', st.lyrics, plainto_tsquery('english', ${sanitized}),
+            'MaxWords=30, MinWords=10, StartSel=<mark>, StopSel=</mark>'
+          ) as matched_text
+        FROM song_translations st
+        JOIN songs s ON s.id = st.song_id
+        WHERE s.is_published = true
+          ${langCondition}
+          AND (
+            st.search_vector @@ plainto_tsquery('english', ${sanitized})
+            OR st.title ILIKE ${"%" + sanitized + "%"}
+            OR st.lyrics ILIKE ${"%" + sanitized + "%"}
+          )
+        ORDER BY
+          ts_rank(st.search_vector, plainto_tsquery('english', ${sanitized})) DESC
+        LIMIT 50
+      `);
 
-  return results.rows as {
-    song_id: number;
-    slug: string;
-    title: string;
-    matched_language: string;
-    matched_text: string;
-    category: string | null;
-  }[];
+      return results.rows as {
+        song_id: number;
+        slug: string;
+        title: string;
+        matched_language: string;
+        matched_text: string;
+        category: string | null;
+      }[];
+    },
+    ["searchSongs", sanitized.toLowerCase(), lang ?? "all"],
+    {
+      revalidate: CACHE_TTL.search,
+      tags: [CACHE_TAGS.search, CACHE_TAGS.songs],
+    }
+  )();
 }
 
 // ─── Favorites ───────────────────────────────────────────────

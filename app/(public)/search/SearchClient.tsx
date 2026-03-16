@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,15 +26,7 @@ function SearchContent() {
   const [searched, setSearched] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  useEffect(() => {
-    if (q) {
-      setQuery(q);
-      performSearch(q);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q]);
-
-  const performSearch = async (searchQuery: string) => {
+  const performSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
     setLoading(true);
     setSearched(true);
@@ -49,7 +41,14 @@ function SearchContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (q) {
+      setQuery(q);
+      performSearch(q);
+    }
+  }, [q, performSearch]);
 
   const handleQueryChange = (value: string) => {
     setQuery(value);

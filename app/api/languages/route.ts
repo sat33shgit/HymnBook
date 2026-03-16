@@ -10,6 +10,8 @@ import {
   updateLanguageSchema,
 } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
+import { revalidateTag } from "next/cache";
+import { CACHE_TAGS } from "@/lib/cache";
 
 const headers = { "X-API-Version": "1" };
 
@@ -47,6 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     const lang = await createLanguage(parsed.data);
+    revalidateTag(CACHE_TAGS.languages, "max");
     return NextResponse.json(lang, { status: 201, headers });
   } catch (error) {
     console.error("POST /api/languages error:", error);
@@ -86,6 +89,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const lang = await updateLanguage(code, parsed.data);
+    revalidateTag(CACHE_TAGS.languages, "max");
     return NextResponse.json(lang, { headers });
   } catch (error) {
     console.error("PUT /api/languages error:", error);
@@ -115,6 +119,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     await deleteLanguage(code);
+    revalidateTag(CACHE_TAGS.languages, "max");
     return NextResponse.json({ success: true }, { headers });
   } catch (error) {
     console.error("DELETE /api/languages error:", error);

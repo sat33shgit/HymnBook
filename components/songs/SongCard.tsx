@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,7 @@ interface SongCardProps {
 }
 
 export function SongCard({ song, index = 0 }: SongCardProps) {
+  const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorited = isFavorite(song.id);
 
@@ -32,20 +33,31 @@ export function SongCard({ song, index = 0 }: SongCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
-      <Card className="group h-full transition-shadow hover:shadow-lg">
+      <Card
+        className="group h-full cursor-pointer transition-shadow hover:shadow-lg"
+        onClick={() => router.push(`/songs/${song.slug}`)}
+        role="link"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            router.push(`/songs/${song.slug}`);
+          }
+        }}
+      >
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
-            <Link
-              href={`/songs/${song.slug}`}
-              className="flex-1 font-heading text-lg font-semibold leading-tight text-foreground transition-colors group-hover:text-primary"
-            >
+            <span className="flex-1 font-heading text-lg font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
               {song.title}
-            </Link>
+            </span>
             <Button
               variant="ghost"
               size="icon"
               className="h-8 w-8 shrink-0"
-              onClick={() => toggleFavorite(song.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavorite(song.id);
+              }}
               aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
             >
               <Heart

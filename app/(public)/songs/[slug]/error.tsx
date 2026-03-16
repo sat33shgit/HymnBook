@@ -5,7 +5,6 @@ import { AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function SongError({
-  error,
   reset,
 }: {
   error: Error & { digest?: string };

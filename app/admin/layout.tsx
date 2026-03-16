@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Music, LayoutDashboard, Music2, Globe, LogOut } from "lucide-react";
+import { Music, LayoutDashboard, Music2, Globe } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { AdminSignOut } from "@/components/admin/AdminSignOut";
 

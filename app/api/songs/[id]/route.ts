@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSongById, updateSong, deleteSong } from "@/lib/db/queries";
 import { updateSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
+import { revalidateTag } from "next/cache";
+import { CACHE_TAGS, songIdTag, songSlugTag } from "@/lib/cache";
 
 const headers = { "X-API-Version": "1" };
 
@@ -70,6 +72,16 @@ export async function PUT(
     }
 
     const song = await updateSong(songId, parsed.data);
+
+    revalidateTag(CACHE_TAGS.songs, "max");
+    revalidateTag(CACHE_TAGS.categories, "max");
+    revalidateTag(CACHE_TAGS.slugs, "max");
+    revalidateTag(CACHE_TAGS.search, "max");
+    revalidateTag(songIdTag(songId), "max");
+    if (song?.slug) {
+      revalidateTag(songSlugTag(song.slug), "max");
+    }
+
     return NextResponse.json(song, { headers });
   } catch (error) {
     console.error("PUT /api/songs/[id] error:", error);
@@ -102,7 +114,18 @@ export async function DELETE(
       );
     }
 
+    const existingSong = await getSongById(songId);
     await deleteSong(songId);
+
+    revalidateTag(CACHE_TAGS.songs, "max");
+    revalidateTag(CACHE_TAGS.categories, "max");
+    revalidateTag(CACHE_TAGS.slugs, "max");
+    revalidateTag(CACHE_TAGS.search, "max");
+    revalidateTag(songIdTag(songId), "max");
+    if (existingSong?.slug) {
+      revalidateTag(songSlugTag(existingSong.slug), "max");
+    }
+
     return NextResponse.json({ success: true }, { headers });
   } catch (error) {
     console.error("DELETE /api/songs/[id] error:", error);

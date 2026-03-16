@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSongs, createSong, getCategories } from "@/lib/db/queries";
+import { getSongs, createSong } from "@/lib/db/queries";
 import { createSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
 import slugify from "slugify";
+import { revalidateTag } from "next/cache";
+import { CACHE_TAGS, songIdTag, songSlugTag } from "@/lib/cache";
 
 const headers = { "X-API-Version": "1" };
 
@@ -54,6 +56,17 @@ export async function POST(request: NextRequest) {
       isPublished,
       translations,
     });
+
+    revalidateTag(CACHE_TAGS.songs, "max");
+    revalidateTag(CACHE_TAGS.categories, "max");
+    revalidateTag(CACHE_TAGS.slugs, "max");
+    revalidateTag(CACHE_TAGS.search, "max");
+    if (song?.id) {
+      revalidateTag(songIdTag(song.id), "max");
+    }
+    if (song?.slug) {
+      revalidateTag(songSlugTag(song.slug), "max");
+    }
 
     return NextResponse.json(song, { status: 201, headers });
   } catch (error) {

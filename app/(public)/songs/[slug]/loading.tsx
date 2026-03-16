@@ -1,5 +1,20 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
+const LYRIC_LINE_WIDTHS = [
+  "92%",
+  "76%",
+  "84%",
+  "68%",
+  "88%",
+  "73%",
+  "95%",
+  "79%",
+  "86%",
+  "71%",
+  "90%",
+  "75%",
+];
+
 export default function SongLoading() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -16,8 +31,8 @@ export default function SongLoading() {
         ))}
       </div>
       <div className="mt-6 space-y-3">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <Skeleton key={i} className="h-5" style={{ width: `${60 + Math.random() * 40}%` }} />
+        {LYRIC_LINE_WIDTHS.map((width, i) => (
+          <Skeleton key={i} className="h-5" style={{ width }} />
         ))}
       </div>
     </div>

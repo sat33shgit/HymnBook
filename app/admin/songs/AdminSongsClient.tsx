@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -30,7 +29,6 @@ interface AdminSongsClientProps {
 }
 
 export function AdminSongsClient({ songs: initialSongs }: AdminSongsClientProps) {
-  const router = useRouter();
   const [songs, setSongs] = useState(initialSongs);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);

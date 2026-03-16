@@ -24,7 +24,7 @@ export function Header() {
         <Link href="/" className="flex items-center gap-2">
           <Music className="h-6 w-6 text-primary" />
           <span className="font-heading text-xl font-bold tracking-tight">
-            HymnBook
+            Hymn Book
           </span>
         </Link>
 

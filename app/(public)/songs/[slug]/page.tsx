@@ -4,7 +4,7 @@ import { LyricsViewer } from "@/components/lyrics/LyricsViewer";
 import type { Metadata } from "next";
 import { truncate } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateStaticParams() {
   try {

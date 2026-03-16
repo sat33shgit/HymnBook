@@ -11,14 +11,12 @@ import { Music } from "lucide-react";
 
 interface HomeClientProps {
   initialSongs: SongListItem[];
-  initialTotal: number;
   initialTotalPages: number;
   categories: string[];
 }
 
 export function HomeClient({
   initialSongs,
-  initialTotal,
   initialTotalPages,
   categories,
 }: HomeClientProps) {
@@ -88,7 +86,7 @@ export function HomeClient({
             <Music className="h-10 w-10 text-primary" />
           </div>
           <h1 className="font-heading text-4xl font-bold tracking-tight md:text-5xl">
-            HymnBook
+            Hymn Book
           </h1>
           <p className="mt-3 text-lg text-muted-foreground">
             Browse Christian song lyrics in multiple languages
