@@ -160,8 +160,10 @@ export async function getSongs({
 
       const data = songRows.map((song) => {
         const songTrans = translations.filter((t) => t.songId === song.id);
-        const englishTitle =
-          songTrans.find((t) => t.languageCode === "en")?.title ?? "Untitled";
+        const englishTitle = songTrans.find((t) => t.languageCode === "en")?.title;
+        const defaultTitle = songTrans.find(
+          (t) => t.languageCode === (song.defaultLang ?? "en")
+        )?.title;
         return {
           id: song.id,
           slug: song.slug,
@@ -169,7 +171,7 @@ export async function getSongs({
           defaultLang: song.defaultLang,
           viewCount: song.viewCount,
           isPublished: song.isPublished,
-          title: englishTitle,
+          title: englishTitle ?? defaultTitle ?? songTrans[0]?.title ?? "Untitled",
           languages: songTrans.map((t) => t.languageCode),
         };
       });
@@ -269,8 +271,10 @@ export async function getMostViewedSongs(limit = 5) {
 
       return songRows.map((song) => {
         const songTrans = translations.filter((t) => t.songId === song.id);
-        const englishTitle =
-          songTrans.find((t) => t.languageCode === "en")?.title ?? "Untitled";
+        const englishTitle = songTrans.find((t) => t.languageCode === "en")?.title;
+        const defaultTitle = songTrans.find(
+          (t) => t.languageCode === (song.defaultLang ?? "en")
+        )?.title;
 
         return {
           id: song.id,
@@ -279,7 +283,7 @@ export async function getMostViewedSongs(limit = 5) {
           defaultLang: song.defaultLang,
           viewCount: song.viewCount,
           isPublished: song.isPublished,
-          title: englishTitle,
+          title: englishTitle ?? defaultTitle ?? songTrans[0]?.title ?? "Untitled",
           languages: songTrans.map((t) => t.languageCode),
         };
       });

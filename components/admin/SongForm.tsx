@@ -139,14 +139,11 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-    if (!title.trim()) newErrors.title = "English title is required";
-
-    const enTrans = translations.find((t) => t.languageCode === "en");
-    if (!enTrans?.title.trim()) {
-      newErrors["en-title"] = "English title is required";
-    }
-    if (!enTrans?.lyrics.trim()) {
-      newErrors["en-lyrics"] = "English lyrics are required";
+    const hasAnyTranslation = translations.some(
+      (t) => t.title.trim() && t.lyrics.trim()
+    );
+    if (!hasAnyTranslation) {
+      newErrors.translations = "At least one translation with title and lyrics is required";
     }
 
     setErrors(newErrors);
@@ -159,15 +156,26 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
 
     setSaving(true);
     try {
-      const slug = slugify(title, { lower: true, strict: true });
       const normalizedCategory = category.trim();
       const nonEmptyTranslations = translations.filter(
         (t) => t.title.trim() && t.lyrics.trim()
       );
 
+      if (nonEmptyTranslations.length === 0) {
+        toast.error("Add at least one translation with title and lyrics");
+        return;
+      }
+
+      const primaryTitle = title.trim() || nonEmptyTranslations[0].title.trim();
+      const slug = slugify(primaryTitle, { lower: true, strict: true });
+      const derivedDefaultLang =
+        nonEmptyTranslations.find((t) => t.languageCode === "en")?.languageCode ??
+        nonEmptyTranslations[0].languageCode;
+
       const payload = {
-        title,
+        title: primaryTitle,
         slug,
+        defaultLang: derivedDefaultLang,
         category:
           normalizedCategory.length > 0
             ? normalizedCategory
@@ -223,17 +231,15 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
 
         <div>
           <Label htmlFor="title">
-            English Title <span className="text-destructive">*</span>
+            Song Title (optional)
           </Label>
           <Input
             id="title"
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
-              // Auto-sync English translation title
-              updateTranslation("en", "title", e.target.value);
             }}
-            placeholder="Enter song title"
+            placeholder="Used for URL slug if provided; otherwise first translation title is used"
             className="mt-1"
           />
           {errors.title && (
@@ -334,19 +340,15 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
                   : undefined
               }
               isEnglish={trans.languageCode === "en"}
-              errors={{
-                title:
-                  trans.languageCode === "en"
-                    ? errors["en-title"]
-                    : undefined,
-                lyrics:
-                  trans.languageCode === "en"
-                    ? errors["en-lyrics"]
-                    : undefined,
-              }}
+              defaultCollapsed={mode === "edit"}
+              errors={{}}
             />
           );
         })}
+
+        {errors.translations && (
+          <p className="text-sm text-destructive">{errors.translations}</p>
+        )}
       </div>
 
       {/* Submit */}

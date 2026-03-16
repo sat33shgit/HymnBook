@@ -27,8 +27,12 @@ export async function generateMetadata({
   const englishTranslation = song.translations.find(
     (t) => t.languageCode === "en"
   );
-  const title = englishTranslation?.title ?? "Song";
-  const lyricsPreview = truncate(englishTranslation?.lyrics ?? "", 100);
+  const defaultTranslation = song.translations.find(
+    (t) => t.languageCode === (song.defaultLang ?? "en")
+  );
+  const preferredTranslation = englishTranslation ?? defaultTranslation ?? song.translations[0];
+  const title = preferredTranslation?.title ?? "Song";
+  const lyricsPreview = truncate(preferredTranslation?.lyrics ?? "", 100);
 
   return {
     title,
@@ -69,7 +73,14 @@ export default async function SongDetailPage({
   const englishTranslation = song.translations.find(
     (t) => t.languageCode === "en"
   );
-  const title = englishTranslation?.title ?? "Untitled";
+  const defaultTranslation = song.translations.find(
+    (t) => t.languageCode === (song.defaultLang ?? "en")
+  );
+  const title =
+    englishTranslation?.title ??
+    defaultTranslation?.title ??
+    song.translations[0]?.title ??
+    "Untitled";
 
   // Only show languages that have translations for this song
   const availableLanguageCodes = new Set(

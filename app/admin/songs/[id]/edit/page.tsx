@@ -22,6 +22,10 @@ export default async function EditSongPage({
 
   const englishTitle =
     song.translations.find((t) => t.languageCode === "en")?.title ?? "";
+  const defaultTitle =
+    song.translations.find((t) => t.languageCode === (song.defaultLang ?? "en"))
+      ?.title ?? "";
+  const formTitle = englishTitle || defaultTitle || song.translations[0]?.title || "";
 
   return (
     <div>
@@ -35,7 +39,7 @@ export default async function EditSongPage({
         mode="edit"
         initialData={{
           id: song.id,
-          title: englishTitle,
+          title: formTitle,
           slug: song.slug,
           category: song.category ?? "",
           isPublished: song.isPublished ?? true,

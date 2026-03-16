@@ -9,31 +9,23 @@ export const translationSchema = z.object({
 
 export const createSongSchema = z.object({
   title: z.string().min(1, "English title is required"),
+  defaultLang: z.string().min(2).max(10).optional(),
   category: z.string().optional(),
   isPublished: z.boolean().optional().default(true),
   translations: z
     .array(translationSchema)
-    .min(1, "At least one translation (English) is required")
-    .refine(
-      (translations) =>
-        translations.some((t) => t.languageCode === "en"),
-      "English translation is required"
-    ),
+    .min(1, "At least one translation is required"),
 });
 
 export const updateSongSchema = z.object({
   title: z.string().min(1, "English title is required").optional(),
   slug: z.string().optional(),
+  defaultLang: z.string().min(2).max(10).optional(),
   category: z.string().nullable().optional(),
   isPublished: z.boolean().optional(),
   translations: z
     .array(translationSchema)
     .min(1)
-    .refine(
-      (translations) =>
-        translations.some((t) => t.languageCode === "en"),
-      "English translation is required"
-    )
     .optional(),
 });
 

@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, EyeOff, Trash2 } from "lucide-react";
 import { LyricsText } from "@/components/lyrics/LyricsText";
 
 interface TranslationEditorProps {
@@ -20,6 +20,7 @@ interface TranslationEditorProps {
   onRemove?: () => void;
   errors?: { title?: string; lyrics?: string };
   isEnglish?: boolean;
+  defaultCollapsed?: boolean;
 }
 
 export function TranslationEditor({
@@ -34,8 +35,10 @@ export function TranslationEditor({
   onRemove,
   errors,
   isEnglish = false,
+  defaultCollapsed = false,
 }: TranslationEditorProps) {
   const [preview, setPreview] = useState(false);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Count lines
@@ -44,7 +47,20 @@ export function TranslationEditor({
   return (
     <div className="space-y-4 rounded-lg border p-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-medium">{languageName}</h3>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 font-medium"
+          onClick={() => setCollapsed((prev) => !prev)}
+          aria-expanded={!collapsed}
+          aria-controls={`translation-body-${languageCode}`}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          )}
+          {languageName}
+        </button>
         <div className="flex items-center gap-2">
           <Button
             type="button"
@@ -52,6 +68,7 @@ export function TranslationEditor({
             size="sm"
             onClick={() => setPreview(!preview)}
             className="gap-1"
+            disabled={collapsed}
           >
             {preview ? (
               <>
@@ -78,7 +95,10 @@ export function TranslationEditor({
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div
+        id={`translation-body-${languageCode}`}
+        className={collapsed ? "hidden" : "space-y-3"}
+      >
         <div>
           <Label htmlFor={`title-${languageCode}`}>
             Title {isEnglish && <span className="text-destructive">*</span>}

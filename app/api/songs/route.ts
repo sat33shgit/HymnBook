@@ -47,11 +47,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title, category, isPublished, translations } = parsed.data;
+    const { title, defaultLang, category, isPublished, translations } = parsed.data;
     const slug = slugify(title, { lower: true, strict: true });
 
     const song = await createSong({
       slug,
+      defaultLang,
       category: category ?? undefined,
       isPublished,
       translations,
