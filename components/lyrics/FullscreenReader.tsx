@@ -1,16 +1,15 @@
 "use client";
 
-import { X, Minus, Plus } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { LanguageTabs } from "./LanguageTabs";
 import { LyricsText } from "./LyricsText";
 import type { FontSize, SongTranslation } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useRef, useCallback } from "react";
 import { useTheme } from "next-themes";
 
-const SIZES: FontSize[] = ["S", "M", "L", "XL"];
 
 interface FullscreenReaderProps {
   isOpen: boolean;
@@ -22,6 +21,7 @@ interface FullscreenReaderProps {
   title: string;
   showEnglishTranslation: boolean;
   onToggleEnglishTranslation: (value: boolean) => void;
+  fontSize: FontSize;
 }
 
 export function FullscreenReader({
@@ -34,14 +34,9 @@ export function FullscreenReader({
   title,
   showEnglishTranslation,
   onToggleEnglishTranslation,
+  fontSize,
 }: FullscreenReaderProps) {
   const { resolvedTheme } = useTheme();
-  const [fontSize, setFontSize] = useState<FontSize>(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("hymnbook_fs_fontsize") as FontSize) || "M";
-    }
-    return "M";
-  });
   const startXRef = useRef(0);
 
   const activeTranslation = translations.find(
@@ -52,20 +47,7 @@ export function FullscreenReader({
     activeLanguage !== "en" && englishMeaning.length > 0;
   const showEnglishInPlace = canShowEnglishTranslation && showEnglishTranslation;
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("hymnbook_fs_fontsize", fontSize);
-    }
-  }, [fontSize]);
-
-  const cycleFontSize = useCallback((direction: "up" | "down") => {
-    setFontSize((prev) => {
-      const idx = SIZES.indexOf(prev);
-      if (direction === "up" && idx < SIZES.length - 1) return SIZES[idx + 1];
-      if (direction === "down" && idx > 0) return SIZES[idx - 1];
-      return prev;
-    });
-  }, []);
+  // Fullscreen uses the `fontSize` passed from normal mode; no local size controls.
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     startXRef.current = e.touches[0].clientX;
@@ -114,30 +96,8 @@ export function FullscreenReader({
       >
         {/* Top controls */}
         <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: isDark ? "#333" : "#e5e5e5" }}>
-          <div className="flex items-center gap-1">
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => cycleFontSize("down")}
-                aria-label="Decrease font size"
-                className={topControlButtonClass}
-                style={{ color: isDark ? "#fff" : "#000" }}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <span className="w-8 text-center text-sm font-medium">{fontSize}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => cycleFontSize("up")}
-                aria-label="Increase font size"
-                className={topControlButtonClass}
-                style={{ color: isDark ? "#fff" : "#000" }}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-medium">{title}</h2>
           </div>
           <Button
             variant="ghost"

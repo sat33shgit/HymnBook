@@ -38,7 +38,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+      <body
+        className={`${inter.variable} ${playfair.variable} font-sans antialiased`}
+        suppressHydrationWarning
+      >
         <Providers>
           {children}
           <Toaster richColors position="bottom-right" />

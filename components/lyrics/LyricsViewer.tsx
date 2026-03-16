@@ -261,6 +261,7 @@ export function LyricsViewer({
         title={currentTitle}
         showEnglishTranslation={showEnglishTranslation}
         onToggleEnglishTranslation={setShowEnglishTranslation}
+        fontSize={fontSize}
       />
 
       {/* Share dialog (fallback) */}
