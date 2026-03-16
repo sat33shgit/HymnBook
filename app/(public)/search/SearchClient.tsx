@@ -101,7 +101,7 @@ function SearchContent({
         <h1 className="mb-6 font-heading text-3xl font-bold">Search Songs</h1>
         <SearchBar value={query} onChange={handleQueryChange} autoFocus />
         <div className="mt-3 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-          Total songs: {totalSongs}
+          Total Songs: {totalSongs}
         </div>
 
         {(loading || searched) && (

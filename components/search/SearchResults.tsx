@@ -56,7 +56,7 @@ export function SearchResults({ results, query }: SearchResultsProps) {
             transition={{ delay: i * 0.03, duration: 0.2 }}
           >
             <Link href={`/songs/${result.slug}?lang=${result.matched_language}`}>
-              <Card className="transition-shadow hover:shadow-md">
+              <Card className="bg-muted/30 transition-colors transition-shadow hover:bg-muted/40 hover:shadow-md">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-heading text-base font-semibold">

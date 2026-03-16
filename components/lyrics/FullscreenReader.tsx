@@ -49,6 +49,7 @@ export function FullscreenReader({
   const englishMeaning = activeTranslation?.englishMeaning?.trim() ?? "";
   const canShowEnglishTranslation =
     activeLanguage !== "en" && englishMeaning.length > 0;
+  const showEnglishInPlace = canShowEnglishTranslation && showEnglishTranslation;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -165,9 +166,9 @@ export function FullscreenReader({
               <Switch
                 checked={showEnglishTranslation}
                 onCheckedChange={onToggleEnglishTranslation}
-                aria-label="Show English meaning"
+                aria-label="Show English Text"
               />
-              <span className="text-sm opacity-80">Show English meaning</span>
+              <span className="text-sm opacity-80">Show English Text</span>
             </div>
           )}
         </div>
@@ -186,31 +187,17 @@ export function FullscreenReader({
               aria-labelledby={`lang-tab-${activeLanguage}`}
             >
               {activeTranslation ? (
-                <div className="space-y-6">
-                  <LyricsText
-                    lyrics={activeTranslation.lyrics}
-                    fontSize={fontSize}
-                    languageCode={activeLanguage}
-                  />
-
-                  {showEnglishTranslation && englishMeaning && (
-                    <div
-                      className="rounded-lg border p-4"
-                      style={{
-                        borderColor: isDark ? "#333" : "#e5e5e5",
-                        backgroundColor: isDark ? "#111" : "#fafafa",
-                      }}
-                    >
-                      <p className="mb-2 text-xs font-medium uppercase tracking-wide opacity-70">
+                  <div className="space-y-3">
+                    {showEnglishInPlace && (
+                      <p className="text-xs font-medium uppercase tracking-wide opacity-70">
                         Text In English
                       </p>
-                      <LyricsText
-                        lyrics={englishMeaning}
-                        fontSize={fontSize}
-                        languageCode="en"
-                      />
-                    </div>
-                  )}
+                    )}
+                  <LyricsText
+                      lyrics={showEnglishInPlace ? englishMeaning : activeTranslation.lyrics}
+                    fontSize={fontSize}
+                      languageCode={showEnglishInPlace ? "en" : activeLanguage}
+                  />
                 </div>
               ) : (
                 <p className="text-center opacity-50">

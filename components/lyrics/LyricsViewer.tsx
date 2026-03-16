@@ -53,6 +53,7 @@ export function LyricsViewer({
   const englishMeaning = activeTranslation?.englishMeaning?.trim() ?? "";
   const canShowEnglishTranslation =
     activeLanguage !== "en" && englishMeaning.length > 0;
+  const showEnglishInPlace = canShowEnglishTranslation && showEnglishTranslation;
 
   const currentTitle = activeTranslation?.title ?? translations[0]?.title ?? "";
 
@@ -143,9 +144,9 @@ export function LyricsViewer({
           <Switch
             checked={showEnglishTranslation}
             onCheckedChange={setShowEnglishTranslation}
-            aria-label="Show English meaning"
+            aria-label="Show English Text"
           />
-          <span className="text-sm text-foreground">Show English meaning</span>
+          <span className="text-sm text-foreground">Show English Text</span>
         </div>
       )}
 
@@ -163,25 +164,17 @@ export function LyricsViewer({
             aria-labelledby={`lang-tab-${activeLanguage}`}
           >
             {activeTranslation ? (
-              <div className="space-y-6">
-                <LyricsText
-                  lyrics={activeTranslation.lyrics}
-                  fontSize={fontSize}
-                  languageCode={activeLanguage}
-                />
-
-                {showEnglishTranslation && englishMeaning && (
-                  <div className="rounded-lg border bg-muted/20 p-4">
-                    <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                      Text In English
-                    </p>
-                    <LyricsText
-                      lyrics={englishMeaning}
-                      fontSize={fontSize}
-                      languageCode="en"
-                    />
-                  </div>
+              <div className="space-y-3">
+                {showEnglishInPlace && (
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Text In English
+                  </p>
                 )}
+                <LyricsText
+                  lyrics={showEnglishInPlace ? englishMeaning : activeTranslation.lyrics}
+                  fontSize={fontSize}
+                  languageCode={showEnglishInPlace ? "en" : activeLanguage}
+                />
               </div>
             ) : (
               <p className="py-12 text-center text-muted-foreground">
