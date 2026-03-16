@@ -20,6 +20,7 @@ const LANG_NAMES: Record<string, string> = {
   hi: "Hindi",
   ta: "Tamil",
   ml: "Malayalam",
+  kn: "Kannada",
 };
 
 interface SearchResultsProps {

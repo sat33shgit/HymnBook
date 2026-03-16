@@ -16,6 +16,7 @@ async function seed() {
     { code: "hi", name: "Hindi", nativeName: "हिन्दी", sortOrder: 2 },
     { code: "ta", name: "Tamil", nativeName: "தமிழ்", sortOrder: 3 },
     { code: "ml", name: "Malayalam", nativeName: "മലയാളം", sortOrder: 4 },
+    { code: "kn", name: "Kannada", nativeName: "ಕನ್ನಡ", sortOrder: 5 },
   ];
 
   for (const lang of langs) {
@@ -72,6 +73,7 @@ Than when we first begun.`,
 కృపే నా భయాలను తొలగించింది.
 ఆ కృప ఎంత అమూల్యంగా కనిపించింది
 నేను మొదట నమ్మిన ఆ గంట.`,
+          englishMeaning: `God's amazing grace is so sweet that it saved a sinner like me. I was once lost, but now I have been found. I was blind, but now I can see. It was grace that taught my heart reverence and removed my fears. That grace became precious to me from the very moment I first believed.`,
         },
       ],
     },
@@ -114,6 +116,7 @@ How great Thou art! How great Thou art!`,
 ఎంత గొప్పవాడవు! ఎంత గొప్పవాడవు!
 అప్పుడు నా ఆత్మ పాడుతుంది, నా రక్షకుడైన దేవా, నీకు:
 ఎంత గొప్పవాడవు! ఎంత గొప్పవాడవు!`,
+          englishMeaning: `When I think about the worlds God created and see the stars, thunder, and all creation, my soul responds in worship. The song declares that God's greatness is seen throughout the universe, and the heart cannot help but sing that He is truly great.`,
         },
       ],
     },
@@ -188,6 +191,7 @@ Great is Thy faithfulness, Lord, unto me!`,
 प्रात: प्रात: नई दया मैं देखता हूँ;
 जो कुछ मुझे चाहिए था तेरे हाथ ने प्रदान किया।
 महान है तेरी विश्वासयोग्यता, प्रभु, मेरे लिए!`,
+          englishMeaning: `This song praises God for His unchanging nature and constant faithfulness. His mercy never fails, and every morning brings new compassion. Everything needed in life comes from His hand, so the singer joyfully declares that the Lord has been faithful in every season.`,
         },
       ],
     },
@@ -243,6 +247,7 @@ Take it to the Lord in prayer.`,
             languageCode: trans.languageCode,
             title: trans.title,
             lyrics: trans.lyrics,
+            englishMeaning: trans.englishMeaning ?? null,
           })
           .onConflictDoNothing();
       }

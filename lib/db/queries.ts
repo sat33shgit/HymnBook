@@ -314,7 +314,12 @@ export async function createSong(data: {
   category?: string;
   defaultLang?: string;
   isPublished?: boolean;
-  translations: { languageCode: string; title: string; lyrics: string }[];
+  translations: {
+    languageCode: string;
+    title: string;
+    lyrics: string;
+    englishMeaning?: string;
+  }[];
 }) {
   const [song] = await db
     .insert(songs)
@@ -333,6 +338,7 @@ export async function createSong(data: {
         languageCode: t.languageCode,
         title: t.title,
         lyrics: t.lyrics,
+        englishMeaning: t.englishMeaning?.trim() ? t.englishMeaning : null,
       }))
     );
   }
@@ -352,7 +358,12 @@ export async function updateSong(
     category?: string | null;
     defaultLang?: string;
     isPublished?: boolean;
-    translations?: { languageCode: string; title: string; lyrics: string }[];
+    translations?: {
+      languageCode: string;
+      title: string;
+      lyrics: string;
+      englishMeaning?: string;
+    }[];
   }
 ) {
   const updateFields: Record<string, unknown> = { updatedAt: new Date() };
@@ -376,6 +387,7 @@ export async function updateSong(
           languageCode: t.languageCode,
           title: t.title,
           lyrics: t.lyrics,
+          englishMeaning: t.englishMeaning?.trim() ? t.englishMeaning : null,
         }))
       );
     }

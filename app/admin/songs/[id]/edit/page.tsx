@@ -43,6 +43,7 @@ export default async function EditSongPage({
             languageCode: t.languageCode,
             title: t.title,
             lyrics: t.lyrics,
+            englishMeaning: t.englishMeaning ?? "",
           })),
         }}
       />

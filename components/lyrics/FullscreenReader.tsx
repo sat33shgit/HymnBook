@@ -2,6 +2,7 @@
 
 import { X, Sun, Moon, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { LanguageTabs } from "./LanguageTabs";
 import { LyricsText } from "./LyricsText";
 import type { FontSize, SongTranslation } from "@/types";
@@ -18,6 +19,8 @@ interface FullscreenReaderProps {
   activeLanguage: string;
   onLanguageChange: (code: string) => void;
   title: string;
+  showEnglishTranslation: boolean;
+  onToggleEnglishTranslation: (value: boolean) => void;
 }
 
 export function FullscreenReader({
@@ -28,6 +31,8 @@ export function FullscreenReader({
   activeLanguage,
   onLanguageChange,
   title,
+  showEnglishTranslation,
+  onToggleEnglishTranslation,
 }: FullscreenReaderProps) {
   const [bgMode, setBgMode] = useState<"white" | "black">("white");
   const [fontSize, setFontSize] = useState<FontSize>(() => {
@@ -41,6 +46,9 @@ export function FullscreenReader({
   const activeTranslation = translations.find(
     (t) => t.languageCode === activeLanguage
   );
+  const englishMeaning = activeTranslation?.englishMeaning?.trim() ?? "";
+  const canShowEnglishTranslation =
+    activeLanguage !== "en" && englishMeaning.length > 0;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -151,6 +159,17 @@ export function FullscreenReader({
             activeLanguage={activeLanguage}
             onSelect={onLanguageChange}
           />
+
+          {canShowEnglishTranslation && (
+            <div className="mt-3 flex items-center gap-3">
+              <Switch
+                checked={showEnglishTranslation}
+                onCheckedChange={onToggleEnglishTranslation}
+                aria-label="Show English meaning"
+              />
+              <span className="text-sm opacity-80">Show English meaning</span>
+            </div>
+          )}
         </div>
 
         {/* Lyrics */}
@@ -167,11 +186,32 @@ export function FullscreenReader({
               aria-labelledby={`lang-tab-${activeLanguage}`}
             >
               {activeTranslation ? (
-                <LyricsText
-                  lyrics={activeTranslation.lyrics}
-                  fontSize={fontSize}
-                  languageCode={activeLanguage}
-                />
+                <div className="space-y-6">
+                  <LyricsText
+                    lyrics={activeTranslation.lyrics}
+                    fontSize={fontSize}
+                    languageCode={activeLanguage}
+                  />
+
+                  {showEnglishTranslation && englishMeaning && (
+                    <div
+                      className="rounded-lg border p-4"
+                      style={{
+                        borderColor: isDark ? "#333" : "#e5e5e5",
+                        backgroundColor: isDark ? "#111" : "#fafafa",
+                      }}
+                    >
+                      <p className="mb-2 text-xs font-medium uppercase tracking-wide opacity-70">
+                        Text In English
+                      </p>
+                      <LyricsText
+                        lyrics={englishMeaning}
+                        fontSize={fontSize}
+                        languageCode="en"
+                      />
+                    </div>
+                  )}
+                </div>
               ) : (
                 <p className="text-center opacity-50">
                   No lyrics available for this language.

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSongById, updateSong, deleteSong } from "@/lib/db/queries";
 import { updateSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { CACHE_TAGS, songIdTag, songSlugTag } from "@/lib/cache";
 
 const headers = { "X-API-Version": "1" };
@@ -82,6 +82,9 @@ export async function PUT(
     if (song?.slug) {
       revalidateTag(songSlugTag(song.slug), "max");
     }
+    revalidatePath("/admin");
+    revalidatePath("/admin/songs");
+    revalidatePath(`/admin/songs/${songId}/edit`);
 
     return NextResponse.json(song, { headers });
   } catch (error) {
@@ -127,6 +130,9 @@ export async function DELETE(
     if (existingSong?.slug) {
       revalidateTag(songSlugTag(existingSong.slug), "max");
     }
+    revalidatePath("/admin");
+    revalidatePath("/admin/songs");
+    revalidatePath(`/admin/songs/${songId}/edit`);
 
     return NextResponse.json({ success: true }, { headers });
   } catch (error) {

@@ -15,6 +15,7 @@ interface Translation {
   languageCode: string;
   title: string;
   lyrics: string;
+  englishMeaning?: string;
 }
 
 interface SongFormProps {
@@ -41,7 +42,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
   );
   const [translations, setTranslations] = useState<Translation[]>(
     initialData?.translations ?? [
-      { languageCode: "en", title: "", lyrics: "" },
+      { languageCode: "en", title: "", lyrics: "", englishMeaning: "" },
     ]
   );
   const [saving, setSaving] = useState(false);
@@ -107,7 +108,11 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
   }, [mode]);
 
   const updateTranslation = useCallback(
-    (langCode: string, field: "title" | "lyrics", value: string) => {
+    (
+      langCode: string,
+      field: "title" | "lyrics" | "englishMeaning",
+      value: string
+    ) => {
       setTranslations((prev) =>
         prev.map((t) =>
           t.languageCode === langCode ? { ...t, [field]: value } : t
@@ -122,7 +127,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
       if (translations.some((t) => t.languageCode === langCode)) return;
       setTranslations((prev) => [
         ...prev,
-        { languageCode: langCode, title: "", lyrics: "" },
+        { languageCode: langCode, title: "", lyrics: "", englishMeaning: "" },
       ]);
     },
     [translations]
@@ -155,6 +160,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
     setSaving(true);
     try {
       const slug = slugify(title, { lower: true, strict: true });
+      const normalizedCategory = category.trim();
       const nonEmptyTranslations = translations.filter(
         (t) => t.title.trim() && t.lyrics.trim()
       );
@@ -162,7 +168,12 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
       const payload = {
         title,
         slug,
-        category: category || undefined,
+        category:
+          normalizedCategory.length > 0
+            ? normalizedCategory
+            : mode === "edit"
+              ? null
+              : undefined,
         isPublished,
         translations: nonEmptyTranslations,
       };
@@ -187,7 +198,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
 
       localStorage.removeItem(AUTOSAVE_KEY);
       toast.success(mode === "create" ? "Song created!" : "Song updated!");
-      router.push("/admin/songs");
+      router.replace("/admin/songs");
       router.refresh();
     } catch {
       toast.error("Failed to save song");
@@ -287,6 +298,8 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
                   size="sm"
                   onClick={() => addTranslation(lang.code)}
                   className="gap-1"
+                  aria-label={`Add ${lang.name} translation`}
+                  title={lang.name}
                 >
                   <Plus className="h-3 w-3" />
                   {lang.nativeName}
@@ -305,11 +318,15 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
               languageName={lang?.nativeName ?? trans.languageCode}
               title={trans.title}
               lyrics={trans.lyrics}
+              englishMeaning={trans.englishMeaning ?? ""}
               onTitleChange={(v) =>
                 updateTranslation(trans.languageCode, "title", v)
               }
               onLyricsChange={(v) =>
                 updateTranslation(trans.languageCode, "lyrics", v)
+              }
+              onEnglishMeaningChange={(v) =>
+                updateTranslation(trans.languageCode, "englishMeaning", v)
               }
               onRemove={
                 trans.languageCode !== "en"

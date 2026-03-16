@@ -13,8 +13,10 @@ interface TranslationEditorProps {
   languageName: string;
   title: string;
   lyrics: string;
+  englishMeaning: string;
   onTitleChange: (title: string) => void;
   onLyricsChange: (lyrics: string) => void;
+  onEnglishMeaningChange: (meaning: string) => void;
   onRemove?: () => void;
   errors?: { title?: string; lyrics?: string };
   isEnglish?: boolean;
@@ -25,8 +27,10 @@ export function TranslationEditor({
   languageName,
   title,
   lyrics,
+  englishMeaning,
   onTitleChange,
   onLyricsChange,
+  onEnglishMeaningChange,
   onRemove,
   errors,
   isEnglish = false,
@@ -124,6 +128,23 @@ export function TranslationEditor({
             <p className="mt-1 text-sm text-destructive">{errors.lyrics}</p>
           )}
         </div>
+
+        {!isEnglish && (
+          <div>
+            <Label htmlFor={`meaning-${languageCode}`}>Meaning In English</Label>
+            <Textarea
+              id={`meaning-${languageCode}`}
+              value={englishMeaning}
+              onChange={(e) => onEnglishMeaningChange(e.target.value)}
+              placeholder={`Explain the meaning of the ${languageName} lyrics in English...`}
+              className="mt-1 min-h-[140px] text-sm"
+              rows={7}
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              This is not the separate English song. Add the equivalent English meaning for readers who cannot read {languageName}.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

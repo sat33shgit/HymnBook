@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   description:
     "Browse and read Christian song lyrics in multiple languages including English, Telugu, Hindi, Tamil and Malayalam.",
   keywords: ["christian songs", "hymns", "lyrics", "worship", "praise"],
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

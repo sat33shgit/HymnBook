@@ -3,7 +3,7 @@ import { getSongs, createSong } from "@/lib/db/queries";
 import { createSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
 import slugify from "slugify";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { CACHE_TAGS, songIdTag, songSlugTag } from "@/lib/cache";
 
 const headers = { "X-API-Version": "1" };
@@ -68,6 +68,8 @@ export async function POST(request: NextRequest) {
     if (song?.slug) {
       revalidateTag(songSlugTag(song.slug), "max");
     }
+    revalidatePath("/admin");
+    revalidatePath("/admin/songs");
 
     return NextResponse.json(song, { status: 201, headers });
   } catch (error) {

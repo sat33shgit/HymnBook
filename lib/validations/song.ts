@@ -4,6 +4,7 @@ export const translationSchema = z.object({
   languageCode: z.string().min(2).max(10),
   title: z.string().min(1, "Title is required"),
   lyrics: z.string().min(1, "Lyrics are required"),
+  englishMeaning: z.string().optional(),
 });
 
 export const createSongSchema = z.object({

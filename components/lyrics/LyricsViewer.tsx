@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Heart, Share2, Maximize2, Copy, Mail } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -42,12 +43,16 @@ export function LyricsViewer({
   const [fontSize, setFontSize] = useState<FontSize>("M");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [showEnglishTranslation, setShowEnglishTranslation] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorited = isFavorite(songId);
 
   const activeTranslation = translations.find(
     (t) => t.languageCode === activeLanguage
   );
+  const englishMeaning = activeTranslation?.englishMeaning?.trim() ?? "";
+  const canShowEnglishTranslation =
+    activeLanguage !== "en" && englishMeaning.length > 0;
 
   const currentTitle = activeTranslation?.title ?? translations[0]?.title ?? "";
 
@@ -72,6 +77,13 @@ export function LyricsViewer({
     url.searchParams.set("lang", activeLanguage);
     window.history.replaceState({}, "", url.toString());
   }, [activeLanguage]);
+
+  const handleLanguageChange = useCallback((code: string) => {
+    setActiveLanguage(code);
+    if (code === "en") {
+      setShowEnglishTranslation(false);
+    }
+  }, []);
 
   const shareUrl =
     typeof window !== "undefined"
@@ -106,7 +118,7 @@ export function LyricsViewer({
       <LanguageTabs
         languages={languages}
         activeLanguage={activeLanguage}
-        onSelect={setActiveLanguage}
+        onSelect={handleLanguageChange}
       />
 
       {/* Font size controls */}
@@ -126,6 +138,17 @@ export function LyricsViewer({
         ))}
       </div>
 
+      {canShowEnglishTranslation && (
+        <div className="mt-4 flex items-center gap-3 rounded-md border bg-muted/20 px-3 py-2">
+          <Switch
+            checked={showEnglishTranslation}
+            onCheckedChange={setShowEnglishTranslation}
+            aria-label="Show English meaning"
+          />
+          <span className="text-sm text-foreground">Show English meaning</span>
+        </div>
+      )}
+
       {/* Lyrics content */}
       <div className="mt-6">
         <AnimatePresence mode="wait">
@@ -140,11 +163,26 @@ export function LyricsViewer({
             aria-labelledby={`lang-tab-${activeLanguage}`}
           >
             {activeTranslation ? (
-              <LyricsText
-                lyrics={activeTranslation.lyrics}
-                fontSize={fontSize}
-                languageCode={activeLanguage}
-              />
+              <div className="space-y-6">
+                <LyricsText
+                  lyrics={activeTranslation.lyrics}
+                  fontSize={fontSize}
+                  languageCode={activeLanguage}
+                />
+
+                {showEnglishTranslation && englishMeaning && (
+                  <div className="rounded-lg border bg-muted/20 p-4">
+                    <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Text In English
+                    </p>
+                    <LyricsText
+                      lyrics={englishMeaning}
+                      fontSize={fontSize}
+                      languageCode="en"
+                    />
+                  </div>
+                )}
+              </div>
             ) : (
               <p className="py-12 text-center text-muted-foreground">
                 No lyrics available for this language.
@@ -226,8 +264,10 @@ export function LyricsViewer({
         translations={translations}
         languages={languages}
         activeLanguage={activeLanguage}
-        onLanguageChange={setActiveLanguage}
+        onLanguageChange={handleLanguageChange}
         title={currentTitle}
+        showEnglishTranslation={showEnglishTranslation}
+        onToggleEnglishTranslation={setShowEnglishTranslation}
       />
 
       {/* Share dialog (fallback) */}

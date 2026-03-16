@@ -22,6 +22,7 @@ const LANG_NAMES: Record<string, string> = {
   hi: "हि",
   ta: "த",
   ml: "മ",
+  kn: "ಕ",
 };
 
 interface AdminSongsClientProps {
