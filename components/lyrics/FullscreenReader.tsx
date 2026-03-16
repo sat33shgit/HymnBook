@@ -3,7 +3,6 @@
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { LanguageTabs } from "./LanguageTabs";
 import { LyricsText } from "./LyricsText";
 import type { FontSize, SongTranslation } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,7 +16,6 @@ interface FullscreenReaderProps {
   translations: SongTranslation[];
   languages: { code: string; nativeName: string }[];
   activeLanguage: string;
-  onLanguageChange: (code: string) => void;
   title: string;
   showEnglishTranslation: boolean;
   onToggleEnglishTranslation: (value: boolean) => void;
@@ -28,23 +26,18 @@ export function FullscreenReader({
   isOpen,
   onClose,
   translations,
-  languages,
   activeLanguage,
-  onLanguageChange,
   title,
   showEnglishTranslation,
   onToggleEnglishTranslation,
   fontSize,
 }: FullscreenReaderProps) {
   const { resolvedTheme } = useTheme();
-  const startXRef = useRef(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
-  const activeTranslation = translations.find(
-    (t) => t.languageCode === activeLanguage
-  );
+  const activeTranslation = translations.find((t) => t.languageCode === activeLanguage);
   const englishMeaning = activeTranslation?.englishMeaning?.trim() ?? "";
   const canShowEnglishTranslation =
     activeLanguage !== "en" && englishMeaning.length > 0;
@@ -121,25 +114,7 @@ export function FullscreenReader({
     }
   }, [onClose]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    startXRef.current = e.touches[0].clientX;
-  }, []);
-
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      const endX = e.changedTouches[0].clientX;
-      const diff = startXRef.current - endX;
-      if (Math.abs(diff) > 50) {
-        const currentIdx = languages.findIndex((l) => l.code === activeLanguage);
-        if (diff > 0 && currentIdx < languages.length - 1) {
-          onLanguageChange(languages[currentIdx + 1].code);
-        } else if (diff < 0 && currentIdx > 0) {
-          onLanguageChange(languages[currentIdx - 1].code);
-        }
-      }
-    },
-    [activeLanguage, languages, onLanguageChange]
-  );
+  // Swipe-to-change-language removed for fullscreen mode.
 
   if (!isOpen) return null;
 
@@ -161,8 +136,7 @@ export function FullscreenReader({
           backgroundColor: isDark ? "#000" : "#fff",
           color: isDark ? "#fff" : "#000",
         }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        
         role="dialog"
         aria-modal="true"
         aria-label={`Fullscreen reader: ${title}`}
@@ -184,14 +158,7 @@ export function FullscreenReader({
           </Button>
         </div>
 
-        {/* Language tabs */}
-        <div className="border-b px-4 py-2" style={{ borderColor: isDark ? "#333" : "#e5e5e5" }}>
-          <LanguageTabs
-            languages={languages}
-            activeLanguage={activeLanguage}
-            onSelect={onLanguageChange}
-          />
-
+        <div className="px-4 py-2">
           {canShowEnglishTranslation && (
             <div className="mt-3 flex items-center gap-3">
               <Switch

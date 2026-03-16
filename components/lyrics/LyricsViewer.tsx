@@ -255,9 +255,7 @@ export function LyricsViewer({
         isOpen={isFullscreen}
         onClose={() => setIsFullscreen(false)}
         translations={translations}
-        languages={languages}
         activeLanguage={activeLanguage}
-        onLanguageChange={handleLanguageChange}
         title={currentTitle}
         showEnglishTranslation={showEnglishTranslation}
         onToggleEnglishTranslation={setShowEnglishTranslation}
