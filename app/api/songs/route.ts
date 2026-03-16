@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
     });
 
     revalidateTag(CACHE_TAGS.songs, "max");
+    revalidateTag(CACHE_TAGS.mostViewed, "max");
     revalidateTag(CACHE_TAGS.categories, "max");
     revalidateTag(CACHE_TAGS.slugs, "max");
     revalidateTag(CACHE_TAGS.search, "max");

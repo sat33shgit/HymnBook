@@ -74,6 +74,7 @@ export async function PUT(
     const song = await updateSong(songId, parsed.data);
 
     revalidateTag(CACHE_TAGS.songs, "max");
+    revalidateTag(CACHE_TAGS.mostViewed, "max");
     revalidateTag(CACHE_TAGS.categories, "max");
     revalidateTag(CACHE_TAGS.slugs, "max");
     revalidateTag(CACHE_TAGS.search, "max");
@@ -118,6 +119,7 @@ export async function DELETE(
     await deleteSong(songId);
 
     revalidateTag(CACHE_TAGS.songs, "max");
+    revalidateTag(CACHE_TAGS.mostViewed, "max");
     revalidateTag(CACHE_TAGS.categories, "max");
     revalidateTag(CACHE_TAGS.slugs, "max");
     revalidateTag(CACHE_TAGS.search, "max");

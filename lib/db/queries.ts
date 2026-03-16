@@ -167,6 +167,7 @@ export async function getSongs({
           slug: song.slug,
           category: song.category,
           defaultLang: song.defaultLang,
+          viewCount: song.viewCount,
           isPublished: song.isPublished,
           title: englishTitle,
           languages: songTrans.map((t) => t.languageCode),
@@ -241,6 +242,71 @@ export async function getSongById(id: number) {
       tags: [CACHE_TAGS.songs, songIdTag(id)],
     }
   )();
+}
+
+export async function getMostViewedSongs(limit = 5) {
+  return unstable_cache(
+    async () => {
+      const songRows = await db
+        .select()
+        .from(songs)
+        .where(eq(songs.isPublished, true))
+        .orderBy(desc(songs.viewCount), desc(songs.createdAt))
+        .limit(limit);
+
+      const songIds = songRows.map((s) => s.id);
+      const translations =
+        songIds.length > 0
+          ? await db
+              .select()
+              .from(songTranslations)
+              .where(
+                sql`${songTranslations.songId} = ANY(${sql.raw(
+                  `ARRAY[${songIds.join(",")}]`
+                )})`
+              )
+          : [];
+
+      return songRows.map((song) => {
+        const songTrans = translations.filter((t) => t.songId === song.id);
+        const englishTitle =
+          songTrans.find((t) => t.languageCode === "en")?.title ?? "Untitled";
+
+        return {
+          id: song.id,
+          slug: song.slug,
+          category: song.category,
+          defaultLang: song.defaultLang,
+          viewCount: song.viewCount,
+          isPublished: song.isPublished,
+          title: englishTitle,
+          languages: songTrans.map((t) => t.languageCode),
+        };
+      });
+    },
+    ["getMostViewedSongs", String(limit)],
+    {
+      revalidate: CACHE_TTL.mostViewed,
+      tags: [CACHE_TAGS.mostViewed, CACHE_TAGS.songs],
+    }
+  )();
+}
+
+export async function incrementSongViews(songId: number) {
+  const result = await db
+    .update(songs)
+    .set({
+      viewCount: sql`${songs.viewCount} + 1`,
+      updatedAt: new Date(),
+    })
+    .where(eq(songs.id, songId))
+    .returning({
+      id: songs.id,
+      slug: songs.slug,
+      viewCount: songs.viewCount,
+    });
+
+  return result[0] ?? null;
 }
 
 export async function createSong(data: {

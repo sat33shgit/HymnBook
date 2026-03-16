@@ -13,6 +13,7 @@ export interface Song {
   slug: string;
   category: string | null;
   defaultLang: string;
+  viewCount: number | null;
   isPublished: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -38,6 +39,7 @@ export interface SongListItem {
   slug: string;
   category: string | null;
   defaultLang: string | null;
+  viewCount: number | null;
   isPublished: boolean | null;
   title: string;
   languages: string[];

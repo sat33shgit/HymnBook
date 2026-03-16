@@ -1,30 +1,21 @@
-import { getSongs, getCategories } from "@/lib/db/queries";
+import { getMostViewedSongs } from "@/lib/db/queries";
 import { HomeClient } from "./HomeClient";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  let initialSongs: Awaited<ReturnType<typeof getSongs>>['data'] = [];
-  let initialTotalPages = 0;
-  let categories: string[] = [];
+  let mostViewedSongs: Awaited<ReturnType<typeof getMostViewedSongs>> = [];
 
   try {
-    const [songsResult, cats] = await Promise.all([
-      getSongs({ page: 1, limit: 20 }),
-      getCategories(),
-    ]);
-    initialSongs = songsResult.data;
-    initialTotalPages = songsResult.totalPages;
-    categories = cats;
+    const topViewed = await getMostViewedSongs(6);
+    mostViewedSongs = topViewed;
   } catch {
     // DB not available
   }
 
   return (
     <HomeClient
-      initialSongs={initialSongs}
-      initialTotalPages={initialTotalPages}
-      categories={categories}
+      mostViewedSongs={mostViewedSongs}
     />
   );
 }

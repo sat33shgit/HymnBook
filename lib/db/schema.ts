@@ -39,6 +39,7 @@ export const songs = pgTable(
     defaultLang: varchar("default_lang", { length: 10 })
       .default("en")
       .references(() => languages.code),
+    viewCount: integer("view_count").default(0),
     isPublished: boolean("is_published").default(true),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
@@ -46,6 +47,7 @@ export const songs = pgTable(
   (table) => [
     index("idx_songs_slug").on(table.slug),
     index("idx_songs_category").on(table.category),
+    index("idx_songs_view_count").on(table.viewCount),
   ]
 );
 

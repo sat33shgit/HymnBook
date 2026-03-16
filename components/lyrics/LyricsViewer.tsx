@@ -51,6 +51,21 @@ export function LyricsViewer({
 
   const currentTitle = activeTranslation?.title ?? translations[0]?.title ?? "";
 
+  useEffect(() => {
+    const viewKey = `song-viewed:${songId}`;
+    if (sessionStorage.getItem(viewKey) === "1") return;
+
+    fetch(`/api/songs/${songId}/view`, {
+      method: "POST",
+      cache: "no-store",
+      keepalive: true,
+    }).catch(() => {
+      // Ignore view-tracking failures
+    });
+
+    sessionStorage.setItem(viewKey, "1");
+  }, [songId]);
+
   // Update URL when language changes
   useEffect(() => {
     const url = new URL(window.location.href);
