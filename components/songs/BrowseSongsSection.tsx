@@ -29,7 +29,7 @@ export function BrowseSongsSection({
     try {
       const params = new URLSearchParams();
       params.set("page", "1");
-      params.set("limit", "20");
+      params.set("limit", "15");
       if (category) params.set("category", category);
 
       const res = await fetch(`/api/songs?${params.toString()}`);
@@ -51,7 +51,7 @@ export function BrowseSongsSection({
       const nextPage = page + 1;
       const params = new URLSearchParams();
       params.set("page", nextPage.toString());
-      params.set("limit", "20");
+      params.set("limit", "15");
       if (selectedCategory) params.set("category", selectedCategory);
 
       const res = await fetch(`/api/songs?${params.toString()}`);

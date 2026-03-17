@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const page = parseInt(searchParams.get("page") ?? "1", 10);
-    const limit = Math.min(parseInt(searchParams.get("limit") ?? "20", 10), 100);
+    const limit = Math.min(parseInt(searchParams.get("limit") ?? "15", 10), 100);
     const category = searchParams.get("category") ?? undefined;
 
     const result = await getSongs({ page, limit, category });

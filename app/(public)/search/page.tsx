@@ -16,7 +16,7 @@ export default async function SearchPage() {
 
   try {
     const [songsResult, cats] = await Promise.all([
-      getSongs({ page: 1, limit: 20 }),
+      getSongs({ page: 1, limit: 15 }),
       getCategories(),
     ]);
     initialSongs = songsResult.data;

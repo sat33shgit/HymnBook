@@ -7,7 +7,7 @@ export default async function HomePage() {
   let mostViewedSongs: Awaited<ReturnType<typeof getMostViewedSongs>> = [];
 
   try {
-    const topViewed = await getMostViewedSongs(20);
+    const topViewed = await getMostViewedSongs(15);
     mostViewedSongs = topViewed;
   } catch {
     // DB not available
