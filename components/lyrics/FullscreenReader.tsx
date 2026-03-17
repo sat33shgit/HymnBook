@@ -2,7 +2,6 @@
 
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { LyricsText } from "./LyricsText";
 import type { FontSize, SongTranslation } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,9 +14,7 @@ interface FullscreenReaderProps {
   onClose: () => void;
   translations: SongTranslation[];
   activeLanguage: string;
-  title: string;
   showEnglishTranslation: boolean;
-  onToggleEnglishTranslation: (value: boolean) => void;
   fontSize: FontSize;
 }
 
@@ -26,9 +23,7 @@ export function FullscreenReader({
   onClose,
   translations,
   activeLanguage,
-  title,
   showEnglishTranslation,
-  onToggleEnglishTranslation,
   fontSize,
 }: FullscreenReaderProps) {
   const { resolvedTheme } = useTheme();
@@ -138,40 +133,27 @@ export function FullscreenReader({
         
         role="dialog"
         aria-modal="true"
-        aria-label={`Fullscreen reader: ${title}`}
+        aria-label={`Fullscreen reader`}
       >
-        {/* Top controls */}
-        <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: isDark ? "#333" : "#e5e5e5" }}>
-          <div className="flex items-center gap-2">
-            <h2 className="text-sm font-medium">{title}</h2>
+        {/* Compact overlay close button (no top bar) */}
+        <div className="pointer-events-none">
+          <div className="absolute top-3 right-3 z-20 pointer-events-auto">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleClose}
+              aria-label="Exit fullscreen"
+              className={`${topControlButtonClass} rounded-full p-1 shadow-sm ${isDark ? "bg-black/60" : "bg-white/90"}`}
+              style={{ color: isDark ? "#fff" : "#000" }}
+            >
+              <X className="h-5 w-5" />
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleClose}
-            aria-label="Exit fullscreen"
-            className={topControlButtonClass}
-            style={{ color: isDark ? "#fff" : "#000" }}
-          >
-            <X className="h-5 w-5" />
-          </Button>
         </div>
 
-        <div className="px-4 py-2">
-          {canShowEnglishTranslation && (
-            <div className="mt-3 flex items-center gap-3">
-              <Switch
-                checked={showEnglishTranslation}
-                onCheckedChange={onToggleEnglishTranslation}
-                aria-label="Show English Text"
-              />
-              <span className="text-sm opacity-80">Show English Text</span>
-            </div>
-          )}
-        </div>
 
         {/* Lyrics */}
-        <div className="flex-1 overflow-y-auto px-6 py-6">
+        <div className="flex-1 overflow-y-auto px-6 pt-0 pb-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeLanguage}

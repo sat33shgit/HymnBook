@@ -72,6 +72,17 @@ export function LyricsViewer({
     sessionStorage.setItem(viewKey, "1");
   }, [songId]);
 
+  // Ensure the page is scrolled to the top when a song page mounts
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        window.scrollTo({ top: 0, left: 0 });
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
+
   // Update URL when language changes
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -256,9 +267,7 @@ export function LyricsViewer({
         onClose={() => setIsFullscreen(false)}
         translations={translations}
         activeLanguage={activeLanguage}
-        title={currentTitle}
         showEnglishTranslation={showEnglishTranslation}
-        onToggleEnglishTranslation={setShowEnglishTranslation}
         fontSize={fontSize}
       />
 
