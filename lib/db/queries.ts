@@ -451,7 +451,11 @@ export async function getAllSlugs() {
 
 // ─── Search ──────────────────────────────────────────────────
 
-export async function searchSongs(query: string, lang?: string) {
+export async function searchSongs(
+  query: string,
+  lang?: string,
+  includeUnpublished = false
+) {
   const sanitized = query.replace(/[^\w\s\u0C00-\u0C7F\u0900-\u097F\u0B80-\u0BFF\u0D00-\u0D7F]/g, " ").trim();
   if (!sanitized) return [];
 
@@ -461,10 +465,15 @@ export async function searchSongs(query: string, lang?: string) {
         ? sql`AND st.language_code = ${lang}`
         : sql``;
 
+      const publishedCondition = includeUnpublished
+        ? sql``
+        : sql`AND s.is_published = true`;
+
       const results = await db.execute(sql`
         SELECT
           s.id as song_id,
           s.slug,
+          s.is_published,
           st.title,
           st.language_code as matched_language,
           s.category,
@@ -473,7 +482,8 @@ export async function searchSongs(query: string, lang?: string) {
           ) as matched_text
         FROM song_translations st
         JOIN songs s ON s.id = st.song_id
-        WHERE s.is_published = true
+        WHERE 1=1
+          ${publishedCondition}
           ${langCondition}
           AND (
             st.search_vector @@ plainto_tsquery('english', ${sanitized})
@@ -488,13 +498,14 @@ export async function searchSongs(query: string, lang?: string) {
       return results.rows as {
         song_id: number;
         slug: string;
+        is_published: boolean;
         title: string;
         matched_language: string;
         matched_text: string;
         category: string | null;
       }[];
     },
-    ["searchSongs", sanitized.toLowerCase(), lang ?? "all"],
+    ["searchSongs", sanitized.toLowerCase(), lang ?? "all", includeUnpublished ? "1" : "0"],
     {
       revalidate: CACHE_TTL.search,
       tags: [CACHE_TAGS.search, CACHE_TAGS.songs],

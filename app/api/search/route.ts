@@ -9,6 +9,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const q = searchParams.get("q") ?? "";
     const lang = searchParams.get("lang") ?? undefined;
+    const includeUnpublishedRaw = searchParams.get("includeUnpublished") ?? "0";
+    const includeUnpublished = includeUnpublishedRaw === "1" || includeUnpublishedRaw === "true";
 
     const parsed = searchSchema.safeParse({ q, lang });
     if (!parsed.success) {
@@ -18,7 +20,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const results = await searchSongs(parsed.data.q, parsed.data.lang);
+    const results = await searchSongs(parsed.data.q, parsed.data.lang, includeUnpublished);
 
     return NextResponse.json({ results }, { headers });
   } catch (error) {

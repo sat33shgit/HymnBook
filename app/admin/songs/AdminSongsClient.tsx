@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,8 +31,85 @@ interface AdminSongsClientProps {
 
 export function AdminSongsClient({ songs: initialSongs }: AdminSongsClientProps) {
   const [songs, setSongs] = useState(initialSongs);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [resultsCount, setResultsCount] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setResultsCount(null);
+    setSongs(initialSongs);
+  };
+
+  const handleSearch = async () => {
+    const q = searchQuery.trim();
+    if (!q) {
+      clearSearch();
+      return;
+    }
+    setSearchLoading(true);
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&includeUnpublished=1`);
+      if (!res.ok) {
+        toast.error("Search failed");
+        return;
+      }
+      const json = await res.json();
+      const results: Array<{
+        song_id: number;
+        slug: string;
+        is_published?: boolean;
+        title: string;
+        matched_language: string;
+        matched_text?: string;
+        category?: string | null;
+      }> = json.results ?? [];
+      setResultsCount(results.length);
+      const mapped = results.map((r) => ({
+        id: r.song_id,
+        slug: r.slug,
+        category: r.category ?? null,
+        defaultLang: r.matched_language,
+        viewCount: null,
+        isPublished: r.is_published ?? null,
+        title: r.title,
+        languages: [r.matched_language],
+      }));
+      setSongs(mapped);
+    } catch (err) {
+      console.error(err);
+      toast.error("Search failed");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Debounce runtime search while typing
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q === "") {
+      // reset to initial list when query cleared
+      setResultsCount(null);
+      setSongs(initialSongs);
+      return;
+    }
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current as ReturnType<typeof setTimeout>);
+    }
+    debounceRef.current = setTimeout(() => {
+      handleSearch();
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current as ReturnType<typeof setTimeout>);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   const handleTogglePublish = async (id: number, isPublished: boolean) => {
     try {
@@ -73,12 +150,36 @@ export function AdminSongsClient({ songs: initialSongs }: AdminSongsClientProps)
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-heading text-3xl font-bold">Songs</h1>
-        <Link href="/admin/songs/new" className={buttonVariants()}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Song
-        </Link>
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="font-heading text-3xl font-bold">Songs</h1>
+          <Link href="/admin/songs/new" className={buttonVariants()}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Song
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSearch();
+            }}
+            placeholder="Search by title or lyrics..."
+            className="w-full max-w-lg rounded-md border px-3 py-2"
+            aria-label="Search songs"
+          />
+          <Button variant="ghost" onClick={clearSearch} disabled={searchLoading}>
+            Clear
+          </Button>
+          {resultsCount !== null && (
+            <div className="ml-4 text-sm text-muted-foreground">
+              {resultsCount} result{resultsCount === 1 ? "" : "s"}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
