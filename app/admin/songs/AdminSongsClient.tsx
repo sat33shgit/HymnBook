@@ -27,9 +27,18 @@ const LANG_NAMES: Record<string, string> = {
 
 interface AdminSongsClientProps {
   songs: SongListItem[];
+  totalSongs: number;
 }
 
-export function AdminSongsClient({ songs: initialSongs }: AdminSongsClientProps) {
+function getSongApiPath(songId: number) {
+  if (!Number.isInteger(songId) || songId <= 0) {
+    throw new Error("Invalid song ID");
+  }
+
+  return `/api/songs/${songId}`;
+}
+
+export function AdminSongsClient({ songs: initialSongs, totalSongs }: AdminSongsClientProps) {
   const [songs, setSongs] = useState(initialSongs);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
@@ -113,7 +122,7 @@ export function AdminSongsClient({ songs: initialSongs }: AdminSongsClientProps)
 
   const handleTogglePublish = async (id: number, isPublished: boolean) => {
     try {
-      const res = await fetch(`/api/songs/${id}`, {
+      const res = await fetch(getSongApiPath(id), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isPublished }),
@@ -133,7 +142,7 @@ export function AdminSongsClient({ songs: initialSongs }: AdminSongsClientProps)
     if (!deleteId) return;
     setDeleting(true);
     try {
-      const res = await fetch(`/api/songs/${deleteId}`, { method: "DELETE" });
+      const res = await fetch(getSongApiPath(deleteId), { method: "DELETE" });
       if (res.ok) {
         setSongs((prev) => prev.filter((s) => s.id !== deleteId));
         toast.success("Song deleted");
@@ -152,7 +161,7 @@ export function AdminSongsClient({ songs: initialSongs }: AdminSongsClientProps)
     <div>
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h1 className="font-heading text-3xl font-bold">Songs</h1>
+          <h1 className="font-heading text-3xl font-bold">Songs ({totalSongs})</h1>
           <Link href="/admin/songs/new" className={buttonVariants()}>
             <Plus className="mr-2 h-4 w-4" />
             Add Song
