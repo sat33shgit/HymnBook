@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SongList } from "@/components/songs/SongList";
 import { SearchBar } from "@/components/search/SearchBar";
+import { resolveVoiceSearchQuery, type VoiceSearchResultCandidate } from "@/lib/voice-search";
 import type { SongListItem } from "@/types";
 import { Music } from "lucide-react";
 
@@ -17,6 +18,12 @@ export function HomeClient({
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
+  const fetchSearchResults = useCallback(async (query: string) => {
+    const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
+    const data = await res.json();
+    return (data.results ?? []) as VoiceSearchResultCandidate[];
+  }, []);
+
   const handleSearch = (q: string) => {
     setSearchQuery(q);
     if (q.trim()) {
@@ -24,17 +31,28 @@ export function HomeClient({
     }
   };
 
+  const handleVoiceResult = useCallback(async (candidates: string[]) => {
+    if (candidates.length === 0) {
+      return;
+    }
+
+    const resolution = await resolveVoiceSearchQuery(candidates, fetchSearchResults);
+    setSearchQuery(resolution.resolvedQuery);
+
+    if (resolution.resolvedQuery.trim()) {
+      const targetUrl = resolution.isUncertain && resolution.suggestion
+        ? `/search?q=${encodeURIComponent(resolution.resolvedQuery.trim())}&suggest=${encodeURIComponent(resolution.suggestion)}`
+        : `/search?q=${encodeURIComponent(resolution.resolvedQuery.trim())}`;
+
+      router.push(targetUrl);
+    }
+  }, [fetchSearchResults, router]);
+
   return (
     <div>
       {/* Hero */}
       <section className="bg-gradient-to-b from-primary/5 to-background px-4 py-8 text-center">
         <div className="mx-auto max-w-2xl">
-          <div className="mb-4 flex items-center justify-center gap-3">
-            <Music className="h-10 w-10 text-primary" />
-            <h1 className="font-heading text-4xl font-bold tracking-tight md:text-5xl">
-              Hymn Book
-            </h1>
-          </div>
           <p className="mt-3 text-lg text-muted-foreground">
             Browse Christian song lyrics in multiple languages
           </p>
@@ -42,6 +60,7 @@ export function HomeClient({
             <SearchBar
               value={searchQuery}
               onChange={handleSearch}
+              onVoiceResult={handleVoiceResult}
               className="mx-auto max-w-lg"
             />
           </div>

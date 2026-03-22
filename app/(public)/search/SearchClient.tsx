@@ -6,6 +6,7 @@ import { SearchBar } from "@/components/search/SearchBar";
 import { SearchResults } from "@/components/search/SearchResults";
 import { BrowseSongsSection } from "@/components/songs/BrowseSongsSection";
 import { Skeleton } from "@/components/ui/skeleton";
+import { resolveVoiceSearchQuery, type VoiceSearchResultCandidate } from "@/lib/voice-search";
 import type { SongListItem } from "@/types";
 
 interface SearchPageClientProps {
@@ -24,7 +25,9 @@ function SearchContent({
   const searchParams = useSearchParams();
   const router = useRouter();
   const q = searchParams.get("q") ?? "";
+  const suggestedQueryParam = searchParams.get("suggest") ?? "";
   const [query, setQuery] = useState(q);
+  const [suggestedQuery, setSuggestedQuery] = useState(suggestedQueryParam || null);
   const [results, setResults] = useState<
     {
       song_id: number;
@@ -38,35 +41,68 @@ function SearchContent({
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const hasInitializedFromUrlRef = useRef(false);
+  const latestLocalQueryRef = useRef(q);
+  const pendingUrlQueryRef = useRef(q);
+
+  const fetchSearchResults = useCallback(async (searchQuery: string) => {
+    const res = await fetch(
+      `/api/search?q=${encodeURIComponent(searchQuery.trim())}`
+    );
+    const data = await res.json();
+    return (data.results ?? []) as VoiceSearchResultCandidate[];
+  }, []);
 
   const performSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
     setLoading(true);
     setSearched(true);
     try {
-      const res = await fetch(
-        `/api/search?q=${encodeURIComponent(searchQuery.trim())}`
-      );
-      const data = await res.json();
-      setResults(data.results ?? []);
+      const data = await fetchSearchResults(searchQuery);
+      setResults(data);
     } catch {
       setResults([]);
     } finally {
       setLoading(false);
     }
+  }, [fetchSearchResults]);
+
+  const clearSearchState = useCallback(() => {
+    setResults([]);
+    setSearched(false);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    if (q) {
-      setQuery(q);
-      performSearch(q);
-    } else {
-      setQuery("");
-      setResults([]);
-      setSearched(false);
-      setLoading(false);
+    const normalizedQ = q.trim();
+    const normalizedLocalQuery = latestLocalQueryRef.current.trim();
+    const isStaleUrlSync =
+      normalizedQ === pendingUrlQueryRef.current.trim() &&
+      normalizedQ !== normalizedLocalQuery;
+
+    if (isStaleUrlSync) {
+      return;
     }
-  }, [q, performSearch]);
+
+    pendingUrlQueryRef.current = normalizedQ;
+
+    if (!hasInitializedFromUrlRef.current || normalizedQ !== normalizedLocalQuery) {
+      latestLocalQueryRef.current = normalizedQ;
+      setQuery(normalizedQ);
+
+      if (normalizedQ) {
+        performSearch(normalizedQ);
+      } else {
+        clearSearchState();
+      }
+    }
+
+    hasInitializedFromUrlRef.current = true;
+  }, [clearSearchState, performSearch, q]);
+
+  useEffect(() => {
+    setSuggestedQuery(suggestedQueryParam || null);
+  }, [suggestedQueryParam]);
 
   useEffect(() => {
     return () => {
@@ -76,30 +112,93 @@ function SearchContent({
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
+    latestLocalQueryRef.current = value;
+    setSuggestedQuery(null);
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     if (!value.trim()) {
-      setResults([]);
-      setSearched(false);
-      setLoading(false);
+      pendingUrlQueryRef.current = "";
+      clearSearchState();
       router.replace("/search", { scroll: false });
       return;
     }
 
     debounceRef.current = setTimeout(() => {
-      if (value.trim()) {
-        router.replace(`/search?q=${encodeURIComponent(value.trim())}`, {
+      const trimmedValue = value.trim();
+
+      if (trimmedValue) {
+        pendingUrlQueryRef.current = trimmedValue;
+        performSearch(trimmedValue);
+        router.replace(`/search?q=${encodeURIComponent(trimmedValue)}`, {
           scroll: false,
         });
       }
     }, 300);
   };
 
+  const handleVoiceResult = useCallback(async (candidates: string[]) => {
+    if (candidates.length === 0) {
+      return;
+    }
+
+    setLoading(true);
+    setSearched(true);
+
+    try {
+      const resolution = await resolveVoiceSearchQuery(candidates, fetchSearchResults);
+      setQuery(resolution.resolvedQuery);
+      latestLocalQueryRef.current = resolution.resolvedQuery;
+      pendingUrlQueryRef.current = resolution.resolvedQuery;
+      setSuggestedQuery(resolution.isUncertain ? resolution.suggestion : null);
+      await performSearch(resolution.resolvedQuery);
+
+      const targetUrl = resolution.isUncertain && resolution.suggestion
+        ? `/search?q=${encodeURIComponent(resolution.resolvedQuery)}&suggest=${encodeURIComponent(resolution.suggestion)}`
+        : `/search?q=${encodeURIComponent(resolution.resolvedQuery)}`;
+
+      router.replace(targetUrl, {
+        scroll: false,
+      });
+    } catch {
+      const fallbackQuery = candidates[0] ?? "";
+      setQuery(fallbackQuery);
+      latestLocalQueryRef.current = fallbackQuery;
+      pendingUrlQueryRef.current = fallbackQuery;
+      setSuggestedQuery(null);
+      if (fallbackQuery) {
+        await performSearch(fallbackQuery);
+        router.replace(`/search?q=${encodeURIComponent(fallbackQuery)}`, {
+          scroll: false,
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchSearchResults, performSearch, router]);
+
+  const handleSuggestedQuerySelect = useCallback((value: string) => {
+    setQuery(value);
+    latestLocalQueryRef.current = value;
+    pendingUrlQueryRef.current = value;
+    setSuggestedQuery(null);
+    performSearch(value);
+    router.replace(`/search?q=${encodeURIComponent(value)}`, {
+      scroll: false,
+    });
+  }, [performSearch, router]);
+
   return (
     <div>
       <div className="mx-auto max-w-3xl px-4 py-8">
         <h1 className="mb-6 font-heading text-3xl font-bold">Search Songs</h1>
-        <SearchBar value={query} onChange={handleQueryChange} autoFocus />
+        <SearchBar
+          value={query}
+          onChange={handleQueryChange}
+          onVoiceResult={handleVoiceResult}
+          suggestedQuery={suggestedQuery}
+          onSuggestedQuerySelect={handleSuggestedQuerySelect}
+          autoFocus
+        />
         <div className="mt-3 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
           Total Songs: {totalSongs}
         </div>
@@ -113,7 +212,7 @@ function SearchContent({
                 ))}
               </div>
             ) : (
-              <SearchResults results={results} query={q} />
+              <SearchResults results={results} query={query} />
             )}
           </div>
         )}

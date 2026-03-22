@@ -477,11 +477,25 @@ export async function searchSongs(
           st.title,
           st.language_code as matched_language,
           s.category,
+          (
+            CASE
+              WHEN lower(st.title) = lower(${sanitized}) THEN 100
+              WHEN st.title ILIKE ${"%" + sanitized + "%"} THEN 50
+              WHEN coalesce(st.english_meaning, '') ILIKE ${"%" + sanitized + "%"} THEN 30
+              WHEN coalesce(s.category, '') ILIKE ${"%" + sanitized + "%"} THEN 20
+              WHEN l.name ILIKE ${"%" + sanitized + "%"} THEN 20
+              WHEN l.native_name ILIKE ${"%" + sanitized + "%"} THEN 20
+              WHEN l.code ILIKE ${"%" + sanitized + "%"} THEN 15
+              WHEN st.lyrics ILIKE ${"%" + sanitized + "%"} THEN 10
+              ELSE 0
+            END
+          ) + coalesce(ts_rank(st.search_vector, plainto_tsquery('english', ${sanitized})), 0) as match_score,
           ts_headline('english', st.lyrics, plainto_tsquery('english', ${sanitized}),
             'MaxWords=30, MinWords=10, StartSel=<mark>, StopSel=</mark>'
           ) as matched_text
         FROM song_translations st
         JOIN songs s ON s.id = st.song_id
+        JOIN languages l ON l.code = st.language_code
         WHERE 1=1
           ${publishedCondition}
           ${langCondition}
@@ -489,9 +503,15 @@ export async function searchSongs(
             st.search_vector @@ plainto_tsquery('english', ${sanitized})
             OR st.title ILIKE ${"%" + sanitized + "%"}
             OR st.lyrics ILIKE ${"%" + sanitized + "%"}
+            OR coalesce(st.english_meaning, '') ILIKE ${"%" + sanitized + "%"}
+            OR coalesce(s.category, '') ILIKE ${"%" + sanitized + "%"}
+            OR l.name ILIKE ${"%" + sanitized + "%"}
+            OR l.native_name ILIKE ${"%" + sanitized + "%"}
+            OR l.code ILIKE ${"%" + sanitized + "%"}
           )
         ORDER BY
-          ts_rank(st.search_vector, plainto_tsquery('english', ${sanitized})) DESC
+          match_score DESC,
+          st.title ASC
         LIMIT 50
       `);
 
