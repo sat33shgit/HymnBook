@@ -7,7 +7,7 @@ import { SearchResults } from "@/components/search/SearchResults";
 import { BrowseSongsSection } from "@/components/songs/BrowseSongsSection";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resolveVoiceSearchQuery, type VoiceSearchResultCandidate } from "@/lib/voice-search";
-import type { SongListItem } from "@/types";
+import type { SearchResultItem, SongListItem } from "@/types";
 
 interface SearchPageClientProps {
   initialSongs: SongListItem[];
@@ -28,16 +28,7 @@ function SearchContent({
   const suggestedQueryParam = searchParams.get("suggest") ?? "";
   const [query, setQuery] = useState(q);
   const [suggestedQuery, setSuggestedQuery] = useState(suggestedQueryParam || null);
-  const [results, setResults] = useState<
-    {
-      song_id: number;
-      slug: string;
-      title: string;
-      matched_language: string;
-      matched_text: string;
-      category: string | null;
-    }[]
-  >([]);
+  const [results, setResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -50,7 +41,7 @@ function SearchContent({
       `/api/search?q=${encodeURIComponent(searchQuery.trim())}`
     );
     const data = await res.json();
-    return (data.results ?? []) as VoiceSearchResultCandidate[];
+    return (data.results ?? []) as SearchResultItem[];
   }, []);
 
   const performSearch = useCallback(async (searchQuery: string) => {

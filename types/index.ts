@@ -46,6 +46,15 @@ export interface SongListItem {
   languages: string[];
 }
 
+export interface SearchResultItem {
+  song_id: number;
+  slug: string;
+  title: string;
+  matched_language: string;
+  matched_text: string;
+  category: string | null;
+}
+
 export type FontSize = "S" | "M" | "L" | "XL";
 
 export const FONT_SIZE_MAP: Record<FontSize, number> = {

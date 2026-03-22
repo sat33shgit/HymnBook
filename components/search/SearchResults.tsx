@@ -4,15 +4,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
-
-interface SearchResultItem {
-  song_id: number;
-  slug: string;
-  title: string;
-  matched_language: string;
-  matched_text: string;
-  category: string | null;
-}
+import type { SearchResultItem } from "@/types";
 
 const LANG_NAMES: Record<string, string> = {
   en: "English",
@@ -26,6 +18,34 @@ const LANG_NAMES: Record<string, string> = {
 interface SearchResultsProps {
   results: SearchResultItem[];
   query: string;
+}
+
+function renderHighlightedText(text: string) {
+  const segments = text.split(/(<mark>|<\/mark>)/g);
+  const content: React.ReactNode[] = [];
+  let isMarked = false;
+
+  segments.forEach((segment, index) => {
+    if (!segment) {
+      return;
+    }
+
+    if (segment === "<mark>") {
+      isMarked = true;
+      return;
+    }
+
+    if (segment === "</mark>") {
+      isMarked = false;
+      return;
+    }
+
+    content.push(
+      isMarked ? <mark key={index}>{segment}</mark> : <span key={index}>{segment}</span>
+    );
+  });
+
+  return content;
 }
 
 export function SearchResults({ results, query }: SearchResultsProps) {
@@ -73,10 +93,9 @@ export function SearchResults({ results, query }: SearchResultsProps) {
                       )}
                     </div>
                   </div>
-                  <p
-                    className="mt-2 line-clamp-2 text-sm text-muted-foreground"
-                    dangerouslySetInnerHTML={{ __html: result.matched_text }}
-                  />
+                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                    {renderHighlightedText(result.matched_text)}
+                  </p>
                 </CardContent>
               </Card>
             </Link>

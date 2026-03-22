@@ -1,9 +1,6 @@
-export interface VoiceSearchResultCandidate {
-  title: string;
-  matched_text: string;
-  matched_language: string;
-  category: string | null;
-}
+import type { SearchResultItem } from "@/types";
+
+export type VoiceSearchResultCandidate = SearchResultItem;
 
 export interface VoiceSearchResolution {
   resolvedQuery: string;

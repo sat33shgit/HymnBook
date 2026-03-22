@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SongList } from "@/components/songs/SongList";
 import { SearchBar } from "@/components/search/SearchBar";
-import { resolveVoiceSearchQuery, type VoiceSearchResultCandidate } from "@/lib/voice-search";
-import type { SongListItem } from "@/types";
+import { resolveVoiceSearchQuery } from "@/lib/voice-search";
+import type { SearchResultItem, SongListItem } from "@/types";
 import { Music } from "lucide-react";
 
 interface HomeClientProps {
@@ -21,7 +21,7 @@ export function HomeClient({
   const fetchSearchResults = useCallback(async (query: string) => {
     const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
     const data = await res.json();
-    return (data.results ?? []) as VoiceSearchResultCandidate[];
+    return (data.results ?? []) as SearchResultItem[];
   }, []);
 
   const handleSearch = (q: string) => {
