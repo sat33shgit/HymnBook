@@ -103,13 +103,13 @@ export function SearchBar({
   return (
     <div className={className}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
           placeholder={isListening ? "Listening…" : placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={cn("pl-10 bg-[var(--card-surface)]", isClient && isSupported ? "pr-12" : "pr-4")}
+          className={cn("h-12 pl-10 bg-[var(--card-surface)]", isClient && isSupported ? "pr-14" : "pr-4")}
           autoFocus={autoFocus}
           aria-label="Search songs"
         />
@@ -119,7 +119,7 @@ export function SearchBar({
               onPointerDown={handlePointerDown}
               onClick={handleClick}
               className={cn(
-                "absolute right-1 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "absolute right-2 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 showVoicePrompt
                   ? "scale-105 bg-primary/10 text-primary shadow-sm ring-4 ring-primary/15"
                   : isError
@@ -129,7 +129,7 @@ export function SearchBar({
               )}
               aria-label={isListening ? "Stop voice input" : "Start voice search"}
             >
-              {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+              {isListening ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
             </TooltipTrigger>
             <TooltipContent>
               {isError ? errorMessage : isListening ? "Listening… tap to stop" : "Search by voice"}

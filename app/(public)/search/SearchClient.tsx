@@ -6,7 +6,7 @@ import { SearchBar } from "@/components/search/SearchBar";
 import { SearchResults } from "@/components/search/SearchResults";
 import { BrowseSongsSection } from "@/components/songs/BrowseSongsSection";
 import { Skeleton } from "@/components/ui/skeleton";
-import { resolveVoiceSearchQuery, type VoiceSearchResultCandidate } from "@/lib/voice-search";
+import { resolveVoiceSearchQuery } from "@/lib/voice-search";
 import type { SearchResultItem, SongListItem } from "@/types";
 
 interface SearchPageClientProps {

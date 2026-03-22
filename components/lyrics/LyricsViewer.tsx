@@ -77,7 +77,7 @@ export function LyricsViewer({
     if (typeof window !== "undefined") {
       try {
         window.scrollTo({ top: 0, left: 0 });
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
@@ -209,11 +209,11 @@ export function LyricsViewer({
               favorited ? "fill-[var(--gold)] text-[var(--gold)]" : ""
             }`}
           />
-          <span>{favorited ? "Saved" : "Favorite"}</span>
+          <span className="text-base font-medium">{favorited ? "Saved" : "Favorite"}</span>
         </Button>
         <Button variant="ghost" onClick={handleShare} className="gap-2">
           <Share2 className="h-5 w-5" />
-          <span>Share</span>
+          <span className="text-base font-medium">Share</span>
         </Button>
         <Button
           variant="ghost"
@@ -221,7 +221,7 @@ export function LyricsViewer({
           className="gap-2"
         >
           <Maximize2 className="h-5 w-5" />
-          <span>Fullscreen</span>
+          <span className="text-base font-medium">Fullscreen</span>
         </Button>
       </div>
 
@@ -239,7 +239,7 @@ export function LyricsViewer({
               favorited ? "fill-[var(--gold)] text-[var(--gold)]" : ""
             }`}
           />
-          <span className="text-[10px]">{favorited ? "Saved" : "Favorite"}</span>
+          <span className="text-xs font-medium">{favorited ? "Saved" : "Favorite"}</span>
         </Button>
         <Button
           variant="ghost"
@@ -248,7 +248,7 @@ export function LyricsViewer({
           className="flex-col gap-0.5 h-auto py-1.5"
         >
           <Share2 className="h-5 w-5" />
-          <span className="text-[10px]">Share</span>
+          <span className="text-xs font-medium">Share</span>
         </Button>
         <Button
           variant="ghost"
@@ -257,7 +257,7 @@ export function LyricsViewer({
           className="flex-col gap-0.5 h-auto py-1.5"
         >
           <Maximize2 className="h-5 w-5" />
-          <span className="text-[10px]">Fullscreen</span>
+          <span className="text-xs font-medium">Fullscreen</span>
         </Button>
       </div>
 

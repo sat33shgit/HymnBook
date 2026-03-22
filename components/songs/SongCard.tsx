@@ -46,7 +46,7 @@ export function SongCard({ song, index = 0 }: SongCardProps) {
           }
         }}
       >
-        <CardHeader className="pb-1.5">
+        <CardHeader className="pb-1">
           <div className="flex items-start justify-between gap-2">
             <span className="flex-1 font-heading text-lg font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
               {song.title}
@@ -74,7 +74,7 @@ export function SongCard({ song, index = 0 }: SongCardProps) {
         <CardContent className="pt-0">
           <div className="flex flex-wrap items-center gap-2">
             {song.category && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-sm">
                 {song.category}
               </Badge>
             )}
@@ -83,7 +83,7 @@ export function SongCard({ song, index = 0 }: SongCardProps) {
                 <Badge
                   key={lang}
                   variant="outline"
-                  className="px-1.5 py-0 text-[10px] font-medium"
+                  className="px-1.5 py-0 text-sm font-medium"
                 >
                   {LANGUAGE_NAMES[lang] ?? lang}
                 </Badge>

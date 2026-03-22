@@ -77,17 +77,17 @@ export function SearchResults({ results, query }: SearchResultsProps) {
           >
             <Link href={`/songs/${result.slug}?lang=${result.matched_language}`}>
               <Card className="bg-muted/30 transition-colors transition-shadow hover:bg-muted/40 hover:shadow-md">
-                <CardContent className="p-4">
+                <CardContent className="px-4 py-2">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-heading text-base font-semibold">
                       {result.title}
                     </h3>
                     <div className="flex shrink-0 gap-1.5">
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-sm">
                         {LANG_NAMES[result.matched_language] ?? result.matched_language}
                       </Badge>
                       {result.category && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-sm">
                           {result.category}
                         </Badge>
                       )}

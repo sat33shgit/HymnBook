@@ -6,7 +6,6 @@ import { SongList } from "@/components/songs/SongList";
 import { SearchBar } from "@/components/search/SearchBar";
 import { resolveVoiceSearchQuery } from "@/lib/voice-search";
 import type { SearchResultItem, SongListItem } from "@/types";
-import { Music } from "lucide-react";
 
 interface HomeClientProps {
   mostViewedSongs: SongListItem[];
@@ -53,10 +52,10 @@ export function HomeClient({
       {/* Hero */}
       <section className="bg-gradient-to-b from-primary/5 to-background px-4 py-8 text-center">
         <div className="mx-auto max-w-2xl">
-          <p className="mt-3 text-lg text-muted-foreground">
+          <p className="mt-1 text-lg text-muted-foreground">
             Browse Christian song lyrics in multiple languages
           </p>
-          <div className="mt-8">
+          <div className="mt-4">
             <SearchBar
               value={searchQuery}
               onChange={handleSearch}
