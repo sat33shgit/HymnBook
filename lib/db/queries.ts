@@ -1,6 +1,6 @@
 import { db } from "./index";
 import { songs, songTranslations, languages, userFavorites } from "./schema";
-import { eq, sql, and, desc, asc, count } from "drizzle-orm";
+import { eq, sql, and, desc, asc } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { CACHE_TAGS, CACHE_TTL, songIdTag, songSlugTag } from "@/lib/cache";
 
@@ -129,21 +129,13 @@ export async function getSongs({
             : and(...conditions)
           : undefined;
 
-      const [songRows, totalResult] = await Promise.all([
-        db
-          .select()
-          .from(songs)
-          .where(whereClause)
-          .orderBy(desc(songs.createdAt))
-          .limit(limit)
-          .offset(offset),
-        db
-          .select({ count: count() })
-          .from(songs)
-          .where(whereClause),
-      ]);
+      const songRows = await db
+        .select()
+        .from(songs)
+        .where(whereClause)
+        .orderBy(desc(songs.createdAt));
 
-      const total = totalResult[0]?.count ?? 0;
+      const total = songRows.length;
 
       const songIds = songRows.map((s) => s.id);
       const translations =
@@ -176,10 +168,14 @@ export async function getSongs({
         };
       });
 
-      data.sort((a, b) => a.title.localeCompare(b.title));
+      data.sort((a, b) =>
+        a.title.localeCompare(b.title, undefined, { sensitivity: "base" })
+      );
+
+      const pagedData = data.slice(offset, offset + limit);
 
       return {
-        data,
+        data: pagedData,
         total,
         page,
         limit,

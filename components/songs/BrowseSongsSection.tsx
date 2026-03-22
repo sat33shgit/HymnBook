@@ -6,6 +6,12 @@ import { CategoryFilter } from "@/components/songs/CategoryFilter";
 import { Button } from "@/components/ui/button";
 import type { SongListItem } from "@/types";
 
+function sortSongsByTitle(items: SongListItem[]) {
+  return [...items].sort((left, right) =>
+    left.title.localeCompare(right.title, undefined, { sensitivity: "base" })
+  );
+}
+
 interface BrowseSongsSectionProps {
   initialSongs: SongListItem[];
   initialTotalPages: number;
@@ -34,7 +40,7 @@ export function BrowseSongsSection({
 
       const res = await fetch(`/api/songs?${params.toString()}`);
       const data = await res.json();
-      setSongs(data.data);
+      setSongs(sortSongsByTitle(data.data ?? []));
       setPage(1);
       setTotalPages(data.totalPages);
     } catch {
@@ -56,7 +62,7 @@ export function BrowseSongsSection({
 
       const res = await fetch(`/api/songs?${params.toString()}`);
       const data = await res.json();
-      setSongs((prev) => [...prev, ...data.data]);
+      setSongs((prev) => sortSongsByTitle([...prev, ...(data.data ?? [])]));
       setPage(nextPage);
     } catch {
       // Ignore

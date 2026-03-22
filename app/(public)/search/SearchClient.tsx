@@ -35,13 +35,16 @@ function SearchContent({
   const hasInitializedFromUrlRef = useRef(false);
   const latestLocalQueryRef = useRef(q);
   const pendingUrlQueryRef = useRef(q);
+  const titleCollatorRef = useRef(new Intl.Collator(undefined, { sensitivity: "base" }));
 
   const fetchSearchResults = useCallback(async (searchQuery: string) => {
     const res = await fetch(
       `/api/search?q=${encodeURIComponent(searchQuery.trim())}`
     );
     const data = await res.json();
-    return (data.results ?? []) as SearchResultItem[];
+    return [...((data.results ?? []) as SearchResultItem[])].sort((left, right) =>
+      titleCollatorRef.current.compare(left.title, right.title)
+    );
   }, []);
 
   const performSearch = useCallback(async (searchQuery: string) => {

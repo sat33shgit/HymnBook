@@ -29,7 +29,7 @@ export function SearchBar({
   onVoiceResult,
   suggestedQuery,
   onSuggestedQuerySelect,
-  placeholder = "Search songs, lyrics, titles...",
+  placeholder = "Search songs, titles, language...",
   className = "",
   autoFocus = false,
   voiceLang,
