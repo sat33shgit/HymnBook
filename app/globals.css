@@ -172,3 +172,23 @@ mark {
 .song-audio-player::-webkit-media-controls-overflow-menu-button {
   display: none;
 }
+
+/* Reduce default audio control height for a more compact player */
+.song-audio-player {
+  display: block;
+  /* Scale the native controls vertically to 75% of their rendered height */
+  transform-origin: center center;
+  transform: scaleY(0.75);
+}
+
+/* For WebKit-based browsers, scale the internal controls panel similarly */
+.song-audio-player::-webkit-media-controls-panel {
+  transform: scaleY(0.75);
+  transform-origin: center center;
+}
+
+/* Keep layout intact by ensuring the player doesn't overflow its container */
+.song-audio-player {
+  max-width: 100%;
+  overflow: hidden;
+}
