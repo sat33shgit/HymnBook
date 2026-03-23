@@ -16,6 +16,7 @@ interface Translation {
   title: string;
   lyrics: string;
   englishMeaning?: string;
+  audioUrl?: string | null;
 }
 
 interface SongFormProps {
@@ -49,6 +50,8 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [categorySuggestions, setCategorySuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [audioFilesByLang, setAudioFilesByLang] = useState<Record<string, File | null>>({});
+  const [removeAudioByLang, setRemoveAudioByLang] = useState<Record<string, boolean>>({});
   const autosaveRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
   // Fetch category suggestions
@@ -127,7 +130,13 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
       if (translations.some((t) => t.languageCode === langCode)) return;
       setTranslations((prev) => [
         ...prev,
-        { languageCode: langCode, title: "", lyrics: "", englishMeaning: "" },
+        {
+          languageCode: langCode,
+          title: "",
+          lyrics: "",
+          englishMeaning: "",
+          audioUrl: null,
+        },
       ]);
     },
     [translations]
@@ -135,6 +144,16 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
 
   const removeTranslation = useCallback((langCode: string) => {
     setTranslations((prev) => prev.filter((t) => t.languageCode !== langCode));
+    setAudioFilesByLang((prev) => {
+      const next = { ...prev };
+      delete next[langCode];
+      return next;
+    });
+    setRemoveAudioByLang((prev) => {
+      const next = { ...prev };
+      delete next[langCode];
+      return next;
+    });
   }, []);
 
   const validate = (): boolean => {
@@ -186,6 +205,69 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
         translations: nonEmptyTranslations,
       };
 
+      // If user marked removal for translations without uploading a replacement,
+      // delete the existing audio objects first so storage is cleaned up prior
+      // to updating the DB.
+      for (const translation of nonEmptyTranslations) {
+        const lang = translation.languageCode;
+        const wantsRemove = removeAudioByLang[lang];
+        const hasNewFile = !!audioFilesByLang[lang];
+        if (wantsRemove && !hasNewFile && translation.audioUrl) {
+          const deleteRes = await fetch("/api/songs/audio", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: translation.audioUrl, slug: `${slug}-${lang}` }),
+          });
+
+          if (!deleteRes.ok) {
+            const err = await deleteRes.json().catch(() => ({}));
+            throw new Error(err.error || `Failed to delete existing audio for ${lang}`);
+          }
+        }
+      }
+
+      const translationsWithAudio = await Promise.all(
+        payload.translations.map(async (translation) => {
+          let nextAudioUrl = translation.audioUrl ?? null;
+          if (removeAudioByLang[translation.languageCode]) {
+            nextAudioUrl = null;
+          }
+
+          const file = audioFilesByLang[translation.languageCode];
+          if (file) {
+            const uploadBody = new FormData();
+            uploadBody.append("file", file);
+            uploadBody.append("slug", `${slug}-${translation.languageCode}`);
+            if (translation.audioUrl) {
+              uploadBody.append("existingUrl", translation.audioUrl);
+            }
+
+            const uploadRes = await fetch("/api/songs/audio", {
+              method: "POST",
+              body: uploadBody,
+            });
+
+            if (!uploadRes.ok) {
+              const errorData = await uploadRes.json().catch(() => ({}));
+              throw new Error(
+                errorData.error ||
+                  `Audio upload failed for ${translation.languageCode}`
+              );
+            }
+
+            const uploaded = await uploadRes.json();
+            nextAudioUrl = uploaded.url;
+          }
+
+          return {
+            ...translation,
+            audioUrl: nextAudioUrl,
+          };
+        })
+      );
+
+      payload.translations = translationsWithAudio;
+
       const url =
         mode === "create"
           ? "/api/songs"
@@ -208,8 +290,10 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
       toast.success(mode === "create" ? "Song created!" : "Song updated!");
       router.replace("/admin/songs");
       router.refresh();
-    } catch {
-      toast.error("Failed to save song");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to save song";
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -333,6 +417,21 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
               }
               onEnglishMeaningChange={(v) =>
                 updateTranslation(trans.languageCode, "englishMeaning", v)
+              }
+              audioUrl={trans.audioUrl ?? null}
+              audioFileName={audioFilesByLang[trans.languageCode]?.name}
+              removeAudio={removeAudioByLang[trans.languageCode] ?? false}
+              onAudioFileChange={(file) =>
+                setAudioFilesByLang((prev) => ({
+                  ...prev,
+                  [trans.languageCode]: file,
+                }))
+              }
+              onRemoveAudioChange={(remove) =>
+                setRemoveAudioByLang((prev) => ({
+                  ...prev,
+                  [trans.languageCode]: remove,
+                }))
               }
               onRemove={
                 trans.languageCode !== "en"

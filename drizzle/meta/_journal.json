@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1742668200000,
+      "tag": "0001_add_song_audio_url",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1742668260000,
+      "tag": "0002_song_translation_audio_url",
+      "breakpoints": true
+    }
+  ]
+}

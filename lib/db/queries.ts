@@ -323,6 +323,7 @@ export async function createSong(data: {
     title: string;
     lyrics: string;
     englishMeaning?: string;
+    audioUrl?: string | null;
   }[];
 }) {
   const [song] = await db
@@ -343,6 +344,7 @@ export async function createSong(data: {
         title: t.title,
         lyrics: t.lyrics,
         englishMeaning: t.englishMeaning?.trim() ? t.englishMeaning : null,
+        audioUrl: t.audioUrl ?? null,
       }))
     );
   }
@@ -367,6 +369,7 @@ export async function updateSong(
       title: string;
       lyrics: string;
       englishMeaning?: string;
+      audioUrl?: string | null;
     }[];
   }
 ) {
@@ -392,6 +395,7 @@ export async function updateSong(
           title: t.title,
           lyrics: t.lyrics,
           englishMeaning: t.englishMeaning?.trim() ? t.englishMeaning : null,
+          audioUrl: t.audioUrl ?? null,
         }))
       );
     }

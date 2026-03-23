@@ -88,7 +88,7 @@ export function AdminSongsClient({ songs: initialSongs, totalSongs }: AdminSongs
       }));
       setSongs(mapped);
     } catch (err) {
-      console.error(err);
+      console.warn(err);
       toast.error("Search failed");
     } finally {
       setSearchLoading(false);

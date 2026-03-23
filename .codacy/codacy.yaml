@@ -1,7 +1,6 @@
 runtimes:
-    - python@3.11.11
     - java@17.0.10
 tools:
-    - lizard@1.17.31
-    - opengrep@1.16.4
     - pmd@6.55.0
+    - opengrep@1.16.4
+    - trivy@0.69.3

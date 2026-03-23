@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, Eye, EyeOff, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, EyeOff, Trash2, Upload } from "lucide-react";
 import { LyricsText } from "@/components/lyrics/LyricsText";
 
 interface TranslationEditorProps {
@@ -14,9 +14,14 @@ interface TranslationEditorProps {
   title: string;
   lyrics: string;
   englishMeaning: string;
+  audioUrl?: string | null;
+  audioFileName?: string;
+  removeAudio?: boolean;
   onTitleChange: (title: string) => void;
   onLyricsChange: (lyrics: string) => void;
   onEnglishMeaningChange: (meaning: string) => void;
+  onAudioFileChange: (file: File | null) => void;
+  onRemoveAudioChange: (remove: boolean) => void;
   onRemove?: () => void;
   errors?: { title?: string; lyrics?: string };
   isEnglish?: boolean;
@@ -29,9 +34,14 @@ export function TranslationEditor({
   title,
   lyrics,
   englishMeaning,
+  audioUrl,
+  audioFileName,
+  removeAudio = false,
   onTitleChange,
   onLyricsChange,
   onEnglishMeaningChange,
+  onAudioFileChange,
+  onRemoveAudioChange,
   onRemove,
   errors,
   isEnglish = false,
@@ -39,10 +49,40 @@ export function TranslationEditor({
 }: TranslationEditorProps) {
   const [preview, setPreview] = useState(false);
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  const [isDraggingAudio, setIsDraggingAudio] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
+  const audioPreviewRef = useRef<HTMLAudioElement>(null);
 
   // Count lines
   const lineCount = lyrics.split("\n").length;
+  const audioPreviewUrl = audioUrl
+    ? `/api/songs/audio/stream?url=${encodeURIComponent(audioUrl)}`
+    : null;
+
+  const handleAudioSelection = (file: File | null) => {
+    if (!file) {
+      onAudioFileChange(null);
+      setAudioError(null);
+      return;
+    }
+
+    const fileName = file.name.toLowerCase();
+    const isMp3ByName = fileName.endsWith(".mp3");
+    const isM4aByName = fileName.endsWith(".m4a");
+    const isMp3ByType = file.type === "audio/mpeg";
+    const isM4aByType = file.type === "audio/mp4" || file.type === "audio/x-m4a" || file.type === "audio/m4a";
+
+    if (!isMp3ByName && !isM4aByName && !isMp3ByType && !isM4aByType) {
+      setAudioError("Only MP3 and M4A files are allowed");
+      return;
+    }
+
+    setAudioError(null);
+    onAudioFileChange(file);
+    onRemoveAudioChange(false);
+  };
 
   return (
     <div className="space-y-4 rounded-lg border p-4">
@@ -165,6 +205,129 @@ export function TranslationEditor({
             </p>
           </div>
         )}
+
+        <div className="space-y-2 rounded-md border bg-muted/20 p-3">
+          <Label htmlFor={`audio-${languageCode}`}>
+            Audio (MP3/M4A) for {languageName}
+          </Label>
+
+          {audioUrl && !removeAudio && !audioFileName && (
+            <p className="text-xs text-muted-foreground">
+              Existing audio is attached.
+              <button
+                type="button"
+                className="ml-2 underline"
+                onClick={() => {
+                  if (!audioPreviewRef.current) return;
+                  void audioPreviewRef.current.play();
+                }}
+              >
+                Preview
+              </button>
+            </p>
+          )}
+
+          {audioPreviewUrl && !removeAudio && (
+            <audio
+              ref={audioPreviewRef}
+              controls
+              preload="none"
+              src={audioPreviewUrl}
+              className="w-full"
+            />
+          )}
+
+          {audioFileName && (
+            <p className="text-xs text-muted-foreground">
+              Selected file: {audioFileName}
+            </p>
+          )}
+
+          {audioError && (
+            <p className="text-xs text-destructive">{audioError}</p>
+          )}
+
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => audioInputRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                audioInputRef.current?.click();
+              }
+            }}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingAudio(true);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingAudio(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingAudio(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingAudio(false);
+              const file = e.dataTransfer.files?.[0] ?? null;
+              handleAudioSelection(file);
+            }}
+            className={`rounded-md border border-dashed p-4 text-center transition-colors ${
+              isDraggingAudio
+                ? "border-primary bg-primary/5"
+                : "border-border bg-background"
+            }`}
+            aria-label={`Upload MP3 for ${languageName}`}
+          >
+            <Upload className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
+            <p className="text-sm font-medium">Drag and drop MP3 here</p>
+            <p className="mt-1 text-xs text-muted-foreground">or click to browse files</p>
+          </div>
+
+          <Input
+            ref={audioInputRef}
+            id={`audio-${languageCode}`}
+            type="file"
+              accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/m4a,.mp3,.m4a"
+            className="hidden"
+            onChange={(e) => {
+              handleAudioSelection(e.target.files?.[0] ?? null);
+            }}
+          />
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => audioInputRef.current?.click()}
+            className="w-fit"
+          >
+            Choose MP3/M4A File
+          </Button>
+
+          {audioUrl && (
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={removeAudio}
+                onChange={(e) => {
+                  onRemoveAudioChange(e.target.checked);
+                  if (e.target.checked) {
+                    onAudioFileChange(null);
+                  }
+                }}
+              />
+              Remove this translation audio
+            </label>
+          )}
+        </div>
       </div>
     </div>
   );

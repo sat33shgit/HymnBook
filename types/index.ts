@@ -26,6 +26,7 @@ export interface SongTranslation {
   title: string;
   lyrics: string;
   englishMeaning?: string | null;
+  audioUrl?: string | null;
   searchVector?: string | null;
   createdAt: Date | null;
   updatedAt: Date | null;

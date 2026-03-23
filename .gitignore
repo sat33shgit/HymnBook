@@ -42,6 +42,7 @@ next-env.d.ts
 
 # project docs
 HymnBook Requirements.txt
+HymnBook Cloudflare R2 details.txt
 
 
 #Ignore vscode AI rules
