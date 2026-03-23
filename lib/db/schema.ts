@@ -98,3 +98,10 @@ export const userFavorites = pgTable(
     unique("uq_user_song").on(table.userId, table.songId),
   ]
 );
+
+// ─── App Settings ────────────────────────────────────────────
+export const appSettings = pgTable("app_settings", {
+  key: varchar("key", { length: 100 }).primaryKey(),
+  boolValue: boolean("bool_value").notNull().default(true),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});

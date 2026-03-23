@@ -1,8 +1,10 @@
 import { db } from "./index";
-import { songs, songTranslations, languages, userFavorites } from "./schema";
+import { songs, songTranslations, languages, userFavorites, appSettings } from "./schema";
 import { eq, sql, and, desc, asc } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { CACHE_TAGS, CACHE_TTL, songIdTag, songSlugTag } from "@/lib/cache";
+
+const PUBLIC_SONG_AUDIO_VISIBLE_KEY = "public_song_audio_visible";
 
 // ─── Languages ───────────────────────────────────────────────
 
@@ -447,6 +449,56 @@ export async function getAllSlugs() {
       tags: [CACHE_TAGS.slugs, CACHE_TAGS.songs],
     }
   )();
+}
+
+export async function isPublicSongAudioVisible() {
+  return unstable_cache(
+    async () => {
+      try {
+        const rows = await db
+          .select({ boolValue: appSettings.boolValue })
+          .from(appSettings)
+          .where(eq(appSettings.key, PUBLIC_SONG_AUDIO_VISIBLE_KEY))
+          .limit(1);
+
+        return rows[0]?.boolValue ?? true;
+      } catch (error) {
+        // During rollout, table may not exist before migration runs.
+        if (
+          error instanceof Error &&
+          error.message.includes('relation "app_settings" does not exist')
+        ) {
+          return true;
+        }
+        throw error;
+      }
+    },
+    ["isPublicSongAudioVisible"],
+    {
+      revalidate: CACHE_TTL.settings,
+      tags: [CACHE_TAGS.settings],
+    }
+  )();
+}
+
+export async function setPublicSongAudioVisible(isVisible: boolean) {
+  const result = await db
+    .insert(appSettings)
+    .values({
+      key: PUBLIC_SONG_AUDIO_VISIBLE_KEY,
+      boolValue: isVisible,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: appSettings.key,
+      set: {
+        boolValue: isVisible,
+        updatedAt: new Date(),
+      },
+    })
+    .returning({ boolValue: appSettings.boolValue });
+
+  return result[0]?.boolValue ?? true;
 }
 
 // ─── Search ──────────────────────────────────────────────────

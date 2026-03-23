@@ -28,6 +28,7 @@ const LANG_NAMES: Record<string, string> = {
 interface AdminSongsClientProps {
   songs: SongListItem[];
   totalSongs: number;
+  initialAudioVisible: boolean;
 }
 
 function getSongApiPath(songId: number) {
@@ -38,8 +39,14 @@ function getSongApiPath(songId: number) {
   return `/api/songs/${songId}`;
 }
 
-export function AdminSongsClient({ songs: initialSongs, totalSongs }: AdminSongsClientProps) {
+export function AdminSongsClient({
+  songs: initialSongs,
+  totalSongs,
+  initialAudioVisible,
+}: AdminSongsClientProps) {
   const [songs, setSongs] = useState(initialSongs);
+  const [audioVisible, setAudioVisible] = useState(initialAudioVisible);
+  const [audioToggleLoading, setAudioToggleLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [resultsCount, setResultsCount] = useState<number | null>(null);
@@ -157,15 +164,54 @@ export function AdminSongsClient({ songs: initialSongs, totalSongs }: AdminSongs
     }
   };
 
+  const handleToggleAudioVisibility = async (checked: boolean) => {
+    const previous = audioVisible;
+    setAudioVisible(checked);
+    setAudioToggleLoading(true);
+    try {
+      const res = await fetch("/api/admin/site-settings/audio-visibility", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visible: checked }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update audio visibility");
+      }
+
+      toast.success(
+        checked
+          ? "Audio enabled on main site"
+          : "Audio hidden on main site"
+      );
+    } catch {
+      setAudioVisible(previous);
+      toast.error("Failed to update audio visibility");
+    } finally {
+      setAudioToggleLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <h1 className="font-heading text-3xl font-bold">Songs ({totalSongs})</h1>
-          <Link href="/admin/songs/new" className={buttonVariants()}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Song
-          </Link>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Show audio on main site</span>
+              <Switch
+                checked={audioVisible}
+                onCheckedChange={handleToggleAudioVisibility}
+                disabled={audioToggleLoading}
+                aria-label="Toggle song audio visibility on main site"
+              />
+            </label>
+            <Link href="/admin/songs/new" className={buttonVariants()}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Song
+            </Link>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

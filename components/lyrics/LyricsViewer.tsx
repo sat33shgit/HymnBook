@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Heart, Share2, Maximize2, Copy, Mail, Play, Pause, Square } from "lucide-react";
+import { Heart, Share2, Maximize2, Copy, Mail } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -27,6 +27,7 @@ interface LyricsViewerProps {
   languages: { code: string; nativeName: string }[];
   defaultLang?: string;
   initialLang?: string;
+  showAudio?: boolean;
 }
 
 export function LyricsViewer({
@@ -36,6 +37,7 @@ export function LyricsViewer({
   languages,
   defaultLang = "en",
   initialLang,
+  showAudio = true,
 }: LyricsViewerProps) {
   const [activeLanguage, setActiveLanguage] = useState(
     initialLang ?? defaultLang
@@ -44,10 +46,9 @@ export function LyricsViewer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [showEnglishTranslation, setShowEnglishTranslation] = useState(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorited = isFavorite(songId);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const activeTranslation = translations.find(
     (t) => t.languageCode === activeLanguage
@@ -96,64 +97,11 @@ export function LyricsViewer({
     window.history.replaceState({}, "", url.toString());
   }, [activeLanguage]);
 
-  useEffect(() => {
-    if (!streamAudioUrl) {
-      audioRef.current = null;
-      return;
-    }
-
-    const element = new Audio(streamAudioUrl);
-    element.preload = "metadata";
-
-    const onPlay = () => setIsAudioPlaying(true);
-    const onPause = () => setIsAudioPlaying(false);
-    const onEnded = () => {
-      element.currentTime = 0;
-      setIsAudioPlaying(false);
-    };
-
-    element.addEventListener("play", onPlay);
-    element.addEventListener("pause", onPause);
-    element.addEventListener("ended", onEnded);
-    audioRef.current = element;
-
-    return () => {
-      element.pause();
-      element.currentTime = 0;
-      element.removeEventListener("play", onPlay);
-      element.removeEventListener("pause", onPause);
-      element.removeEventListener("ended", onEnded);
-      if (audioRef.current === element) {
-        audioRef.current = null;
-      }
-      setIsAudioPlaying(false);
-    };
-  }, [streamAudioUrl]);
-
   const stopAudio = useCallback(() => {
     const audioElement = audioRef.current;
     if (!audioElement) return;
     audioElement.pause();
     audioElement.currentTime = 0;
-    setIsAudioPlaying(false);
-  }, []);
-
-  const playAudio = useCallback(async () => {
-    const audioElement = audioRef.current;
-    if (!audioElement) return;
-    try {
-      await audioElement.play();
-    } catch (error) {
-      console.error("Audio play failed:", error);
-      toast.error("Unable to play audio. Please try again.");
-    }
-  }, []);
-
-  const pauseAudio = useCallback(() => {
-    const audioElement = audioRef.current;
-    if (!audioElement) return;
-    audioElement.pause();
-    setIsAudioPlaying(false);
   }, []);
 
   const handleLanguageChange = useCallback((code: string) => {
@@ -193,38 +141,18 @@ export function LyricsViewer({
 
   return (
     <div>
-      {activeAudioUrl && (
-        <div className="mb-4 rounded-lg border bg-muted/20 p-3">
-          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Song Audio
-          </p>
-          <div className="flex items-center gap-2">
-            <Button type="button" size="sm" onClick={playAudio} className="gap-1">
-              <Play className="h-4 w-4" />
-              Start
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={pauseAudio}
-              disabled={!isAudioPlaying}
-              className="gap-1"
-            >
-              <Pause className="h-4 w-4" />
-              Pause
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={stopAudio}
-              className="gap-1"
-            >
-              <Square className="h-4 w-4" />
-              Stop
-            </Button>
-          </div>
+      {showAudio && activeAudioUrl && (
+        <div className="mb-4 rounded-md border bg-muted/20 p-3">
+          <audio
+            ref={audioRef}
+            controls
+            preload="none"
+            src={streamAudioUrl ?? undefined}
+            controlsList="nodownload noplaybackrate noremoteplayback"
+            disablePictureInPicture
+            disableRemotePlayback
+            className="song-audio-player w-full"
+          />
         </div>
       )}
 

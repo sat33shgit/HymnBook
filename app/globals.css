@@ -166,3 +166,9 @@ mark {
     cursor: pointer;
   }
 }
+
+/* Hide native audio overflow menu options like Download/Playback speed. */
+.song-audio-player::-webkit-media-controls-overflow-button,
+.song-audio-player::-webkit-media-controls-overflow-menu-button {
+  display: none;
+}

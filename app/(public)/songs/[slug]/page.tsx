@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getSongBySlug, getLanguages, getAllSlugs } from "@/lib/db/queries";
+import { getSongBySlug, getLanguages, getAllSlugs, isPublicSongAudioVisible } from "@/lib/db/queries";
 import { LyricsViewer } from "@/components/lyrics/LyricsViewer";
 import type { Metadata } from "next";
 import { truncate } from "@/lib/utils";
@@ -61,9 +61,10 @@ export default async function SongDetailPage({
   const { slug } = await params;
   const { lang } = await searchParams;
 
-  const [song, allLanguages] = await Promise.all([
+  const [song, allLanguages, isAudioVisible] = await Promise.all([
     getSongBySlug(slug),
     getLanguages(true),
+    isPublicSongAudioVisible(),
   ]);
 
   if (!song || !song.isPublished) {
@@ -115,6 +116,7 @@ export default async function SongDetailPage({
         languages={songLanguages}
         defaultLang={song.defaultLang ?? "en"}
         initialLang={lang}
+        showAudio={isAudioVisible}
       />
     </article>
   );

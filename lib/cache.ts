@@ -6,6 +6,7 @@ export const CACHE_TTL = {
   categories: 300,
   slugs: 1800,
   search: 60,
+  settings: 300,
 } as const;
 
 export const CACHE_TAGS = {
@@ -15,6 +16,7 @@ export const CACHE_TAGS = {
   categories: "categories",
   slugs: "slugs",
   search: "search",
+  settings: "settings",
 } as const;
 
 export function songIdTag(id: number) {
