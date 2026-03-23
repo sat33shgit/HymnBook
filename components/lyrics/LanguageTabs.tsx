@@ -26,12 +26,12 @@ export function LanguageTabs({
             aria-selected={isActive}
             aria-controls={`lyrics-panel-${lang.code}`}
             id={`lang-tab-${lang.code}`}
-            className={`shrink-0 rounded-full border px-3 py-2 text-base md:text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
+            className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
               isActive
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
-            style={{ minWidth: 52, minHeight: 52 }}
+            style={{ minWidth: 52, minHeight: 40 }}
             onClick={() => onSelect(lang.code)}
           >
             {lang.nativeName}

@@ -77,7 +77,7 @@ export function SearchResults({ results, query }: SearchResultsProps) {
           >
             <Link href={`/songs/${result.slug}?lang=${result.matched_language}`}>
               <Card className="bg-muted/30 transition-colors transition-shadow hover:bg-muted/40 hover:shadow-md">
-                <CardContent className="px-4 py-2">
+                <CardContent className="px-4">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-heading text-base font-semibold">
                       {result.title}

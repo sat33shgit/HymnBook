@@ -46,7 +46,7 @@ export function SongCard({ song, index = 0 }: SongCardProps) {
           }
         }}
       >
-        <CardHeader className="pb-1">
+        <CardHeader className="pb-0">
           <div className="flex items-start justify-between gap-2">
             <span className="flex-1 font-heading text-lg font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
               {song.title}
