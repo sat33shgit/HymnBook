@@ -149,8 +149,6 @@ export function LyricsViewer({
             preload="none"
             src={streamAudioUrl ?? undefined}
             controlsList="nodownload noplaybackrate noremoteplayback"
-            disablePictureInPicture
-            disableRemotePlayback
             className="song-audio-player w-full"
           />
         </div>
