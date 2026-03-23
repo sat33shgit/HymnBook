@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSongById, updateSong, deleteSong } from "@/lib/db/queries";
-import { extractR2ObjectKeyFromUrl, deleteSongAudioFromR2, deleteObjectsByPrefix } from "@/lib/r2";
+import { extractR2ObjectKeyFromUrl, deleteSongAudioFromR2, deleteObjectsByPrefix, deleteObjectsMatchingSong } from "@/lib/r2";
 import { updateSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
