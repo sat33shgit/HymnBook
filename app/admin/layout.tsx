@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import Link from "next/link";
-import { Music, LayoutDashboard, Music2, Globe } from "lucide-react";
+import { Music, LayoutDashboard, Music2, Globe, ExternalLink } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { AdminSignOut } from "@/components/admin/AdminSignOut";
 
@@ -65,8 +65,14 @@ export default async function AdminLayout({
               <span className="text-sm text-muted-foreground">
                 {session.user.email}
               </span>
-              <Link href="/" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+              <Link
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonVariants({ variant: "ghost", size: "sm" }) + " flex items-center gap-2"}
+              >
                 View Site
+                <ExternalLink className="h-4 w-4" />
               </Link>
             </div>
           </header>

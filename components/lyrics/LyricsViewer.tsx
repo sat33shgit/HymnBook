@@ -64,6 +64,22 @@ export function LyricsViewer({
 
   const currentTitle = activeTranslation?.title ?? translations[0]?.title ?? "";
 
+  // Update the browser title and the page header when the active translation changes
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    try {
+      if (currentTitle) {
+        document.title = `${currentTitle} | HymnBook`;
+      }
+      const headerEl = document.getElementById(`song-title-${songId}`);
+      if (headerEl && currentTitle) {
+        headerEl.textContent = currentTitle;
+      }
+    } catch {
+      // ignore DOM update failures
+    }
+  }, [currentTitle, songId]);
+
   useEffect(() => {
     const viewKey = `song-viewed:${songId}`;
     if (sessionStorage.getItem(viewKey) === "1") return;

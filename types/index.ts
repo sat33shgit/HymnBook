@@ -45,6 +45,7 @@ export interface SongListItem {
   isPublished: boolean | null;
   title: string;
   languages: string[];
+  hasAudio?: boolean;
 }
 
 export interface SearchResultItem {

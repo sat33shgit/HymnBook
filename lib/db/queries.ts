@@ -167,6 +167,7 @@ export async function getSongs({
           isPublished: song.isPublished,
           title: englishTitle ?? defaultTitle ?? songTrans[0]?.title ?? "Untitled",
           languages: songTrans.map((t) => t.languageCode),
+          hasAudio: songTrans.some((t) => (t.audioUrl ?? "").toString().trim() !== ""),
         };
       });
 
@@ -528,6 +529,11 @@ export async function searchSongs(
           s.is_published,
           st.title,
           st.language_code as matched_language,
+          (
+            SELECT EXISTS(
+              SELECT 1 FROM song_translations st2 WHERE st2.song_id = s.id AND coalesce(st2.audio_url, '') <> ''
+            )
+          ) as has_audio,
           s.category,
           (
             CASE
@@ -573,6 +579,7 @@ export async function searchSongs(
         is_published: boolean;
         title: string;
         matched_language: string;
+        has_audio: boolean;
         matched_text: string;
         category: string | null;
       }[];

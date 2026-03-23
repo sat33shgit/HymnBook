@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Music as MusicIcon } from "lucide-react";
 import { toast } from "sonner";
 import type { SongListItem } from "@/types";
 
@@ -79,6 +79,7 @@ export function AdminSongsClient({
         is_published?: boolean;
         title: string;
         matched_language: string;
+        has_audio?: boolean;
         matched_text?: string;
         category?: string | null;
       }> = json.results ?? [];
@@ -92,6 +93,7 @@ export function AdminSongsClient({
         isPublished: r.is_published ?? null,
         title: r.title,
         languages: [r.matched_language],
+        hasAudio: r.has_audio ?? false,
       }));
       setSongs(mapped);
     } catch (err) {
@@ -249,9 +251,16 @@ export function AdminSongsClient({
             </tr>
           </thead>
           <tbody>
-            {songs.map((song) => (
-              <tr key={song.id} className="border-b last:border-0">
-                <td className="px-4 py-3 font-medium">{song.title}</td>
+            {songs.map((song, idx) => (
+              <tr key={`${song.id}-${idx}`} className="border-b last:border-0">
+                <td className="px-4 py-3 font-medium">
+                  <div className="flex items-center gap-2">
+                    <span>{song.title}</span>
+                    {song.hasAudio && (
+                      <MusicIcon className="h-4 w-4 text-muted-foreground" aria-hidden />
+                    )}
+                  </div>
+                </td>
                 <td className="px-4 py-3">
                   <div className="flex gap-1">
                     {song.languages.map((lang) => (

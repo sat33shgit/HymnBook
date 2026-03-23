@@ -99,7 +99,7 @@ export default async function SongDetailPage({
   return (
     <article className="mx-auto max-w-3xl px-4 py-8 pb-24 md:pb-8">
       <header className="mb-6">
-        <h1 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
+        <h1 id={`song-title-${song.id}`} className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
           {title}
         </h1>
         {song.category && (

@@ -36,6 +36,8 @@ const AUTOSAVE_KEY = "hymnbook_draft";
 
 export function SongForm({ languages, initialData, mode }: SongFormProps) {
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement | null>(null);
+
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
   const [isPublished, setIsPublished] = useState(
@@ -307,8 +309,18 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
     c.toLowerCase().includes(category.toLowerCase())
   );
 
+  const handleFloatingSubmit = () => {
+    if (formRef.current) {
+      // Use requestSubmit so the browser runs form validation and onSubmit
+      // handlers as if the user clicked the real submit button.
+      // Cast to any to avoid ts lib differences where requestSubmit may be missing
+      (formRef.current as any).requestSubmit?.();
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <>
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
       {/* Section 1: Metadata */}
       <div className="space-y-4 rounded-lg border p-6">
         <h2 className="font-heading text-xl font-semibold">Song Details</h2>
@@ -450,8 +462,14 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
         )}
       </div>
 
-      {/* Submit */}
-      <div className="flex justify-end gap-3">
+      {/* Hidden submit for accessibility/keyboard submit; floating bar handles visible actions */}
+      <button type="submit" className="sr-only" aria-hidden>
+        Submit
+      </button>
+      </form>
+
+      {/* Floating action bar: always visible */}
+      <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-md bg-popover/90 p-3 shadow-lg backdrop-blur">
         <Button
           type="button"
           variant="outline"
@@ -459,7 +477,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={saving} className="gap-2">
+        <Button onClick={handleFloatingSubmit} disabled={saving} className="gap-2">
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
@@ -468,6 +486,6 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
           {mode === "create" ? "Create Song" : "Update Song"}
         </Button>
       </div>
-    </form>
+    </>
   );
 }
