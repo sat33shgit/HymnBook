@@ -22,6 +22,8 @@ interface TranslationEditorProps {
   onEnglishMeaningChange: (meaning: string) => void;
   onAudioFileChange: (file: File | null) => void;
   onRemoveAudioChange: (remove: boolean) => void;
+  youtubeUrl?: string | null;
+  onYouTubeUrlChange?: (url: string) => void;
   onRemove?: () => void;
   errors?: { title?: string; lyrics?: string };
   isEnglish?: boolean;
@@ -42,6 +44,8 @@ export function TranslationEditor({
   onEnglishMeaningChange,
   onAudioFileChange,
   onRemoveAudioChange,
+  youtubeUrl,
+  onYouTubeUrlChange,
   onRemove,
   errors,
   isEnglish = false,
@@ -243,6 +247,8 @@ export function TranslationEditor({
             />
           )}
 
+
+
           {audioFileName && (
             <p className="text-xs text-muted-foreground">
               Selected file: {audioFileName}
@@ -333,6 +339,20 @@ export function TranslationEditor({
               Remove this translation audio
             </label>
           )}
+
+          <div role="separator" aria-orientation="horizontal" className="my-3 border-t border-border" />
+
+          <div className="mt-3">
+            <Label htmlFor={`youtube-${languageCode}`}>YouTube URL for {languageName}</Label>
+            <input
+              id={`youtube-${languageCode}`}
+              type="url"
+              placeholder="https://www.youtube.com/watch?v=..."
+              value={youtubeUrl ?? ""}
+              onChange={(e) => onYouTubeUrlChange?.(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2"
+            />
+          </div>
         </div>
       </div>
     </div>

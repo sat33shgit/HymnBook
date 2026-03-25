@@ -49,6 +49,7 @@ export default async function EditSongPage({
             lyrics: t.lyrics,
             englishMeaning: t.englishMeaning ?? "",
             audioUrl: t.audioUrl ?? null,
+            youtubeUrl: t.youtubeUrl ?? null,
           })),
         }}
       />

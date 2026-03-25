@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Heart, Share2, Maximize2, Copy, Mail } from "lucide-react";
+import { Heart, Share2, Maximize2, Copy, Mail, Youtube, ExternalLink } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -155,6 +155,27 @@ export function LyricsViewer({
     setShareOpen(false);
   };
 
+  const [youtubeVisible, setYoutubeVisible] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/admin/site-settings/youtube-visibility")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!mounted) return;
+        if (data && typeof data.visible === "boolean") setYoutubeVisible(data.visible);
+        else setYoutubeVisible(false);
+      })
+      .catch(() => {
+        if (mounted) setYoutubeVisible(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // We only show a text link to YouTube (no thumbnail/embed)
+
   return (
     <div>
       {showAudio && activeAudioUrl && (
@@ -166,6 +187,22 @@ export function LyricsViewer({
             controlsList="nodownload noplaybackrate noremoteplayback"
             className="song-audio-player w-full mb-6"
           />
+      )}
+
+      {/* YouTube link (text only) */}
+      {youtubeVisible === true && activeTranslation?.youtubeUrl && (
+        <div className="mb-6 mt-2">
+          <a
+            href={activeTranslation.youtubeUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 text-primary hover:underline"
+          >
+            <Youtube className="h-5 w-5" />
+            <span className="text-sm">Watch on YouTube</span>
+            <ExternalLink className="h-4 w-4 text-muted-foreground" />
+          </a>
+        </div>
       )}
 
       {/* Language tabs */}

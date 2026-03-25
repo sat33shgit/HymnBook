@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2, Plus, Music as MusicIcon, ArrowUp } from "lucide-react";
+import { Pencil, Trash2, Plus, Music as MusicIcon, ArrowUp, Youtube as YoutubeIcon } from "lucide-react";
 import { toast } from "sonner";
 import type { SongListItem } from "@/types";
 
@@ -29,6 +29,7 @@ interface AdminSongsClientProps {
   songs: SongListItem[];
   totalSongs: number;
   initialAudioVisible: boolean;
+  initialYoutubeVisible?: boolean;
 }
 
 function getSongApiPath(songId: number) {
@@ -43,10 +44,13 @@ export function AdminSongsClient({
   songs: initialSongs,
   totalSongs,
   initialAudioVisible,
+  initialYoutubeVisible = true,
 }: AdminSongsClientProps) {
   const [songs, setSongs] = useState(initialSongs);
   const [audioVisible, setAudioVisible] = useState(initialAudioVisible);
   const [audioToggleLoading, setAudioToggleLoading] = useState(false);
+  const [youtubeVisible, setYoutubeVisible] = useState(initialYoutubeVisible);
+  const [youtubeToggleLoading, setYoutubeToggleLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [resultsCount, setResultsCount] = useState<number | null>(null);
@@ -92,6 +96,7 @@ export function AdminSongsClient({
         title: string;
         matched_language: string;
         has_audio?: boolean;
+        has_youtube?: boolean;
         matched_text?: string;
         category?: string | null;
       }> = json.results ?? [];
@@ -106,6 +111,7 @@ export function AdminSongsClient({
         title: r.title,
         languages: [r.matched_language],
         hasAudio: r.has_audio ?? false,
+        hasYoutube: r.has_youtube ?? false,
       }));
       setSongs(mapped);
     } catch (err) {
@@ -206,6 +212,34 @@ export function AdminSongsClient({
     }
   };
 
+  const handleToggleYouTubeVisibility = async (checked: boolean) => {
+    const previous = youtubeVisible;
+    setYoutubeVisible(checked);
+    setYoutubeToggleLoading(true);
+    try {
+      const res = await fetch("/api/admin/site-settings/youtube-visibility", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visible: checked }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update youtube visibility");
+      }
+
+      toast.success(
+        checked
+          ? "YouTube links enabled on main site"
+          : "YouTube links hidden on main site"
+      );
+    } catch {
+      setYoutubeVisible(previous);
+      toast.error("Failed to update YouTube visibility");
+    } finally {
+      setYoutubeToggleLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="mb-6">
@@ -213,12 +247,21 @@ export function AdminSongsClient({
           <h1 className="font-heading text-3xl font-bold">Songs ({totalSongs})</h1>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Show audio on main site</span>
+              <span>Enable Audio</span>
               <Switch
                 checked={audioVisible}
                 onCheckedChange={handleToggleAudioVisibility}
                 disabled={audioToggleLoading}
                 aria-label="Toggle song audio visibility on main site"
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Enable YouTube</span>
+              <Switch
+                checked={youtubeVisible}
+                onCheckedChange={handleToggleYouTubeVisibility}
+                disabled={youtubeToggleLoading}
+                aria-label="Toggle song YouTube visibility on main site"
               />
             </label>
             <Link href="/admin/songs/new" className={buttonVariants()}>
@@ -269,6 +312,9 @@ export function AdminSongsClient({
                     <span>{song.title}</span>
                     {song.hasAudio && (
                       <MusicIcon className="h-4 w-4 text-muted-foreground" aria-hidden />
+                    )}
+                    {song.hasYoutube && (
+                      <YoutubeIcon className="h-4 w-4 text-red-600" aria-hidden />
                     )}
                   </div>
                 </td>

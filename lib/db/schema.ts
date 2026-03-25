@@ -66,6 +66,7 @@ export const songTranslations = pgTable(
     lyrics: text("lyrics").notNull(),
     englishMeaning: text("english_meaning"),
     audioUrl: text("audio_url"),
+    youtubeUrl: text("youtube_url"),
     searchVector: tsvector("search_vector"),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),

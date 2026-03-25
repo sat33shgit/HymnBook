@@ -17,6 +17,7 @@ interface Translation {
   lyrics: string;
   englishMeaning?: string;
   audioUrl?: string | null;
+  youtubeUrl?: string | null;
 }
 
 interface SongFormProps {
@@ -115,7 +116,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
   const updateTranslation = useCallback(
     (
       langCode: string,
-      field: "title" | "lyrics" | "englishMeaning",
+      field: "title" | "lyrics" | "englishMeaning" | "youtubeUrl",
       value: string
     ) => {
       setTranslations((prev) =>
@@ -138,6 +139,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
           lyrics: "",
           englishMeaning: "",
           audioUrl: null,
+          youtubeUrl: null,
         },
       ]);
     },
@@ -420,6 +422,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
               languageName={lang?.nativeName ?? trans.languageCode}
               title={trans.title}
               lyrics={trans.lyrics}
+              youtubeUrl={trans.youtubeUrl ?? null}
               englishMeaning={trans.englishMeaning ?? ""}
               onTitleChange={(v) =>
                 updateTranslation(trans.languageCode, "title", v)
@@ -430,6 +433,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
               onEnglishMeaningChange={(v) =>
                 updateTranslation(trans.languageCode, "englishMeaning", v)
               }
+              onYouTubeUrlChange={(v) => updateTranslation(trans.languageCode, "youtubeUrl", v)}
               audioUrl={trans.audioUrl ?? null}
               audioFileName={audioFilesByLang[trans.languageCode]?.name}
               removeAudio={removeAudioByLang[trans.languageCode] ?? false}

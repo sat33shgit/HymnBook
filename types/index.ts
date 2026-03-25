@@ -27,6 +27,7 @@ export interface SongTranslation {
   lyrics: string;
   englishMeaning?: string | null;
   audioUrl?: string | null;
+  youtubeUrl?: string | null;
   searchVector?: string | null;
   createdAt: Date | null;
   updatedAt: Date | null;
@@ -46,6 +47,7 @@ export interface SongListItem {
   title: string;
   languages: string[];
   hasAudio?: boolean;
+  hasYoutube?: boolean;
 }
 
 export interface SearchResultItem {

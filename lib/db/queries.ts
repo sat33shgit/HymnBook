@@ -5,6 +5,7 @@ import { unstable_cache } from "next/cache";
 import { CACHE_TAGS, CACHE_TTL, songIdTag, songSlugTag } from "@/lib/cache";
 
 const PUBLIC_SONG_AUDIO_VISIBLE_KEY = "public_song_audio_visible";
+const PUBLIC_SONG_YOUTUBE_VISIBLE_KEY = "public_song_youtube_visible";
 
 // ─── Languages ───────────────────────────────────────────────
 
@@ -168,6 +169,7 @@ export async function getSongs({
           title: englishTitle ?? defaultTitle ?? songTrans[0]?.title ?? "Untitled",
           languages: songTrans.map((t) => t.languageCode),
           hasAudio: songTrans.some((t) => (t.audioUrl ?? "").toString().trim() !== ""),
+          hasYoutube: songTrans.some((t) => (t.youtubeUrl ?? "").toString().trim() !== ""),
         };
       });
 
@@ -327,6 +329,7 @@ export async function createSong(data: {
     lyrics: string;
     englishMeaning?: string;
     audioUrl?: string | null;
+    youtubeUrl?: string | null;
   }[];
 }) {
   const [song] = await db
@@ -348,6 +351,7 @@ export async function createSong(data: {
         lyrics: t.lyrics,
         englishMeaning: t.englishMeaning?.trim() ? t.englishMeaning : null,
         audioUrl: t.audioUrl ?? null,
+        youtubeUrl: t.youtubeUrl ?? null,
       }))
     );
   }
@@ -373,6 +377,7 @@ export async function updateSong(
       lyrics: string;
       englishMeaning?: string;
       audioUrl?: string | null;
+      youtubeUrl?: string | null;
     }[];
   }
 ) {
@@ -399,6 +404,7 @@ export async function updateSong(
           lyrics: t.lyrics,
           englishMeaning: t.englishMeaning?.trim() ? t.englishMeaning : null,
           audioUrl: t.audioUrl ?? null,
+          youtubeUrl: t.youtubeUrl ?? null,
         }))
       );
     }
@@ -502,6 +508,52 @@ export async function setPublicSongAudioVisible(isVisible: boolean) {
   return result[0]?.boolValue ?? true;
 }
 
+export async function isPublicSongYoutubeVisible() {
+  return unstable_cache(
+    async () => {
+      try {
+        const rows = await db
+          .select({ boolValue: appSettings.boolValue })
+          .from(appSettings)
+          .where(eq(appSettings.key, PUBLIC_SONG_YOUTUBE_VISIBLE_KEY))
+          .limit(1);
+
+        return rows[0]?.boolValue ?? true;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes('relation "app_settings" does not exist')
+        ) {
+          return true;
+        }
+        throw error;
+      }
+    },
+    ["isPublicSongYoutubeVisible"],
+    {
+      revalidate: CACHE_TTL.settings,
+      tags: [CACHE_TAGS.settings],
+    }
+  )();
+}
+
+export async function setPublicSongYoutubeVisible(isVisible: boolean) {
+  const result = await db
+    .insert(appSettings)
+    .values({
+      key: PUBLIC_SONG_YOUTUBE_VISIBLE_KEY,
+      boolValue: isVisible,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: appSettings.key,
+      set: { boolValue: isVisible, updatedAt: new Date() },
+    })
+    .returning({ boolValue: appSettings.boolValue });
+
+  return result[0]?.boolValue ?? true;
+}
+
 // ─── Search ──────────────────────────────────────────────────
 
 export async function searchSongs(
@@ -534,6 +586,11 @@ export async function searchSongs(
               SELECT 1 FROM song_translations st2 WHERE st2.song_id = s.id AND coalesce(st2.audio_url, '') <> ''
             )
           ) as has_audio,
+          (
+            SELECT EXISTS(
+              SELECT 1 FROM song_translations st2 WHERE st2.song_id = s.id AND coalesce(st2.youtube_url, '') <> ''
+            )
+          ) as has_youtube,
           s.category,
           (
             CASE
