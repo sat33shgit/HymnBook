@@ -158,16 +158,14 @@ export function LyricsViewer({
   return (
     <div>
       {showAudio && activeAudioUrl && (
-        <div className="mb-4 rounded-md border bg-muted/20 p-3">
           <audio
             ref={audioRef}
             controls
             preload="none"
             src={streamAudioUrl ?? undefined}
             controlsList="nodownload noplaybackrate noremoteplayback"
-            className="song-audio-player w-full"
+            className="song-audio-player w-full mb-6"
           />
-        </div>
       )}
 
       {/* Language tabs */}

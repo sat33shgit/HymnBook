@@ -314,7 +314,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
       // Use requestSubmit so the browser runs form validation and onSubmit
       // handlers as if the user clicked the real submit button.
       // Cast to any to avoid ts lib differences where requestSubmit may be missing
-      (formRef.current as any).requestSubmit?.();
+      (formRef.current as HTMLFormElement | null)?.requestSubmit?.();
     }
   };
 

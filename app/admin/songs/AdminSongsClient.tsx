@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2, Plus, Music as MusicIcon } from "lucide-react";
+import { Pencil, Trash2, Plus, Music as MusicIcon, ArrowUp } from "lucide-react";
 import { toast } from "sonner";
 import type { SongListItem } from "@/types";
 
@@ -52,11 +52,23 @@ export function AdminSongsClient({
   const [resultsCount, setResultsCount] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showTop, setShowTop] = useState(false);
 
   const clearSearch = () => {
     setSearchQuery("");
     setResultsCount(null);
     setSongs(initialSongs);
+  };
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSearch = async () => {
@@ -226,11 +238,10 @@ export function AdminSongsClient({
             }}
             placeholder="Search by title or lyrics..."
             className="w-full max-w-lg rounded-md border px-3 py-2"
+            disabled={searchLoading}
             aria-label="Search songs"
           />
-          <Button variant="ghost" onClick={clearSearch} disabled={searchLoading}>
-            Clear
-          </Button>
+          
           {resultsCount !== null && (
             <div className="ml-4 text-sm text-muted-foreground">
               {resultsCount} result{resultsCount === 1 ? "" : "s"}
@@ -343,6 +354,16 @@ export function AdminSongsClient({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {showTop && (
+        <Button
+          size="icon"
+          onClick={scrollToTop}
+          aria-label="Back to top"
+          className="fixed bottom-6 right-6 z-50 rounded-full h-12 w-12 p-0"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </Button>
+      )}
     </div>
   );
 }

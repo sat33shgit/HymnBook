@@ -89,7 +89,7 @@ export function TranslationEditor({
       <div className="flex items-center justify-between">
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 font-medium"
+          className="inline-flex items-center gap-1.5 font-medium flex-1 text-left"
           onClick={() => setCollapsed((prev) => !prev)}
           aria-expanded={!collapsed}
           aria-controls={`translation-body-${languageCode}`}
@@ -106,7 +106,10 @@ export function TranslationEditor({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => setPreview(!preview)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setPreview(!preview);
+            }}
             className="gap-1"
             disabled={collapsed}
           >
@@ -125,7 +128,10 @@ export function TranslationEditor({
               type="button"
               variant="ghost"
               size="sm"
-              onClick={onRemove}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
               className="text-destructive hover:text-destructive gap-1"
             >
               <Trash2 className="h-4 w-4" />
@@ -206,7 +212,7 @@ export function TranslationEditor({
           </div>
         )}
 
-        <div className="space-y-2 rounded-md border bg-muted/20 p-3">
+        <div className="space-y-2 rounded-md bg-muted/20 p-3">
           <Label htmlFor={`audio-${languageCode}`}>
             Audio (MP3/M4A) for {languageName}
           </Label>
