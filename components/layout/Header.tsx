@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Heart, Menu, Moon, Sun, Music } from "lucide-react";
+import { Search as SearchIcon, Heart, Menu, Moon, Sun, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -67,7 +67,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link href="/search" aria-label="Search songs">
             <Button variant="ghost" size="icon" className="md:hidden">
-              <Search className="h-5 w-5" />
+              <SearchIcon className="h-5 w-5" />
             </Button>
           </Link>
 

@@ -50,7 +50,7 @@ export function HomeClient({
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/5 to-background px-4 py-8 text-center">
+      <section className="bg-background px-4 py-8 text-center">
         <div className="mx-auto max-w-2xl">
           <p className="mt-1 text-lg text-muted-foreground">
             Browse Christian song lyrics in multiple languages

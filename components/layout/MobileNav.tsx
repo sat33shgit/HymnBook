@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Music, Home, Search, Heart } from "lucide-react";
+import { Music, Home, Search as SearchIcon, Heart } from "lucide-react";
 
 interface MobileNavProps {
   open: boolean;
@@ -20,7 +20,7 @@ export function MobileNav({ open, onOpenChange }: MobileNavProps) {
 
   const links = [
     { href: "/", label: "Home", icon: Home },
-    { href: "/search", label: "Search", icon: Search },
+    { href: "/search", label: "Search", icon: SearchIcon },
     { href: "/favorites", label: "Favorites", icon: Heart },
   ];
 

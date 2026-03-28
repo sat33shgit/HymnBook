@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Mic, MicOff, AudioLines } from "lucide-react";
+import { Search as SearchIcon, Mic, MicOff, AudioLines } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -103,7 +103,7 @@ export function SearchBar({
   return (
     <div className={className}>
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+        <SearchIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
           placeholder={isListening ? "Listening…" : placeholder}
