@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, Eye, EyeOff, Trash2, Upload } from "lucide-react";
 import { LyricsText } from "@/components/lyrics/LyricsText";
+import { AUDIO_SIZE_ERROR_MESSAGE, MAX_AUDIO_SIZE_BYTES, MAX_AUDIO_SIZE_MB } from "@/lib/audio";
 
 interface TranslationEditorProps {
   languageCode: string;
@@ -65,6 +66,18 @@ export function TranslationEditor({
     ? `/api/songs/audio/stream?url=${encodeURIComponent(audioUrl)}`
     : null;
 
+  const clearAudioInput = () => {
+    if (audioInputRef.current) {
+      audioInputRef.current.value = "";
+    }
+  };
+
+  const rejectAudioSelection = (message: string) => {
+    setAudioError(message);
+    onAudioFileChange(null);
+    clearAudioInput();
+  };
+
   const handleAudioSelection = (file: File | null) => {
     if (!file) {
       onAudioFileChange(null);
@@ -76,10 +89,18 @@ export function TranslationEditor({
     const isMp3ByName = fileName.endsWith(".mp3");
     const isM4aByName = fileName.endsWith(".m4a");
     const isMp3ByType = file.type === "audio/mpeg";
-    const isM4aByType = file.type === "audio/mp4" || file.type === "audio/x-m4a" || file.type === "audio/m4a";
+    const isM4aByType =
+      file.type === "audio/mp4" ||
+      file.type === "audio/x-m4a" ||
+      file.type === "audio/m4a";
 
     if (!isMp3ByName && !isM4aByName && !isMp3ByType && !isM4aByType) {
-      setAudioError("Only MP3 and M4A files are allowed");
+      rejectAudioSelection("Only MP3 and M4A files are allowed");
+      return;
+    }
+
+    if (file.size > MAX_AUDIO_SIZE_BYTES) {
+      rejectAudioSelection(AUDIO_SIZE_ERROR_MESSAGE);
       return;
     }
 
@@ -218,8 +239,11 @@ export function TranslationEditor({
 
         <div className="space-y-2 rounded-md bg-muted/20 p-3">
           <Label htmlFor={`audio-${languageCode}`}>
-            Audio (MP3/M4A) for {languageName}
+            Audio (MP3/M4A, max {MAX_AUDIO_SIZE_MB} MB) for {languageName}
           </Label>
+          <p className="text-xs text-muted-foreground">
+            Upload only audio files that are {MAX_AUDIO_SIZE_MB} MB or smaller.
+          </p>
 
           {audioUrl && !removeAudio && !audioFileName && (
             <p className="text-xs text-muted-foreground">
@@ -246,8 +270,6 @@ export function TranslationEditor({
               className="w-full"
             />
           )}
-
-
 
           {audioFileName && (
             <p className="text-xs text-muted-foreground">
@@ -296,18 +318,20 @@ export function TranslationEditor({
                 ? "border-primary bg-primary/5"
                 : "border-border bg-background"
             }`}
-            aria-label={`Upload MP3 for ${languageName}`}
+            aria-label={`Upload audio file for ${languageName}`}
           >
             <Upload className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
-            <p className="text-sm font-medium">Drag and drop MP3 here</p>
-            <p className="mt-1 text-xs text-muted-foreground">or click to browse files</p>
+            <p className="text-sm font-medium">Drag and drop MP3 or M4A here</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              or click to browse files up to {MAX_AUDIO_SIZE_MB} MB
+            </p>
           </div>
 
           <Input
             ref={audioInputRef}
             id={`audio-${languageCode}`}
             type="file"
-              accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/m4a,.mp3,.m4a"
+            accept="audio/mpeg,audio/mp4,audio/x-m4a,audio/m4a,.mp3,.m4a"
             className="hidden"
             onChange={(e) => {
               handleAudioSelection(e.target.files?.[0] ?? null);

@@ -1,7 +1,6 @@
 import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { randomUUID } from "node:crypto";
-
-const MAX_AUDIO_SIZE_BYTES = 25 * 1024 * 1024;
+import { AUDIO_SIZE_ERROR_MESSAGE, MAX_AUDIO_SIZE_BYTES } from "@/lib/audio";
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name];
@@ -57,7 +56,7 @@ export async function uploadSongAudioToR2(params: {
     throw new Error("Uploaded file is empty");
   }
   if (fileBytes.byteLength > MAX_AUDIO_SIZE_BYTES) {
-    throw new Error("Audio file is too large. Maximum size is 25MB");
+    throw new Error(AUDIO_SIZE_ERROR_MESSAGE);
   }
 
   const extension = detectExtension(fileName, mimeType);
