@@ -31,7 +31,7 @@ export default function RootLayout({
           {children}
           <Toaster richColors position="bottom-right" />
         </Providers>
-        <Analytics />
+        <Analytics debug={false} />
       </body>
     </html>
   );

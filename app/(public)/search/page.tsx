@@ -1,4 +1,4 @@
-import { getSongs, getCategories } from "@/lib/db/queries";
+import { getSongs, getCategories, getPublishedSongTranslationCount } from "@/lib/db/queries";
 import { SearchPageClient } from "./SearchClient";
 
 export const metadata = {
@@ -15,12 +15,13 @@ export default async function SearchPage() {
   let categories: string[] = [];
 
   try {
-    const [songsResult, cats] = await Promise.all([
+    const [songsResult, indexedSongCount, cats] = await Promise.all([
       getSongs({ page: 1, limit: 15 }),
+      getPublishedSongTranslationCount(),
       getCategories(),
     ]);
     initialSongs = songsResult.data;
-    totalSongs = songsResult.total;
+    totalSongs = indexedSongCount;
     initialTotalPages = songsResult.totalPages;
     categories = cats;
   } catch {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { SongCard } from "@/components/songs/SongCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,6 +20,9 @@ export function FavoritesClient() {
   const [songs, setSongs] = useState<SongListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<"recent" | "alpha">("recent");
+  const titleCollatorRef = useRef(
+    new Intl.Collator(undefined, { sensitivity: "base" })
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -39,10 +42,23 @@ export function FavoritesClient() {
         const res = await fetch(`/api/songs?limit=100`, {
           signal: controller.signal,
         });
+        if (!res.ok) {
+          throw new Error("Favorites songs request failed");
+        }
         const data = await res.json();
-        const favSongs = (data.data as SongListItem[]).filter((s) =>
-          favorites.includes(s.id)
+        const favoriteSet = new Set(favorites);
+        const favoriteOrder = new Map(
+          favorites.map((songId, index) => [songId, index])
         );
+
+        const favSongs = ((data.data ?? []) as SongListItem[])
+          .filter((song) => favoriteSet.has(song.id))
+          .sort(
+            (left, right) =>
+              (favoriteOrder.get(left.id) ?? Number.MAX_SAFE_INTEGER) -
+              (favoriteOrder.get(right.id) ?? Number.MAX_SAFE_INTEGER)
+          );
+
         if (active) {
           setSongs(favSongs);
         }
@@ -67,11 +83,13 @@ export function FavoritesClient() {
 
   const sorted =
     sortBy === "alpha"
-      ? [...songs].sort((a, b) => a.title.localeCompare(b.title))
+      ? [...songs].sort((a, b) =>
+          titleCollatorRef.current.compare(a.title, b.title)
+        )
       : songs;
 
   return (
-    <div className="space-y-6 md:space-y-8">
+    <div className="space-y-6 pt-2 md:space-y-8 md:pt-0">
       <section className="mx-4 rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-5 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:mx-0 md:p-6">
         <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-6">
           <div className="flex items-start gap-4">

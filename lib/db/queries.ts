@@ -315,6 +315,66 @@ export async function getMostViewedSongs(limit = 5) {
   )();
 }
 
+export async function getPublishedLanguageSongCounts(activeOnly = true) {
+  const cacheKey = activeOnly ? "active" : "all";
+
+  return unstable_cache(
+    async () => {
+      const conditions = [eq(songs.isPublished, true)];
+
+      if (activeOnly) {
+        conditions.push(eq(languages.isActive, true));
+      }
+
+      const whereClause =
+        conditions.length === 1 ? conditions[0] : and(...conditions);
+
+      const rows = await db
+        .select({
+          code: languages.code,
+          count: sql<number>`count(*)`,
+        })
+        .from(songTranslations)
+        .innerJoin(songs, eq(songTranslations.songId, songs.id))
+        .innerJoin(languages, eq(songTranslations.languageCode, languages.code))
+        .where(whereClause)
+        .groupBy(languages.code, languages.sortOrder)
+        .orderBy(desc(sql<number>`count(*)`), asc(languages.sortOrder), asc(languages.code));
+
+      return rows.map((row) => ({
+        code: row.code,
+        count: Number(row.count),
+      }));
+    },
+    ["getPublishedLanguageSongCounts", cacheKey],
+    {
+      revalidate: CACHE_TTL.songs,
+      tags: [CACHE_TAGS.songs, CACHE_TAGS.languages],
+    }
+  )();
+}
+
+export async function getPublishedSongTranslationCount() {
+  return unstable_cache(
+    async () => {
+      const result = await db
+        .select({
+          count: sql<number>`count(*)`,
+        })
+        .from(songTranslations)
+        .innerJoin(songs, eq(songTranslations.songId, songs.id))
+        .where(eq(songs.isPublished, true));
+
+      return Number(result[0]?.count ?? 0);
+    },
+    ["getPublishedSongTranslationCount"],
+    {
+      revalidate: CACHE_TTL.songs,
+      tags: [CACHE_TAGS.songs],
+    }
+  )();
+}
+
 export async function incrementSongViews(songId: number) {
   const result = await db
     .update(songs)

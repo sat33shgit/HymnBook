@@ -1,4 +1,9 @@
-import { getCategories, getLanguages, getMostViewedSongs, getSongs } from "@/lib/db/queries";
+import {
+  getCategories,
+  getLanguages,
+  getMostViewedSongs,
+  getPublishedLanguageSongCounts,
+} from "@/lib/db/queries";
 import { HomeClient } from "./HomeClient";
 
 export const revalidate = 300;
@@ -11,24 +16,19 @@ export default async function HomePage() {
   let languageOverview: { code: string; label: string; count: number }[] = [];
 
   try {
-    const [topViewed, songsResult, activeLanguages, categories] = await Promise.all([
+    const [topViewed, activeLanguages, languageCountsResult, categories] = await Promise.all([
       getMostViewedSongs(12),
-      getSongs({ page: 1, limit: 500 }),
       getLanguages(true),
+      getPublishedLanguageSongCounts(true),
       getCategories(),
     ]);
 
     mostViewedSongs = topViewed;
-    totalSongs = songsResult.total;
     totalLanguages = activeLanguages.length;
     totalCategories = categories.length;
-
-    const languageCounts = new Map<string, number>();
-    songsResult.data.forEach((song) => {
-      song.languages.forEach((code) => {
-        languageCounts.set(code, (languageCounts.get(code) ?? 0) + 1);
-      });
-    });
+    const languageCounts = new Map(
+      languageCountsResult.map((language) => [language.code, language.count])
+    );
 
     languageOverview = activeLanguages
       .map((language) => ({
@@ -39,6 +39,11 @@ export default async function HomePage() {
       .filter((language) => language.count > 0)
       .sort((left, right) => right.count - left.count)
       .slice(0, 6);
+
+    totalSongs = languageOverview.reduce(
+      (sum, language) => sum + language.count,
+      0
+    );
   } catch {
     // DB not available
   }

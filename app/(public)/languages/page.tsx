@@ -1,4 +1,4 @@
-import { getLanguages, getSongs } from "@/lib/db/queries";
+import { getLanguages, getPublishedLanguageSongCounts, getSongs } from "@/lib/db/queries";
 import type { LanguageOverviewItem } from "@/components/languages/BrowseByLanguageSection";
 import { LanguagesClient } from "./LanguagesClient";
 
@@ -24,17 +24,13 @@ export default async function LanguagesPage({
   let languageOverview: LanguageOverviewItem[] = [];
 
   try {
-    const [activeLanguages, allSongsResult] = await Promise.all([
+    const [activeLanguages, languageCountsResult] = await Promise.all([
       getLanguages(true),
-      getSongs({ page: 1, limit: 500 }),
+      getPublishedLanguageSongCounts(true),
     ]);
-
-    const languageCounts = new Map<string, number>();
-    allSongsResult.data.forEach((song) => {
-      song.languages.forEach((code) => {
-        languageCounts.set(code, (languageCounts.get(code) ?? 0) + 1);
-      });
-    });
+    const languageCounts = new Map(
+      languageCountsResult.map((language) => [language.code, language.count])
+    );
 
     languageOverview = activeLanguages
       .map((language) => ({

@@ -36,12 +36,16 @@ function SearchContent({
   const hasInitializedFromUrlRef = useRef(false);
   const latestLocalQueryRef = useRef(q);
   const pendingUrlQueryRef = useRef(q);
+  const latestSearchRequestRef = useRef(0);
   const titleCollatorRef = useRef(new Intl.Collator(undefined, { sensitivity: "base" }));
 
   const fetchSearchResults = useCallback(async (searchQuery: string) => {
     const res = await fetch(
       `/api/search?q=${encodeURIComponent(searchQuery.trim())}`
     );
+    if (!res.ok) {
+      throw new Error("Search request failed");
+    }
     const data = await res.json();
     return [...((data.results ?? []) as SearchResultItem[])].sort((left, right) =>
       titleCollatorRef.current.compare(left.title, right.title)
@@ -50,19 +54,29 @@ function SearchContent({
 
   const performSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
+    const requestId = latestSearchRequestRef.current + 1;
+    latestSearchRequestRef.current = requestId;
     setLoading(true);
     setSearched(true);
+
     try {
       const data = await fetchSearchResults(searchQuery);
-      setResults(data);
+      if (latestSearchRequestRef.current === requestId) {
+        setResults(data);
+      }
     } catch {
-      setResults([]);
+      if (latestSearchRequestRef.current === requestId) {
+        setResults([]);
+      }
     } finally {
-      setLoading(false);
+      if (latestSearchRequestRef.current === requestId) {
+        setLoading(false);
+      }
     }
   }, [fetchSearchResults]);
 
   const clearSearchState = useCallback(() => {
+    latestSearchRequestRef.current += 1;
     setResults([]);
     setSearched(false);
     setLoading(false);
@@ -210,7 +224,7 @@ function SearchContent({
   }, [performSearch, router]);
 
   return (
-    <div className="space-y-6 md:space-y-8">
+    <div className="space-y-6 pt-2 md:space-y-8 md:pt-0">
       <section
         className="mx-4 rounded-[2.1rem] px-5 py-6 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] md:mx-0 md:rounded-[2.35rem] md:px-8 md:py-9"
         style={{
@@ -249,7 +263,7 @@ function SearchContent({
 
         <div className="mt-5 flex flex-wrap gap-2.5 md:gap-3">
           <span className="rounded-full bg-white/10 px-4 py-1.5 text-[0.82rem] font-semibold">
-            {totalSongs} songs indexed
+            {totalSongs} songs available
           </span>
           {query.trim() && (
             <span className="rounded-full bg-white/10 px-4 py-1.5 text-[0.82rem] font-semibold">

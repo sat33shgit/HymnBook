@@ -353,8 +353,7 @@ export function LyricsViewer({
                 Focused reader
               </h2>
               <p className="mt-2 text-[0.9rem] leading-7 text-[var(--desktop-nav-muted)]">
-                Reading in {activeLanguageLabel}. Use the toolbar below to save,
-                share, or go fullscreen.
+                Use the toolbar below to save, share, or go fullscreen.
               </p>
             </div>
             <span className="rounded-full bg-[var(--desktop-panel)] px-3 py-1.5 text-[0.82rem] font-semibold text-foreground shadow-[0_10px_20px_rgba(15,23,42,0.06)] dark:shadow-[0_10px_20px_rgba(2,6,23,0.18)]">
