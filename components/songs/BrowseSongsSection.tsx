@@ -72,26 +72,42 @@ export function BrowseSongsSection({
   };
 
   return (
-    <section className="mx-auto max-w-[1200px] px-4 py-4">
-      {categories.length > 0 && (
-        <div className="mb-6">
-          <CategoryFilter
-            categories={categories}
-            selected={selectedCategory}
-            onSelect={handleCategoryChange}
-          />
+    <section className="w-full px-4 py-4 md:px-0 md:py-0">
+      <div className="md:rounded-[2rem] md:border md:border-[var(--desktop-panel-border)] md:bg-[var(--desktop-panel)] md:p-6 md:shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:md:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
+        <div className="hidden md:block">
+          <h2 className="font-heading text-[1.85rem] font-semibold leading-[1.05] tracking-[-0.04em] text-foreground">
+            Browse all songs
+          </h2>
+          <p className="mt-2 text-[0.94rem] text-[var(--desktop-nav-muted)]">
+            Filter by category and continue exploring the full library.
+          </p>
         </div>
-      )}
 
-      <SongList songs={songs} />
+        {categories.length > 0 && (
+          <div className="mb-6 md:mt-6">
+            <CategoryFilter
+              categories={categories}
+              selected={selectedCategory}
+              onSelect={handleCategoryChange}
+            />
+          </div>
+        )}
 
-      {page < totalPages && (
-        <div className="mt-8 flex justify-center">
-          <Button variant="outline" onClick={loadMore} disabled={loading}>
-            {loading ? "Loading..." : "Load More"}
-          </Button>
-        </div>
-      )}
+        <SongList songs={songs} className="xl:grid-cols-3" />
+
+        {page < totalPages && (
+          <div className="mt-8 flex justify-center md:mt-10">
+            <Button
+              variant="outline"
+              className="md:rounded-full md:border-[var(--desktop-chip-border)] md:bg-[var(--desktop-chip)] md:px-6 md:text-[var(--desktop-chip-foreground)]"
+              onClick={loadMore}
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Load More"}
+            </Button>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

@@ -5,6 +5,8 @@
 
 :root {
   --radius: 0.625rem;
+  --font-heading-family: "Segoe UI", "Segoe UI Variable", Tahoma, Geneva, Verdana, sans-serif;
+  --font-sans-family: "Segoe UI", "Segoe UI Variable", Tahoma, Geneva, Verdana, sans-serif;
   /* Light theme — warm ivory background, soft indigo primary, golden accents */
   --background: #FFFFFF;
   --foreground: #1C1917;
@@ -80,6 +82,120 @@
   --sidebar-ring: #818CF8;
 }
 
+.theme-c-public {
+  --background: #FFFFFF;
+  --foreground: #000000;
+  --card: #FFFFFF;
+  --card-foreground: #000000;
+  --card-surface: #FFFFFF;
+  --popover: #FFFFFF;
+  --popover-foreground: #000000;
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EFF6FF;
+  --secondary-foreground: #1D4ED8;
+  --muted: #F8FAFC;
+  --muted-foreground: #475569;
+  --accent: #EFF6FF;
+  --accent-foreground: #1D4ED8;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #2563EB;
+  --chart-1: #2563EB;
+  --chart-2: #0F172A;
+  --chart-3: #3B82F6;
+  --chart-4: #1D4ED8;
+  --chart-5: #60A5FA;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #2563EB;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EFF6FF;
+  --sidebar-accent-foreground: #1D4ED8;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #2563EB;
+  --gold: #2563EB;
+  --gold-light: #DBEAFE;
+  --font-heading-family: "Segoe UI", "Segoe UI Variable", Tahoma, Geneva, Verdana, sans-serif;
+  --font-sans-family: "Segoe UI", "Segoe UI Variable", Tahoma, Geneva, Verdana, sans-serif;
+  --desktop-shell: #eef3f8;
+  --desktop-sidebar: rgba(255, 255, 255, 0.84);
+  --desktop-panel: #ffffff;
+  --desktop-panel-soft: #f3f7fb;
+  --desktop-panel-border: rgba(148, 163, 184, 0.22);
+  --desktop-divider: rgba(148, 163, 184, 0.22);
+  --desktop-hero-start: #074f3c;
+  --desktop-hero-end: #0b7057;
+  --desktop-hero-foreground: #f6fffb;
+  --desktop-hero-muted: rgba(226, 255, 244, 0.84);
+  --desktop-chip: #edf4fb;
+  --desktop-chip-border: #d7e2ee;
+  --desktop-chip-foreground: #244267;
+  --desktop-chip-hover: #ffffff;
+  --desktop-chip-hover-border: #bfd0e3;
+  --desktop-chip-hover-foreground: #173b62;
+  --desktop-chip-hover-count: #e9f1fb;
+  --desktop-nav-active: #17203a;
+  --desktop-nav-active-foreground: #f8fafc;
+  --desktop-nav-muted: #53657d;
+}
+
+.dark .theme-c-public {
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+  --card: #111827;
+  --card-foreground: #F1F5F9;
+  --card-surface: #111827;
+  --popover: #111827;
+  --popover-foreground: #F1F5F9;
+  --primary: #60A5FA;
+  --primary-foreground: #0F172A;
+  --secondary: #1E293B;
+  --secondary-foreground: #DBEAFE;
+  --muted: #111827;
+  --muted-foreground: #CBD5E1;
+  --accent: #1E293B;
+  --accent-foreground: #DBEAFE;
+  --border: #334155;
+  --input: #334155;
+  --ring: #60A5FA;
+  --chart-1: #60A5FA;
+  --chart-2: #F1F5F9;
+  --chart-3: #93C5FD;
+  --chart-4: #3B82F6;
+  --chart-5: #1D4ED8;
+  --sidebar: #0F172A;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-primary: #60A5FA;
+  --sidebar-primary-foreground: #0F172A;
+  --sidebar-accent: #1E293B;
+  --sidebar-accent-foreground: #DBEAFE;
+  --sidebar-border: #334155;
+  --sidebar-ring: #60A5FA;
+  --gold: #60A5FA;
+  --gold-light: #1D4ED8;
+  --desktop-shell: #08131f;
+  --desktop-sidebar: rgba(9, 22, 35, 0.9);
+  --desktop-panel: #0e1b2b;
+  --desktop-panel-soft: #132235;
+  --desktop-panel-border: rgba(71, 85, 105, 0.42);
+  --desktop-divider: rgba(71, 85, 105, 0.42);
+  --desktop-hero-start: #08362d;
+  --desktop-hero-end: #0d5b49;
+  --desktop-hero-foreground: #f3fffa;
+  --desktop-hero-muted: rgba(213, 255, 237, 0.74);
+  --desktop-chip: #152336;
+  --desktop-chip-border: #26364b;
+  --desktop-chip-foreground: #dbe8ff;
+  --desktop-chip-hover: #1b2c43;
+  --desktop-chip-hover-border: #3a5474;
+  --desktop-chip-hover-foreground: #f1f7ff;
+  --desktop-chip-hover-count: #273a54;
+  --desktop-nav-active: #1a2a44;
+  --desktop-nav-active-foreground: #f8fbff;
+  --desktop-nav-muted: #9fb0ca;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -119,13 +235,15 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
-  --font-heading: var(--font-playfair);
-  --font-sans: var(--font-inter);
+  --font-heading: var(--font-heading-family);
+  --font-sans: var(--font-sans-family);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 /* Horizontal scrollbar hidden for language tabs */
@@ -140,7 +258,7 @@ body {
 /* Lyrics verse spacing */
 .lyrics-text {
   white-space: pre-wrap;
-  line-height: 1.8;
+  line-height: 1.85;
 }
 
 /* Focus styles */
@@ -156,6 +274,10 @@ mark {
   color: #000000;
   padding: 0 2px;
   border-radius: 2px;
+}
+
+.theme-c-public .song-audio-player {
+  accent-color: var(--primary);
 }
 
 @media (max-width: 767px) {

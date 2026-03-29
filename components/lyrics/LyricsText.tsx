@@ -11,7 +11,7 @@ interface LyricsTextProps {
 
 export function LyricsText({ lyrics, fontSize, languageCode }: LyricsTextProps) {
   const isIndic = ["te", "hi", "ta", "ml"].includes(languageCode);
-  const fontFamily = isIndic ? "'Noto Sans', sans-serif" : "var(--font-inter), sans-serif";
+  const fontFamily = isIndic ? "'Noto Sans', var(--font-sans)" : "var(--font-sans)";
 
   return (
     <div

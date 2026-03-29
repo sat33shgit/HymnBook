@@ -241,7 +241,7 @@ export function FullscreenReader({
               {activeTranslation ? (
                   <div className="space-y-3">
                     {showEnglishInPlace && (
-                      <p className="text-xs font-medium uppercase tracking-wide opacity-70">
+                      <p className="text-[0.76rem] font-semibold uppercase tracking-[0.16em] opacity-70">
                         Text In English
                       </p>
                     )}

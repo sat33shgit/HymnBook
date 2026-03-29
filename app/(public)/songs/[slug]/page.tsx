@@ -97,13 +97,16 @@ export default async function SongDetailPage({
     .map((l) => ({ code: l.code, nativeName: l.nativeName }));
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-8 pb-24 md:pb-8">
+    <article className="mx-auto max-w-3xl px-4 py-8 pb-16 md:pb-8">
       <header className="mb-6">
-        <h1 id={`song-title-${song.id}`} className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
+        <h1
+          id={`song-title-${song.id}`}
+          className="font-heading text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em]"
+        >
           {title}
         </h1>
         {song.category && (
-          <span className="mt-2 inline-block rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
+          <span className="mt-2 inline-block rounded-full bg-secondary px-3 py-1 text-[0.78rem] font-semibold text-secondary-foreground">
             {song.category}
           </span>
         )}

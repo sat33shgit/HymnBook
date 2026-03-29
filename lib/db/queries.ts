@@ -98,11 +98,13 @@ export async function getSongs({
   page = 1,
   limit = 20,
   category,
+  language,
   publishedOnly = true,
 }: {
   page?: number;
   limit?: number;
   category?: string;
+  language?: string;
   publishedOnly?: boolean;
 } = {}) {
   const cacheKey = [
@@ -110,6 +112,7 @@ export async function getSongs({
     `page:${page}`,
     `limit:${limit}`,
     `category:${category ?? "all"}`,
+    `language:${language ?? "all"}`,
     `publishedOnly:${publishedOnly ? "1" : "0"}`,
   ];
 
@@ -137,8 +140,6 @@ export async function getSongs({
         .from(songs)
         .where(whereClause)
         .orderBy(desc(songs.createdAt));
-
-      const total = songRows.length;
 
       const songIds = songRows.map((s) => s.id);
       const translations =
@@ -177,7 +178,12 @@ export async function getSongs({
         a.title.localeCompare(b.title, undefined, { sensitivity: "base" })
       );
 
-      const pagedData = data.slice(offset, offset + limit);
+      const filteredData = language
+        ? data.filter((song) => song.languages.includes(language))
+        : data;
+
+      const total = filteredData.length;
+      const pagedData = filteredData.slice(offset, offset + limit);
 
       return {
         data: pagedData,

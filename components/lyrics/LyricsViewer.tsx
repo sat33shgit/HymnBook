@@ -199,7 +199,7 @@ export function LyricsViewer({
             className="inline-flex items-center gap-2 text-primary hover:underline"
           >
             <Youtube className="h-5 w-5" />
-            <span className="text-sm">Watch on YouTube</span>
+            <span className="text-[0.88rem] font-semibold">Watch on YouTube</span>
             <ExternalLink className="h-4 w-4 text-muted-foreground" />
           </a>
         </div>
@@ -214,13 +214,13 @@ export function LyricsViewer({
 
       {/* Font size controls */}
       <div className="mt-4 flex items-center gap-2">
-        <span className="text-xs text-muted-foreground">Size:</span>
+        <span className="text-[0.78rem] text-muted-foreground">Size:</span>
         {SIZES.map((s) => (
           <Button
             key={s}
             variant={fontSize === s ? "default" : "outline"}
             size="sm"
-            className="h-7 w-7 p-0 text-xs"
+            className="h-7 w-7 p-0 text-[0.78rem]"
             onClick={() => setFontSize(s)}
             aria-label={`Font size ${s}`}
           >
@@ -236,7 +236,7 @@ export function LyricsViewer({
             onCheckedChange={setShowEnglishTranslation}
             aria-label="Show English Text"
           />
-          <span className="text-sm text-foreground">Show English Text</span>
+          <span className="text-[0.88rem] text-foreground">Show English Text</span>
         </div>
       )}
 
@@ -256,7 +256,7 @@ export function LyricsViewer({
             {activeTranslation ? (
               <div className="space-y-3">
                 {showEnglishInPlace && (
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <p className="text-[0.76rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     Text In English
                   </p>
                 )}
@@ -281,36 +281,36 @@ export function LyricsViewer({
           variant="ghost"
           onClick={() => toggleFavorite(songId)}
           aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
-          className="gap-2"
+          className="min-h-11 gap-2 px-3"
         >
           <Heart
             className={`h-5 w-5 ${
               favorited ? "fill-[var(--gold)] text-[var(--gold)]" : ""
             }`}
           />
-          <span className="text-base font-medium">{favorited ? "Saved" : "Favorite"}</span>
+          <span className="text-[0.88rem] font-semibold">{favorited ? "Saved" : "Favorite"}</span>
         </Button>
-        <Button variant="ghost" onClick={handleShare} className="gap-2">
+        <Button variant="ghost" onClick={handleShare} className="min-h-11 gap-2 px-3">
           <Share2 className="h-5 w-5" />
-          <span className="text-base font-medium">Share</span>
+          <span className="text-[0.88rem] font-semibold">Share</span>
         </Button>
         <Button
           variant="ghost"
           onClick={() => setIsFullscreen(true)}
-          className="gap-2"
+          className="min-h-11 gap-2 px-3"
         >
           <Maximize2 className="h-5 w-5" />
-          <span className="text-base font-medium">Fullscreen</span>
+          <span className="text-[0.88rem] font-semibold">Fullscreen</span>
         </Button>
       </div>
 
       {/* Action bar - mobile (bottom fixed) */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t bg-background py-2 md:hidden">
+      <div className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] left-0 right-0 z-40 flex items-center justify-around border-t bg-background py-2 md:hidden">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => toggleFavorite(songId)}
-          className="flex-col gap-0.5 h-auto py-1.5"
+          className="h-11 min-w-16 flex-col gap-0.5 px-3"
           aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
         >
           <Heart
@@ -318,25 +318,25 @@ export function LyricsViewer({
               favorited ? "fill-[var(--gold)] text-[var(--gold)]" : ""
             }`}
           />
-          <span className="text-xs font-medium">{favorited ? "Saved" : "Favorite"}</span>
+          <span className="text-[0.78rem] font-semibold">{favorited ? "Saved" : "Favorite"}</span>
         </Button>
         <Button
           variant="ghost"
           size="sm"
           onClick={handleShare}
-          className="flex-col gap-0.5 h-auto py-1.5"
+          className="h-11 min-w-16 flex-col gap-0.5 px-3"
         >
           <Share2 className="h-5 w-5" />
-          <span className="text-xs font-medium">Share</span>
+          <span className="text-[0.78rem] font-semibold">Share</span>
         </Button>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsFullscreen(true)}
-          className="flex-col gap-0.5 h-auto py-1.5"
+          className="h-11 min-w-16 flex-col gap-0.5 px-3"
         >
           <Maximize2 className="h-5 w-5" />
-          <span className="text-xs font-medium">Fullscreen</span>
+          <span className="text-[0.78rem] font-semibold">Fullscreen</span>
         </Button>
       </div>
 

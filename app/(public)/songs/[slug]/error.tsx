@@ -13,8 +13,10 @@ export default function SongError({
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
       <AlertCircle className="mb-4 h-12 w-12 text-destructive" />
-      <h2 className="font-heading text-2xl font-bold">Could not load song</h2>
-      <p className="mt-2 text-muted-foreground">
+      <h2 className="font-heading text-[1.7rem] font-semibold leading-[1.1] tracking-[-0.03em]">
+        Could not load song
+      </h2>
+      <p className="mt-2 text-[0.88rem] text-muted-foreground">
         Something went wrong while loading this song.
       </p>
       <div className="mt-6 flex gap-3">

@@ -14,8 +14,9 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") ?? "1", 10);
     const limit = Math.min(parseInt(searchParams.get("limit") ?? "15", 10), 100);
     const category = searchParams.get("category") ?? undefined;
+    const language = searchParams.get("language") ?? undefined;
 
-    const result = await getSongs({ page, limit, category });
+    const result = await getSongs({ page, limit, category, language });
 
     return NextResponse.json(result, { headers });
   } catch (error) {

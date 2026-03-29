@@ -14,6 +14,7 @@ function subscribeToClientRender() {
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
+  onSubmit?: (value: string) => void;
   onVoiceResult?: (candidates: string[]) => void;
   suggestedQuery?: string | null;
   onSuggestedQuerySelect?: (value: string) => void;
@@ -26,6 +27,7 @@ interface SearchBarProps {
 export function SearchBar({
   value,
   onChange,
+  onSubmit,
   onVoiceResult,
   suggestedQuery,
   onSuggestedQuerySelect,
@@ -100,16 +102,31 @@ export function SearchBar({
     start();
   };
 
+  const handleSubmit = () => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return;
+    onSubmit?.(trimmedValue);
+  };
+
   return (
     <div className={className}>
       <div className="relative">
         <SearchIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
-          placeholder={isListening ? "Listening…" : placeholder}
+          placeholder={isListening ? "Listening..." : placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={cn("h-12 pl-10 bg-[var(--card-surface)]", isClient && isSupported ? "pr-14" : "pr-4")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
+          className={cn(
+            "h-12 bg-[var(--card-surface)] pl-10 text-base placeholder:text-[0.95rem]",
+            isClient && isSupported ? "pr-14" : "pr-4"
+          )}
           autoFocus={autoFocus}
           aria-label="Search songs"
         />
@@ -132,14 +149,14 @@ export function SearchBar({
               {isListening ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
             </TooltipTrigger>
             <TooltipContent>
-              {isError ? errorMessage : isListening ? "Listening… tap to stop" : "Search by voice"}
+              {isError ? errorMessage : isListening ? "Listening... tap to stop" : "Search by voice"}
             </TooltipContent>
           </Tooltip>
         )}
       </div>
 
       {(showVoicePrompt || suggestedQuery) && (
-        <div className="mt-2 min-h-12 text-left text-sm">
+        <div className="mt-2 min-h-12 text-left text-[0.88rem]">
           {showVoicePrompt && (
             <div
               className={cn(
@@ -160,10 +177,10 @@ export function SearchBar({
                 <AudioLines className="relative h-4 w-4" />
               </div>
               <div className="leading-tight">
-                <p className="font-semibold">
+                <p className="text-[0.95rem] font-semibold">
                   {showSpeakNow ? "Speak now" : "Listening..."}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[0.78rem] text-muted-foreground">
                   {showSpeakNow
                     ? "Say the song title, a lyric line, or the language."
                     : "Keep speaking naturally. Tap the mic again to stop."}
@@ -175,7 +192,7 @@ export function SearchBar({
             <button
               type="button"
               onClick={() => onSuggestedQuerySelect?.(suggestedQuery)}
-              className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-muted-foreground transition-colors hover:text-primary"
+              className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-[0.88rem] text-muted-foreground transition-colors hover:text-primary"
             >
               Did you mean <span className="font-medium text-primary">{suggestedQuery}</span>?
             </button>
