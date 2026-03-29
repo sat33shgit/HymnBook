@@ -9,6 +9,12 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import type { SongListItem } from "@/types";
 
+function getSortButtonClassName(isActive: boolean) {
+  return isActive
+    ? "rounded-full bg-[var(--desktop-nav-active)] px-4 text-[var(--desktop-nav-active-foreground)] hover:bg-[var(--desktop-nav-active)]/95"
+    : "rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-4 text-[var(--desktop-chip-foreground)] hover:border-[var(--desktop-chip-hover-border)] hover:bg-[var(--desktop-chip-hover)] hover:text-[var(--desktop-chip-hover-foreground)]";
+}
+
 export function FavoritesClient() {
   const { favorites } = useFavorites();
   const [songs, setSongs] = useState<SongListItem[]>([]);
@@ -16,29 +22,47 @@ export function FavoritesClient() {
   const [sortBy, setSortBy] = useState<"recent" | "alpha">("recent");
 
   useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+
     const fetchFavorites = async () => {
       if (favorites.length === 0) {
-        setSongs([]);
-        setLoading(false);
+        if (active) {
+          setSongs([]);
+          setLoading(false);
+        }
         return;
       }
 
       try {
         // Fetch all songs to find the favorites
-        const res = await fetch(`/api/songs?limit=100`);
+        const res = await fetch(`/api/songs?limit=100`, {
+          signal: controller.signal,
+        });
         const data = await res.json();
         const favSongs = (data.data as SongListItem[]).filter((s) =>
           favorites.includes(s.id)
         );
-        setSongs(favSongs);
-      } catch {
-        setSongs([]);
+        if (active) {
+          setSongs(favSongs);
+        }
+      } catch (error) {
+        if ((error as Error).name !== "AbortError" && active) {
+          setSongs([]);
+        }
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
     fetchFavorites();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, [favorites]);
 
   const sorted =
@@ -48,55 +72,27 @@ export function FavoritesClient() {
 
   return (
     <div className="space-y-6 md:space-y-8">
-      <div className="mx-auto max-w-[1200px] px-4 py-8 md:hidden">
-        <h1 className="font-heading text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em]">
-          Favorites
-        </h1>
-        {songs.length > 0 && (
-          <div className="mt-6 flex gap-2">
-            <Button
-              variant={sortBy === "recent" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSortBy("recent")}
-            >
-              Recent
-            </Button>
-            <Button
-              variant={sortBy === "alpha" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSortBy("alpha")}
-            >
-              A-Z
-            </Button>
-          </div>
-        )}
-      </div>
-
-      <section className="hidden rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-6 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:block">
-        <div className="flex items-start justify-between gap-6">
+      <section className="mx-4 rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-5 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:mx-0 md:p-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-6">
           <div className="flex items-start gap-4">
             <div className="flex size-14 items-center justify-center rounded-[1.4rem] bg-[var(--desktop-panel-soft)] text-rose-500">
               <Heart className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="mt-3 font-heading text-[3rem] font-semibold leading-[0.95] tracking-[-0.06em] text-foreground">
+              <h1 className="mt-2 font-heading text-[clamp(2.2rem,6vw,3rem)] font-semibold leading-[0.95] tracking-[-0.06em] text-foreground">
                 Favorites
               </h1>
-              <p className="mt-4 max-w-2xl text-[0.98rem] leading-8 text-[var(--desktop-nav-muted)]">
+              <p className="mt-3 max-w-2xl text-[0.94rem] leading-7 text-[var(--desktop-nav-muted)] md:mt-4 md:text-[0.98rem] md:leading-8">
                 Keep quick access to the songs you revisit most.
               </p>
             </div>
           </div>
 
           {songs.length > 0 && (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 md:justify-end">
               <Button
                 variant={sortBy === "recent" ? "default" : "outline"}
-                className={
-                  sortBy === "recent"
-                    ? "rounded-full bg-[var(--desktop-nav-active)] px-4 text-[var(--desktop-nav-active-foreground)]"
-                    : "rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-4 text-[var(--desktop-chip-foreground)]"
-                }
+                className={getSortButtonClassName(sortBy === "recent")}
                 size="sm"
                 onClick={() => setSortBy("recent")}
               >
@@ -104,11 +100,7 @@ export function FavoritesClient() {
               </Button>
               <Button
                 variant={sortBy === "alpha" ? "default" : "outline"}
-                className={
-                  sortBy === "alpha"
-                    ? "rounded-full bg-[var(--desktop-nav-active)] px-4 text-[var(--desktop-nav-active-foreground)]"
-                    : "rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-4 text-[var(--desktop-chip-foreground)]"
-                }
+                className={getSortButtonClassName(sortBy === "alpha")}
                 size="sm"
                 onClick={() => setSortBy("alpha")}
               >
@@ -132,21 +124,30 @@ export function FavoritesClient() {
         <section className="px-4 md:px-0">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 xl:gap-5">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-40 rounded-lg md:h-64 md:rounded-[2rem]" />
+              <Skeleton
+                key={i}
+                className="h-44 rounded-[1.7rem] md:h-64 md:rounded-[2rem]"
+              />
             ))}
           </div>
         </section>
       ) : songs.length === 0 ? (
         <section className="px-4 md:px-0">
-          <div className="flex flex-col items-center justify-center rounded-[1.5rem] py-20 text-center md:rounded-[2rem] md:border md:border-[var(--desktop-panel-border)] md:bg-[var(--desktop-panel)] md:px-6 md:shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:md:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
-            <Heart className="mb-4 h-16 w-16 text-muted-foreground/30" />
-            <p className="text-[1.12rem] font-semibold text-muted-foreground">
+          <div className="flex flex-col items-center justify-center rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] px-6 py-20 text-center shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
+            <Heart className="mb-4 h-16 w-16 text-[var(--desktop-nav-muted)]/35" />
+            <p className="text-[1.12rem] font-semibold text-foreground">
               No favorites yet
             </p>
-            <p className="mt-2 text-[0.88rem] text-muted-foreground">
+            <p className="mt-2 text-[0.88rem] text-[var(--desktop-nav-muted)]">
               Tap the heart on any song to save it here.
             </p>
-            <Link href="/" className={buttonVariants({ className: "mt-6 rounded-full" })}>
+            <Link
+              href="/"
+              className={buttonVariants({
+                className:
+                  "mt-6 rounded-full bg-[var(--desktop-nav-active)] px-5 text-[var(--desktop-nav-active-foreground)] hover:bg-[var(--desktop-nav-active)]/95",
+              })}
+            >
               Browse Songs
             </Link>
           </div>

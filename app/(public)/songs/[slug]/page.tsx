@@ -95,21 +95,48 @@ export default async function SongDetailPage({
       return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
     })
     .map((l) => ({ code: l.code, nativeName: l.nativeName }));
+  const mobileSummary = `${new Intl.NumberFormat("en-US").format(song.viewCount ?? 0)} views / Available in ${songLanguages.length} ${songLanguages.length === 1 ? "language" : "languages"}`;
 
   return (
-    <article className="px-4 py-8 pb-16 md:px-0 md:py-0 md:pb-0">
+    <article className="px-4 py-6 pb-16 md:px-0 md:py-0 md:pb-0">
       <header className="mb-6 md:hidden">
-        <h1
-          id={`song-title-${song.id}`}
-          className="font-heading text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em]"
+        <div
+          className="rounded-[2.1rem] px-5 py-6 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)]"
+          style={{
+            backgroundImage:
+              "linear-gradient(135deg, var(--desktop-hero-start), var(--desktop-hero-end))",
+          }}
         >
-          {title}
-        </h1>
-        {song.category && (
-          <span className="mt-2 inline-block rounded-full bg-secondary px-3 py-1 text-[0.78rem] font-semibold text-secondary-foreground">
-            {song.category}
-          </span>
-        )}
+          <div className="flex flex-wrap gap-2">
+            {song.category && (
+              <span className="rounded-full bg-white/12 px-3 py-1 text-[0.78rem] font-semibold">
+                {song.category}
+              </span>
+            )}
+            {songLanguages.slice(0, 3).map((language) => (
+              <span
+                key={language.code}
+                className="rounded-full bg-white/10 px-3 py-1 text-[0.78rem] font-semibold text-[var(--desktop-hero-muted)]"
+              >
+                {language.nativeName}
+              </span>
+            ))}
+            {songLanguages.length > 3 && (
+              <span className="rounded-full bg-white/10 px-3 py-1 text-[0.78rem] font-semibold text-[var(--desktop-hero-muted)]">
+                +{songLanguages.length - 3}
+              </span>
+            )}
+          </div>
+          <h1
+            id={`song-title-${song.id}`}
+            className="mt-4 font-heading text-[clamp(2.2rem,8vw,3.3rem)] font-semibold leading-[0.96] tracking-[-0.05em]"
+          >
+            {title}
+          </h1>
+          <p className="mt-4 text-[0.92rem] leading-7 text-[var(--desktop-hero-muted)]">
+            {mobileSummary}
+          </p>
+        </div>
       </header>
 
       <LyricsViewer

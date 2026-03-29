@@ -55,7 +55,7 @@ export function SongCard({
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
       <Card
-        className="group h-full cursor-pointer bg-[var(--card-surface)] transition-colors transition-shadow hover:shadow-lg md:rounded-[2rem] md:border md:border-[var(--desktop-panel-border)] md:bg-[var(--desktop-panel)] md:py-5 md:shadow-[0_20px_42px_rgba(15,23,42,0.07)] dark:md:shadow-[0_20px_42px_rgba(2,6,23,0.3)]"
+        className="group h-full cursor-pointer rounded-[1.75rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] py-4 ring-0 shadow-[0_18px_36px_rgba(15,23,42,0.07)] transition-all hover:-translate-y-px hover:shadow-[0_20px_42px_rgba(15,23,42,0.1)] md:rounded-[2rem] md:py-5 dark:shadow-[0_20px_42px_rgba(2,6,23,0.3)] dark:hover:shadow-[0_22px_46px_rgba(2,6,23,0.34)]"
         onClick={() => router.push(songHref)}
         role="link"
         tabIndex={0}
@@ -66,19 +66,19 @@ export function SongCard({
           }
         }}
       >
-        <CardHeader className="pb-0 md:px-5">
+        <CardHeader className="px-4 pb-0 md:px-5">
           <div className="flex items-start gap-4">
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <span className="block font-heading text-[1.12rem] font-semibold leading-[1.2] text-foreground transition-colors group-hover:text-primary md:text-[1.65rem] md:leading-[1.05] md:tracking-[-0.04em]">
+                  <span className="block font-heading text-[1.2rem] font-semibold leading-[1.16] tracking-[-0.03em] text-foreground transition-colors group-hover:text-[var(--desktop-chip-hover-foreground)] md:text-[1.65rem] md:leading-[1.05] md:tracking-[-0.04em]">
                     {displayTitle}
                   </span>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     {song.category && (
                       <Badge
                         variant="secondary"
-                        className="rounded-full px-3 py-1 text-[0.76rem] font-semibold md:bg-[var(--desktop-panel-soft)] md:text-[0.78rem] md:text-[var(--desktop-chip-foreground)]"
+                        className="rounded-full bg-[var(--desktop-panel-soft)] px-3 py-1 text-[0.76rem] font-semibold text-[var(--desktop-chip-foreground)] md:text-[0.78rem]"
                       >
                         {song.category}
                       </Badge>
@@ -87,7 +87,7 @@ export function SongCard({
                       <Badge
                         key={lang}
                         variant="outline"
-                        className="rounded-full px-3 py-1 text-[0.76rem] font-semibold md:border-[var(--desktop-chip-border)] md:bg-[var(--desktop-chip)] md:text-[var(--desktop-chip-foreground)]"
+                        className="rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-3 py-1 text-[0.76rem] font-semibold text-[var(--desktop-chip-foreground)]"
                       >
                         {LANGUAGE_NAMES[lang] ?? lang}
                       </Badge>
@@ -95,7 +95,7 @@ export function SongCard({
                     {song.languages.length > 4 && (
                       <Badge
                         variant="outline"
-                        className="rounded-full px-3 py-1 text-[0.76rem] font-semibold md:border-[var(--desktop-chip-border)] md:bg-[var(--desktop-chip)] md:text-[var(--desktop-chip-foreground)]"
+                        className="rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-3 py-1 text-[0.76rem] font-semibold text-[var(--desktop-chip-foreground)]"
                       >
                         +{song.languages.length - 4}
                       </Badge>
@@ -105,7 +105,7 @@ export function SongCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="-mr-2 -mt-2 h-11 w-11 shrink-0 rounded-full md:-mr-1 md:-mt-1 md:rounded-[1.15rem] md:bg-[var(--desktop-panel-soft)] md:hover:bg-[var(--desktop-chip)]"
+                  className="-mr-1 -mt-1 h-11 w-11 shrink-0 rounded-[1.15rem] bg-[var(--desktop-panel-soft)] hover:bg-[var(--desktop-chip)]"
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFavorite(song.id);
@@ -116,7 +116,7 @@ export function SongCard({
                     className={`h-4 w-4 transition-colors ${
                       favorited
                         ? "fill-[var(--gold)] text-[var(--gold)]"
-                        : "text-muted-foreground md:text-[var(--desktop-nav-muted)]"
+                        : "text-[var(--desktop-nav-muted)]"
                     }`}
                   />
                 </Button>
@@ -124,9 +124,9 @@ export function SongCard({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="pt-4 md:px-5">
+        <CardContent className="px-4 pt-4 md:px-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.88rem] text-muted-foreground md:text-[0.92rem] md:text-[var(--desktop-nav-muted)]">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.9rem] text-[var(--desktop-nav-muted)] md:text-[0.92rem]">
               <span className="inline-flex items-center gap-2">
                 <Globe2 className="h-4 w-4" />
                 {song.languages.length} {song.languages.length === 1 ? "language" : "languages"}

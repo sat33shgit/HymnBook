@@ -15,14 +15,14 @@ export function CategoryFilter({
 }: CategoryFilterProps) {
   const getButtonClassName = (isActive: boolean) =>
     cn(
-      "inline-flex items-center rounded-full border px-4 py-2 text-[0.88rem] font-semibold transition-colors",
+      "inline-flex items-center rounded-full border px-4 py-2 text-[0.88rem] font-semibold transition-all",
       isActive
-        ? "border-primary bg-primary text-primary-foreground md:border-transparent md:bg-[var(--desktop-nav-active)] md:text-[var(--desktop-nav-active-foreground)]"
-        : "border-border bg-background text-muted-foreground hover:text-foreground md:border-[var(--desktop-chip-border)] md:bg-[var(--desktop-chip)] md:text-[var(--desktop-chip-foreground)] md:hover:border-primary/30 md:hover:text-primary",
+        ? "border-transparent bg-[var(--desktop-nav-active)] text-[var(--desktop-nav-active-foreground)] shadow-[0_14px_28px_rgba(15,23,42,0.14)]"
+        : "border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] text-[var(--desktop-chip-foreground)] hover:-translate-y-px hover:border-[var(--desktop-chip-hover-border)] hover:bg-[var(--desktop-chip-hover)] hover:text-[var(--desktop-chip-hover-foreground)]",
     );
 
   return (
-    <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+    <div className="flex flex-wrap gap-2.5" role="group" aria-label="Filter by category">
       <button
         type="button"
         className={getButtonClassName(selected === null)}

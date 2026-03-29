@@ -2,77 +2,49 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Moon, Sun, Music } from "lucide-react";
+import { BookOpenText, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { useFavorites } from "@/hooks/useFavorites";
 
 export function Header() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
-  const { favorites } = useFavorites();
 
   const isAdmin = pathname.startsWith("/admin");
   if (isAdmin) return null;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Music className="h-6 w-6 text-primary" />
-          <span className="font-heading text-[1.1rem] font-semibold tracking-[-0.02em] md:text-[1.15rem]">
-            Beautiful Songs
-          </span>
+    <header className="sticky top-0 z-50 px-4 pt-4 md:hidden">
+      <div className="mx-auto flex max-w-md items-center justify-between rounded-[1.75rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-sidebar)] px-4 py-3.5 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:shadow-[0_18px_40px_rgba(2,6,23,0.36)]">
+        <Link href="/" className="flex min-w-0 items-center gap-3">
+          <div
+            className="flex size-11 shrink-0 items-center justify-center rounded-[1.1rem] text-[var(--desktop-hero-foreground)] shadow-[0_18px_32px_rgba(6,78,59,0.24)]"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, var(--desktop-hero-start), var(--desktop-hero-end))",
+            }}
+          >
+            <BookOpenText className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--desktop-nav-muted)]">
+              Hymn Book
+            </p>
+            <p className="truncate text-[0.95rem] font-semibold text-foreground">
+              Worship songs library
+            </p>
+          </div>
         </Link>
-
-        <nav className="hidden items-center gap-6 md:flex" role="navigation">
-          <Link
-            href="/"
-            className={`text-[0.88rem] font-semibold transition-colors hover:text-primary ${
-              pathname === "/" ? "text-primary" : "text-muted-foreground"
-            }`}
-          >
-            Songs
-          </Link>
-          <Link
-            href="/search"
-            className={`text-[0.88rem] font-semibold transition-colors hover:text-primary ${
-              pathname === "/search"
-                ? "text-primary"
-                : "text-muted-foreground"
-            }`}
-          >
-            Search
-          </Link>
-          <Link
-            href="/favorites"
-            className={`relative text-[0.88rem] font-semibold transition-colors hover:text-primary ${
-              pathname === "/favorites"
-                ? "text-primary"
-                : "text-muted-foreground"
-            }`}
-          >
-            Favorites
-            {favorites.length > 0 && (
-              <span className="absolute -right-5 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--gold)] text-[0.76rem] font-semibold text-white">
-                {favorites.length}
-              </span>
-            )}
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-11 md:size-8"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            aria-label="Toggle theme"
-          >
-            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-11 rounded-[1.1rem] bg-[var(--desktop-panel)] text-[var(--desktop-nav-muted)] shadow-[0_12px_24px_rgba(15,23,42,0.08)] hover:bg-[var(--desktop-chip)] hover:text-foreground dark:shadow-[0_12px_24px_rgba(2,6,23,0.24)]"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          aria-label="Toggle theme"
+        >
+          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        </Button>
       </div>
     </header>
   );

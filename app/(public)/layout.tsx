@@ -8,11 +8,11 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="theme-c-public min-h-screen bg-background text-foreground font-sans md:bg-[var(--desktop-shell)]">
+    <div className="theme-c-public min-h-screen bg-[var(--desktop-shell)] text-foreground font-sans">
       <Header />
       <div className="md:grid md:min-h-screen md:grid-cols-[292px_minmax(0,1fr)]">
         <DesktopSidebar />
-        <main className="flex-1 pb-[calc(5.75rem+env(safe-area-inset-bottom))] md:min-w-0 md:px-8 md:py-7 md:pb-10 lg:px-10">
+        <main className="flex-1 pb-[calc(8rem+env(safe-area-inset-bottom))] md:min-w-0 md:px-8 md:py-7 md:pb-10 lg:px-10">
           {children}
         </main>
       </div>

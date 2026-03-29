@@ -73,9 +73,9 @@ export function BrowseSongsSection({
 
   return (
     <section className="w-full px-4 py-4 md:px-0 md:py-0">
-      <div className="md:rounded-[2rem] md:border md:border-[var(--desktop-panel-border)] md:bg-[var(--desktop-panel)] md:p-6 md:shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:md:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
-        <div className="hidden md:block">
-          <h2 className="font-heading text-[1.85rem] font-semibold leading-[1.05] tracking-[-0.04em] text-foreground">
+      <div className="rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-5 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:p-6">
+        <div>
+          <h2 className="font-heading text-[1.7rem] font-semibold leading-[1.05] tracking-[-0.04em] text-foreground md:text-[1.85rem]">
             Browse all songs
           </h2>
           <p className="mt-2 text-[0.94rem] text-[var(--desktop-nav-muted)]">
@@ -99,7 +99,7 @@ export function BrowseSongsSection({
           <div className="mt-8 flex justify-center md:mt-10">
             <Button
               variant="outline"
-              className="md:rounded-full md:border-[var(--desktop-chip-border)] md:bg-[var(--desktop-chip)] md:px-6 md:text-[var(--desktop-chip-foreground)]"
+              className="rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-6 text-[var(--desktop-chip-foreground)] hover:border-[var(--desktop-chip-hover-border)] hover:bg-[var(--desktop-chip-hover)] hover:text-[var(--desktop-chip-hover-foreground)]"
               onClick={loadMore}
               disabled={loading}
             >
