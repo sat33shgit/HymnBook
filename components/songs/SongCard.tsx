@@ -30,16 +30,20 @@ interface SongCardProps {
   song: SongListItem;
   index?: number;
   preferredLanguage?: string;
+  titleVariant?: "common" | "localized";
 }
 
 export function SongCard({
   song,
   index = 0,
   preferredLanguage,
+  titleVariant = "common",
 }: SongCardProps) {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorited = isFavorite(song.id);
+  const displayTitle =
+    titleVariant === "localized" ? song.localizedTitle ?? song.title : song.title;
   const songHref = preferredLanguage
     ? `/songs/${song.slug}?lang=${encodeURIComponent(preferredLanguage)}`
     : `/songs/${song.slug}`;
@@ -68,7 +72,7 @@ export function SongCard({
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <span className="block font-heading text-[1.12rem] font-semibold leading-[1.2] text-foreground transition-colors group-hover:text-primary md:text-[1.65rem] md:leading-[1.05] md:tracking-[-0.04em]">
-                    {song.title}
+                    {displayTitle}
                   </span>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     {song.category && (

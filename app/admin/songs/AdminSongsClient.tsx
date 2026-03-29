@@ -114,8 +114,7 @@ export function AdminSongsClient({
         hasYoutube: r.has_youtube ?? false,
       }));
       setSongs(mapped);
-    } catch (err) {
-      console.warn(err);
+    } catch {
       toast.error("Search failed");
     } finally {
       setSearchLoading(false);

@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { LyricsText } from "./LyricsText";
 import type { FontSize, SongTranslation } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
@@ -224,7 +225,10 @@ export function FullscreenReader({
 
 
         {/* Lyrics */}
-        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-6 pt-0 pb-6">
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto px-6 pt-0 pb-6 md:px-10 md:pb-10"
+        >
           <AnimatePresence mode="wait">
             <motion.div
               ref={contentRef}
@@ -233,13 +237,16 @@ export function FullscreenReader({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className={shouldCenterContent ? "flex min-h-full flex-col justify-center" : undefined}
+              className={cn(
+                "md:mx-auto md:w-full md:max-w-5xl",
+                shouldCenterContent && "flex min-h-full flex-col justify-center"
+              )}
               role="tabpanel"
               id={`lyrics-panel-${activeLanguage}`}
               aria-labelledby={`lang-tab-${activeLanguage}`}
             >
               {activeTranslation ? (
-                  <div className="space-y-3">
+                  <div className="space-y-3 md:mx-auto md:w-full md:max-w-3xl md:text-center">
                     {showEnglishInPlace && (
                       <p className="text-[0.76rem] font-semibold uppercase tracking-[0.16em] opacity-70">
                         Text In English

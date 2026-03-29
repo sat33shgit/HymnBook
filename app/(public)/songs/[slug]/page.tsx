@@ -97,8 +97,8 @@ export default async function SongDetailPage({
     .map((l) => ({ code: l.code, nativeName: l.nativeName }));
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-8 pb-16 md:pb-8">
-      <header className="mb-6">
+    <article className="px-4 py-8 pb-16 md:px-0 md:py-0 md:pb-0">
+      <header className="mb-6 md:hidden">
         <h1
           id={`song-title-${song.id}`}
           className="font-heading text-[clamp(2.2rem,5vw,4rem)] font-semibold leading-none tracking-[-0.04em]"
@@ -120,6 +120,8 @@ export default async function SongDetailPage({
         defaultLang={song.defaultLang ?? "en"}
         initialLang={lang}
         showAudio={isAudioVisible}
+        songCategory={song.category}
+        songViewCount={song.viewCount}
       />
     </article>
   );

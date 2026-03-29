@@ -45,6 +45,7 @@ export interface SongListItem {
   viewCount: number | null;
   isPublished: boolean | null;
   title: string;
+  localizedTitle?: string | null;
   languages: string[];
   hasAudio?: boolean;
   hasYoutube?: boolean;

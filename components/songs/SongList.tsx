@@ -8,12 +8,14 @@ interface SongListProps {
   songs: SongListItem[];
   className?: string;
   preferredLanguage?: string;
+  titleVariant?: "common" | "localized";
 }
 
 export function SongList({
   songs,
   className,
   preferredLanguage,
+  titleVariant = "common",
 }: SongListProps) {
   if (songs.length === 0) {
     return (
@@ -36,6 +38,7 @@ export function SongList({
           song={song}
           index={i}
           preferredLanguage={preferredLanguage}
+          titleVariant={titleVariant}
         />
       ))}
     </div>

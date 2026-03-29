@@ -116,6 +116,7 @@ export function LanguagesClient({
           songs={songs}
           className="xl:grid-cols-3"
           preferredLanguage={selectedLanguage}
+          titleVariant="localized"
         />
 
         {page < totalPages && (

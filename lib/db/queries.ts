@@ -160,6 +160,9 @@ export async function getSongs({
         const defaultTitle = songTrans.find(
           (t) => t.languageCode === (song.defaultLang ?? "en")
         )?.title;
+        const localizedTitle = language
+          ? songTrans.find((t) => t.languageCode === language)?.title ?? null
+          : null;
         return {
           id: song.id,
           slug: song.slug,
@@ -168,6 +171,7 @@ export async function getSongs({
           viewCount: song.viewCount,
           isPublished: song.isPublished,
           title: englishTitle ?? defaultTitle ?? songTrans[0]?.title ?? "Untitled",
+          localizedTitle,
           languages: songTrans.map((t) => t.languageCode),
           hasAudio: songTrans.some((t) => (t.audioUrl ?? "").toString().trim() !== ""),
           hasYoutube: songTrans.some((t) => (t.youtubeUrl ?? "").toString().trim() !== ""),
@@ -175,7 +179,11 @@ export async function getSongs({
       });
 
       data.sort((a, b) =>
-        a.title.localeCompare(b.title, undefined, { sensitivity: "base" })
+        (language ? a.localizedTitle ?? a.title : a.title).localeCompare(
+          language ? b.localizedTitle ?? b.title : b.title,
+          undefined,
+          { sensitivity: "base" }
+        )
       );
 
       const filteredData = language
@@ -585,7 +593,23 @@ export async function searchSongs(
           s.id as song_id,
           s.slug,
           s.is_published,
-          st.title,
+          COALESCE(
+            (
+              SELECT st_common.title
+              FROM song_translations st_common
+              WHERE st_common.song_id = s.id
+                AND st_common.language_code = 'en'
+              LIMIT 1
+            ),
+            (
+              SELECT st_common.title
+              FROM song_translations st_common
+              WHERE st_common.song_id = s.id
+                AND st_common.language_code = s.default_lang
+              LIMIT 1
+            ),
+            st.title
+          ) as title,
           st.language_code as matched_language,
           (
             SELECT EXISTS(
