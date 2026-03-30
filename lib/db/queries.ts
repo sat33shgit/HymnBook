@@ -1,6 +1,6 @@
 import { db } from "./index";
 import { songs, songTranslations, languages, userFavorites, appSettings } from "./schema";
-import { eq, sql, and, desc, asc } from "drizzle-orm";
+import { eq, sql, and, desc, asc, inArray } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { CACHE_TAGS, CACHE_TTL, songIdTag, songSlugTag } from "@/lib/cache";
 
@@ -275,24 +275,45 @@ export async function getMostViewedSongs(limit = 5) {
         .orderBy(desc(songs.viewCount), desc(songs.createdAt))
         .limit(safeLimit);
 
-      const songIds = songRows.map((s) => s.id);
-      const translations =
-        songIds.length > 0
-          ? await db
-              .select()
-              .from(songTranslations)
-              .where(
-                sql`${songTranslations.songId} = ANY(${sql.raw(
-                  `ARRAY[${songIds.join(",")}]`
-                )})`
-              )
-          : [];
+      if (songRows.length === 0) {
+        return [];
+      }
+
+      const songIds = songRows.map((song) => song.id);
+      const translations = await db
+        .select({
+          songId: songTranslations.songId,
+          languageCode: songTranslations.languageCode,
+          title: songTranslations.title,
+        })
+        .from(songTranslations)
+        .where(inArray(songTranslations.songId, songIds))
+        .orderBy(asc(songTranslations.languageCode));
+
+      const translationsBySongId = new Map<
+        number,
+        { languageCode: string; title: string }[]
+      >();
+
+      for (const translation of translations) {
+        const existingTranslations =
+          translationsBySongId.get(translation.songId) ?? [];
+
+        existingTranslations.push({
+          languageCode: translation.languageCode,
+          title: translation.title,
+        });
+        translationsBySongId.set(translation.songId, existingTranslations);
+      }
 
       return songRows.map((song) => {
-        const songTrans = translations.filter((t) => t.songId === song.id);
-        const englishTitle = songTrans.find((t) => t.languageCode === "en")?.title;
-        const defaultTitle = songTrans.find(
-          (t) => t.languageCode === (song.defaultLang ?? "en")
+        const songTranslationsForSong = translationsBySongId.get(song.id) ?? [];
+        const englishTitle = songTranslationsForSong.find(
+          (translation) => translation.languageCode === "en"
+        )?.title;
+        const defaultTitle = songTranslationsForSong.find(
+          (translation) =>
+            translation.languageCode === (song.defaultLang ?? "en")
         )?.title;
 
         return {
@@ -302,8 +323,14 @@ export async function getMostViewedSongs(limit = 5) {
           defaultLang: song.defaultLang,
           viewCount: song.viewCount,
           isPublished: song.isPublished,
-          title: englishTitle ?? defaultTitle ?? songTrans[0]?.title ?? "Untitled",
-          languages: songTrans.map((t) => t.languageCode),
+          title:
+            englishTitle ??
+            defaultTitle ??
+            songTranslationsForSong[0]?.title ??
+            "Untitled",
+          languages: songTranslationsForSong.map(
+            (translation) => translation.languageCode
+          ),
         };
       });
     },

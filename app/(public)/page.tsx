@@ -1,29 +1,32 @@
 import {
   getCategories,
   getLanguages,
-  getMostViewedSongs,
   getPublishedLanguageSongCounts,
 } from "@/lib/db/queries";
+import { Suspense } from "react";
 import { HomeClient } from "./HomeClient";
+import {
+  DesktopMostViewedSongsSkeleton,
+  DesktopMostViewedSongsSection,
+  MobileMostViewedSongsSkeleton,
+  MobileMostViewedSongsSection,
+} from "./MostViewedSongsSection";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  let mostViewedSongs: Awaited<ReturnType<typeof getMostViewedSongs>> = [];
   let totalSongs = 0;
   let totalLanguages = 0;
   let totalCategories = 0;
   let languageOverview: { code: string; label: string; count: number }[] = [];
 
   try {
-    const [topViewed, activeLanguages, languageCountsResult, categories] = await Promise.all([
-      getMostViewedSongs(12),
+    const [activeLanguages, languageCountsResult, categories] = await Promise.all([
       getLanguages(true),
       getPublishedLanguageSongCounts(true),
       getCategories(),
     ]);
 
-    mostViewedSongs = topViewed;
     totalLanguages = activeLanguages.length;
     totalCategories = categories.length;
     const languageCounts = new Map(
@@ -50,11 +53,20 @@ export default async function HomePage() {
 
   return (
     <HomeClient
-      mostViewedSongs={mostViewedSongs}
       totalSongs={totalSongs}
       totalLanguages={totalLanguages}
       totalCategories={totalCategories}
       languageOverview={languageOverview}
+      mobileMostViewedSongsSection={
+        <Suspense fallback={<MobileMostViewedSongsSkeleton />}>
+          <MobileMostViewedSongsSection />
+        </Suspense>
+      }
+      desktopMostViewedSongsSection={
+        <Suspense fallback={<DesktopMostViewedSongsSkeleton />}>
+          <DesktopMostViewedSongsSection />
+        </Suspense>
+      }
     />
   );
 }

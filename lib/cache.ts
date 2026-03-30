@@ -1,7 +1,7 @@
 export const CACHE_TTL = {
   songs: 300,
   song: 300,
-  mostViewed: 120,
+  mostViewed: 300,
   languages: 300,
   categories: 300,
   slugs: 1800,

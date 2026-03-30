@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { incrementSongViews } from "@/lib/db/queries";
-import { CACHE_TAGS, songIdTag, songSlugTag } from "@/lib/cache";
+import { songIdTag, songSlugTag } from "@/lib/cache";
 
 const headers = { "X-API-Version": "1" };
 
@@ -22,7 +22,6 @@ export async function POST(
       return NextResponse.json({ error: "Song not found" }, { status: 404, headers });
     }
 
-    revalidateTag(CACHE_TAGS.mostViewed, "max");
     revalidateTag(songIdTag(song.id), "max");
     revalidateTag(songSlugTag(song.slug), "max");
 
