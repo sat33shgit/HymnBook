@@ -19,6 +19,7 @@ export function LyricsText({ lyrics, fontSize, languageCode }: LyricsTextProps) 
       style={{
         fontSize: `${FONT_SIZE_MAP[fontSize]}px`,
         fontFamily,
+        fontWeight: 700,
       }}
       lang={languageCode}
     >
