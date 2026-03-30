@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bookmark, Home, Languages, Search as SearchIcon } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
+import { publicNavItems } from "./publicNavItems";
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -12,41 +12,16 @@ export function MobileNav() {
 
   if (hideNav) return null;
 
-  const links = [
-    {
-      href: "/",
-      label: "Home",
-      icon: Home,
-      isActive: pathname === "/",
-    },
-    {
-      href: "/search",
-      label: "Search",
-      icon: SearchIcon,
-      isActive: pathname.startsWith("/search"),
-    },
-    {
-      href: "/languages",
-      label: "Languages",
-      icon: Languages,
-      isActive: pathname.startsWith("/languages"),
-    },
-    {
-      href: "/favorites",
-      label: "Saved",
-      icon: Bookmark,
-      isActive: pathname.startsWith("/favorites"),
-      badge: favorites.length > 0 ? favorites.length : null,
-    },
-  ];
-
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-50 px-4 pb-[env(safe-area-inset-bottom)] md:hidden"
       aria-label="Mobile navigation"
     >
       <div className="mx-auto flex max-w-lg items-center gap-2 rounded-[1.85rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-sidebar)] p-2.5 shadow-[0_20px_48px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:shadow-[0_20px_48px_rgba(2,6,23,0.4)]">
-        {links.map(({ href, label, icon: Icon, isActive, badge }) => {
+        {publicNavItems.map(({ href, label, icon: Icon, matches }) => {
+          const isActive = matches(pathname);
+          const badge = href === "/favorites" && favorites.length > 0 ? favorites.length : null;
+
           return (
             <Link
               key={href}

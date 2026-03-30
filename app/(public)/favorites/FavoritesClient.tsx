@@ -5,7 +5,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { SongCard } from "@/components/songs/SongCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Heart } from "lucide-react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { SongListItem } from "@/types";
 
@@ -14,6 +14,9 @@ function getSortButtonClassName(isActive: boolean) {
     ? "rounded-full bg-[var(--desktop-nav-active)] px-4 text-[var(--desktop-nav-active-foreground)] hover:bg-[var(--desktop-nav-active)]/95"
     : "rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-4 text-[var(--desktop-chip-foreground)] hover:border-[var(--desktop-chip-hover-border)] hover:bg-[var(--desktop-chip-hover)] hover:text-[var(--desktop-chip-hover-foreground)]";
 }
+
+const browseSongsLinkClassName =
+  "inline-flex h-11 w-full max-w-[14rem] items-center justify-center whitespace-nowrap rounded-full border border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-5 text-[0.88rem] font-semibold text-[var(--desktop-chip-foreground)] transition-all hover:border-[var(--desktop-chip-hover-border)] hover:bg-[var(--desktop-chip-hover)] hover:text-[var(--desktop-chip-hover-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]/35 md:h-12 md:w-auto md:max-w-none md:border-[var(--desktop-panel-border)] md:bg-[var(--desktop-panel)] md:px-6 md:text-[0.94rem] md:text-foreground md:shadow-[0_10px_24px_rgba(15,23,42,0.08)] md:hover:-translate-y-px md:hover:border-[var(--desktop-chip-hover-border)] md:hover:bg-[var(--desktop-chip-hover)] md:hover:text-[var(--desktop-chip-hover-foreground)] md:hover:shadow-[0_16px_32px_rgba(15,23,42,0.12)] dark:md:shadow-[0_12px_24px_rgba(2,6,23,0.28)] dark:md:hover:shadow-[0_16px_32px_rgba(2,6,23,0.36)]";
 
 export function FavoritesClient() {
   const { favorites } = useFavorites();
@@ -151,20 +154,19 @@ export function FavoritesClient() {
         </section>
       ) : songs.length === 0 ? (
         <section className="px-4 md:px-0">
-          <div className="flex flex-col items-center justify-center rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] px-6 py-20 text-center shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
-            <Heart className="mb-4 h-16 w-16 text-[var(--desktop-nav-muted)]/35" />
-            <p className="text-[1.12rem] font-semibold text-foreground">
+          <div className="flex flex-col items-center justify-center rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] px-5 py-14 text-center shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:px-8 md:py-[4.5rem] lg:px-10 lg:py-20">
+            <div className="flex size-16 items-center justify-center rounded-[1.4rem] bg-[var(--desktop-panel-soft)] text-rose-500 shadow-[0_14px_30px_rgba(15,23,42,0.08)] dark:shadow-[0_16px_34px_rgba(2,6,23,0.22)] md:size-[4.75rem] md:rounded-[1.65rem]">
+              <Heart className="h-8 w-8 md:h-10 md:w-10" />
+            </div>
+            <p className="mt-5 font-heading text-[1.45rem] font-semibold leading-[1.02] tracking-[-0.04em] text-foreground md:mt-6 md:text-[1.85rem]">
               No favorites yet
             </p>
-            <p className="mt-2 text-[0.88rem] text-[var(--desktop-nav-muted)]">
+            <p className="mt-3 max-w-md text-[0.92rem] leading-7 text-[var(--desktop-nav-muted)] md:text-[0.98rem] md:leading-8">
               Tap the heart on any song to save it here.
             </p>
             <Link
               href="/"
-              className={buttonVariants({
-                className:
-                  "mt-6 rounded-full bg-[var(--desktop-nav-active)] px-5 text-[var(--desktop-nav-active-foreground)] hover:bg-[var(--desktop-nav-active)]/95",
-              })}
+              className={`${browseSongsLinkClassName} mt-7 md:mt-8`}
             >
               Browse Songs
             </Link>

@@ -4,43 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BookOpenText,
-  Heart,
-  Home,
-  Languages,
   Moon,
-  Search,
   Sun,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useFavorites } from "@/hooks/useFavorites";
-
-const navItems = [
-  {
-    href: "/",
-    label: "Home",
-    icon: Home,
-    isActive: (pathname: string) => pathname === "/",
-  },
-  {
-    href: "/search",
-    label: "Search",
-    icon: Search,
-    isActive: (pathname: string) => pathname.startsWith("/search"),
-  },
-  {
-    href: "/favorites",
-    label: "Favorites",
-    icon: Heart,
-    isActive: (pathname: string) => pathname.startsWith("/favorites"),
-  },
-  {
-    href: "/languages",
-    label: "Languages",
-    icon: Languages,
-    isActive: (pathname: string) => pathname.startsWith("/languages"),
-  },
-];
+import { publicNavItems } from "./publicNavItems";
 
 export function DesktopSidebar() {
   const pathname = usePathname();
@@ -90,7 +60,7 @@ export function DesktopSidebar() {
         aria-label="Desktop navigation"
       >
         <div className="space-y-1.5">
-          {navItems.map(({ href, label, icon: Icon, isActive: matches }) => {
+          {publicNavItems.map(({ href, label, icon: Icon, matches }) => {
             const isActive = matches(pathname);
 
             return (
@@ -105,7 +75,7 @@ export function DesktopSidebar() {
               >
                 <Icon className="h-5 w-5" strokeWidth={1.9} />
                 <span>{label}</span>
-                {label === "Favorites" && favorites.length > 0 && (
+                {href === "/favorites" && favorites.length > 0 && (
                   <span className="ml-auto rounded-full bg-white/12 px-2 py-0.5 text-[0.72rem] font-semibold text-current">
                     {favorites.length}
                   </span>
