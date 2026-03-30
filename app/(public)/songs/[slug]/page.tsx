@@ -3,6 +3,7 @@ import { getSongBySlug, getLanguages, getAllSlugs, isPublicSongAudioVisible } fr
 import { LyricsViewer } from "@/components/lyrics/LyricsViewer";
 import type { Metadata } from "next";
 import { truncate } from "@/lib/utils";
+import { defaultOgImagePath } from "@/lib/site";
 
 export const revalidate = 300;
 
@@ -42,11 +43,20 @@ export async function generateMetadata({
       description: lyricsPreview,
       url: `/songs/${slug}`,
       type: "article",
+      images: [
+        {
+          url: defaultOgImagePath,
+          width: 1200,
+          height: 630,
+          alt: "HymnBook preview image",
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: `${title} | HymnBook`,
       description: lyricsPreview,
+      images: [defaultOgImagePath],
     },
   };
 }

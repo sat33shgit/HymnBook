@@ -402,6 +402,25 @@ export async function getPublishedSongTranslationCount() {
   )();
 }
 
+export async function getFavoritesCount() {
+  return unstable_cache(
+    async () => {
+      const result = await db
+        .select({
+          count: sql<number>`count(*)`,
+        })
+        .from(userFavorites);
+
+      return Number(result[0]?.count ?? 0);
+    },
+    ["getFavoritesCount"],
+    {
+      revalidate: CACHE_TTL.songs,
+      tags: [CACHE_TAGS.songs],
+    }
+  )();
+}
+
 export async function incrementSongViews(songId: number) {
   const result = await db
     .update(songs)
