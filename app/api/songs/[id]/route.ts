@@ -5,6 +5,7 @@ import { updateSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { CACHE_TAGS, songIdTag, songSlugTag } from "@/lib/cache";
+import { deriveSongDefaultLanguage, deriveSongSlug } from "@/lib/song-utils";
 
 const headers = { "X-API-Version": "1" };
 
@@ -76,24 +77,29 @@ export async function PUT(
     // abort and do NOT modify the DB so that the audioUrl remains in the table.
     const deletionErrors: Array<{ lang: string; error: unknown }> = [];
     const existing = await getSongById(songId);
-    if (existing?.translations) {
-      for (const oldT of existing.translations) {
-        const incoming = parsed.data.translations?.find(
-          (t: { languageCode: string }) => t.languageCode === oldT.languageCode
-        );
+    if (!existing) {
+      return NextResponse.json(
+        { error: "Song not found" },
+        { status: 404, headers }
+      );
+    }
 
-        const oldUrl = oldT.audioUrl;
-        const newUrl = incoming?.audioUrl ?? null;
+    for (const oldT of existing.translations) {
+      const incoming = parsed.data.translations?.find(
+        (t: { languageCode: string }) => t.languageCode === oldT.languageCode
+      );
 
-        // If there was an old URL and it's being removed or replaced, delete the R2 object
-        if (oldUrl && (!newUrl || newUrl !== oldUrl)) {
-          try {
-            const key = extractR2ObjectKeyFromUrl(oldUrl);
-            await deleteSongAudioFromR2(key);
-          } catch (err) {
-            console.error("Failed to delete old audio from R2:", err);
-            deletionErrors.push({ lang: oldT.languageCode, error: err });
-          }
+      const oldUrl = oldT.audioUrl;
+      const newUrl = incoming?.audioUrl ?? null;
+
+      // If there was an old URL and it's being removed or replaced, delete the R2 object
+      if (oldUrl && (!newUrl || newUrl !== oldUrl)) {
+        try {
+          const key = extractR2ObjectKeyFromUrl(oldUrl);
+          await deleteSongAudioFromR2(key);
+        } catch (err) {
+          console.error("Failed to delete old audio from R2:", err);
+          deletionErrors.push({ lang: oldT.languageCode, error: err });
         }
       }
     }
@@ -106,7 +112,24 @@ export async function PUT(
       );
     }
 
-    const song = await updateSong(songId, parsed.data);
+    const nextTranslations = (parsed.data.translations ?? existing.translations).map(
+      (translation) => ({
+        languageCode: translation.languageCode,
+        title: translation.title,
+        lyrics: translation.lyrics,
+      })
+    );
+    const defaultLang = deriveSongDefaultLanguage(nextTranslations);
+    const slug = deriveSongSlug(nextTranslations, {
+      defaultLanguageCode: defaultLang,
+      existingSlug: existing.slug,
+    });
+
+    const song = await updateSong(songId, {
+      ...parsed.data,
+      defaultLang,
+      slug,
+    });
 
     revalidateTag(CACHE_TAGS.songs, "max");
     revalidateTag(CACHE_TAGS.mostViewed, "max");

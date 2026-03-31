@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSongs, createSong } from "@/lib/db/queries";
 import { createSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
-import slugify from "slugify";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { CACHE_TAGS, songIdTag, songSlugTag } from "@/lib/cache";
+import { deriveSongDefaultLanguage, deriveSongSlug } from "@/lib/song-utils";
 
 const headers = { "X-API-Version": "1" };
 
@@ -48,8 +48,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title, defaultLang, category, isPublished, translations } = parsed.data;
-    const slug = slugify(title, { lower: true, strict: true });
+    const { category, isPublished, translations } = parsed.data;
+    const defaultLang = deriveSongDefaultLanguage(translations);
+    const slug = deriveSongSlug(translations, { defaultLanguageCode: defaultLang });
 
     const song = await createSong({
       slug,

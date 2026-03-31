@@ -10,8 +10,6 @@ export const translationSchema = z.object({
 });
 
 export const createSongSchema = z.object({
-  title: z.string().min(1, "English title is required"),
-  defaultLang: z.string().min(2).max(10).optional(),
   category: z.string().optional(),
   isPublished: z.boolean().optional().default(true),
   translations: z
@@ -20,9 +18,6 @@ export const createSongSchema = z.object({
 });
 
 export const updateSongSchema = z.object({
-  title: z.string().min(1, "English title is required").optional(),
-  slug: z.string().optional(),
-  defaultLang: z.string().min(2).max(10).optional(),
   category: z.string().nullable().optional(),
   isPublished: z.boolean().optional(),
   translations: z

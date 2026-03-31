@@ -4,6 +4,7 @@ import { LyricsViewer } from "@/components/lyrics/LyricsViewer";
 import type { Metadata } from "next";
 import { truncate } from "@/lib/utils";
 import { defaultOgImagePath } from "@/lib/site";
+import { deriveSongDisplayTitle, deriveSongPrimaryTitle } from "@/lib/song-utils";
 
 export const revalidate = 300;
 
@@ -32,7 +33,10 @@ export async function generateMetadata({
     (t) => t.languageCode === (song.defaultLang ?? "en")
   );
   const preferredTranslation = englishTranslation ?? defaultTranslation ?? song.translations[0];
-  const title = preferredTranslation?.title ?? "Song";
+  const title =
+    deriveSongPrimaryTitle(song.translations, song.defaultLang) ||
+    preferredTranslation?.title ||
+    "Song";
   const lyricsPreview = truncate(preferredTranslation?.lyrics ?? "", 100);
 
   return {
@@ -81,17 +85,11 @@ export default async function SongDetailPage({
     notFound();
   }
 
-  const englishTranslation = song.translations.find(
-    (t) => t.languageCode === "en"
-  );
-  const defaultTranslation = song.translations.find(
-    (t) => t.languageCode === (song.defaultLang ?? "en")
-  );
   const title =
-    englishTranslation?.title ??
-    defaultTranslation?.title ??
-    song.translations[0]?.title ??
-    "Untitled";
+    deriveSongDisplayTitle(song.translations, {
+      preferredLanguageCode: lang,
+      defaultLanguageCode: song.defaultLang,
+    }) || "Untitled";
 
   // Only show languages that have translations for this song
   const availableLanguageCodes = new Set(

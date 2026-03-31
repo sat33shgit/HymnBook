@@ -15,6 +15,7 @@ import {
 import {
   ArrowUp,
   ArrowUpDown,
+  FileDown,
   Music as MusicIcon,
   Pencil,
   Plus,
@@ -395,6 +396,15 @@ export function AdminSongsClient({
                 aria-label="Toggle song YouTube visibility on main site"
               />
             </label>
+            <Link
+              href="/admin/songs/export?autoprint=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <FileDown className="mr-2 h-4 w-4" />
+              Export PDF
+            </Link>
             <Link href="/admin/songs/new" className={buttonVariants()}>
               <Plus className="mr-2 h-4 w-4" />
               Add Song

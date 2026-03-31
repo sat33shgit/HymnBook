@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { TranslationEditor } from "./TranslationEditor";
 import { toast } from "sonner";
 import { Plus, Save, Loader2 } from "lucide-react";
-import slugify from "slugify";
+import { deriveSongSlug } from "@/lib/song-utils";
 
 interface Translation {
   languageCode: string;
@@ -24,7 +24,6 @@ interface SongFormProps {
   languages: { code: string; name: string; nativeName: string }[];
   initialData?: {
     id?: number;
-    title: string;
     slug: string;
     category: string;
     isPublished: boolean;
@@ -39,7 +38,6 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement | null>(null);
 
-  const [title, setTitle] = useState(initialData?.title ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
   const [isPublished, setIsPublished] = useState(
     initialData?.isPublished ?? true
@@ -77,14 +75,14 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
   // Autosave draft
   useEffect(() => {
     autosaveRef.current = setInterval(() => {
-      const draft = { title, category, isPublished, translations };
+      const draft = { category, isPublished, translations };
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(draft));
     }, 30000);
 
     return () => {
       if (autosaveRef.current) clearInterval(autosaveRef.current);
     };
-  }, [title, category, isPublished, translations]);
+  }, [category, isPublished, translations]);
 
   // Restore draft on mount (create mode only)
   useEffect(() => {
@@ -93,12 +91,11 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
       if (saved) {
         try {
           const draft = JSON.parse(saved);
-          if (draft.title || draft.translations?.some((t: Translation) => t.lyrics)) {
+          if (draft.translations?.some((t: Translation) => t.lyrics || t.title)) {
             const restore = window.confirm(
               "A draft was found. Would you like to restore it?"
             );
             if (restore) {
-              setTitle(draft.title ?? "");
               setCategory(draft.category ?? "");
               setIsPublished(draft.isPublished ?? true);
               setTranslations(draft.translations ?? []);
@@ -189,16 +186,11 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
         return;
       }
 
-      const primaryTitle = title.trim() || nonEmptyTranslations[0].title.trim();
-      const slug = slugify(primaryTitle, { lower: true, strict: true });
-      const derivedDefaultLang =
-        nonEmptyTranslations.find((t) => t.languageCode === "en")?.languageCode ??
-        nonEmptyTranslations[0].languageCode;
+      const slug = deriveSongSlug(nonEmptyTranslations, {
+        existingSlug: initialData?.slug,
+      });
 
       const payload = {
-        title: primaryTitle,
-        slug,
-        defaultLang: derivedDefaultLang,
         category:
           normalizedCategory.length > 0
             ? normalizedCategory
@@ -326,24 +318,6 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
       {/* Section 1: Metadata */}
       <div className="space-y-4 rounded-lg border p-6">
         <h2 className="font-heading text-xl font-semibold">Song Details</h2>
-
-        <div>
-          <Label htmlFor="title">
-            Song Title (optional)
-          </Label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
-            placeholder="Used for URL slug if provided; otherwise first translation title is used"
-            className="mt-1"
-          />
-          {errors.title && (
-            <p className="mt-1 text-sm text-destructive">{errors.title}</p>
-          )}
-        </div>
 
         <div className="relative">
           <Label htmlFor="category">Category</Label>

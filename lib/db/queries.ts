@@ -3,6 +3,7 @@ import { songs, songTranslations, languages, userFavorites, appSettings } from "
 import { eq, sql, and, desc, asc, inArray } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { CACHE_TAGS, CACHE_TTL, songIdTag, songSlugTag } from "@/lib/cache";
+import { deriveSongPrimaryTitle } from "@/lib/song-utils";
 
 const PUBLIC_SONG_AUDIO_VISIBLE_KEY = "public_song_audio_visible";
 const PUBLIC_SONG_YOUTUBE_VISIBLE_KEY = "public_song_youtube_visible";
@@ -156,13 +157,10 @@ export async function getSongs({
 
       const data = songRows.map((song) => {
         const songTrans = translations.filter((t) => t.songId === song.id);
-        const englishTitle = songTrans.find((t) => t.languageCode === "en")?.title;
-        const defaultTitle = songTrans.find(
-          (t) => t.languageCode === (song.defaultLang ?? "en")
-        )?.title;
         const localizedTitle = language
           ? songTrans.find((t) => t.languageCode === language)?.title ?? null
           : null;
+
         return {
           id: song.id,
           slug: song.slug,
@@ -170,7 +168,8 @@ export async function getSongs({
           defaultLang: song.defaultLang,
           viewCount: song.viewCount,
           isPublished: song.isPublished,
-          title: englishTitle ?? defaultTitle ?? songTrans[0]?.title ?? "Untitled",
+          title:
+            deriveSongPrimaryTitle(songTrans, song.defaultLang) || "Untitled",
           localizedTitle,
           languages: songTrans.map((t) => t.languageCode),
           hasAudio: songTrans.some((t) => (t.audioUrl ?? "").toString().trim() !== ""),
@@ -263,6 +262,130 @@ export async function getSongById(id: number) {
   )();
 }
 
+export async function getSongsForExport() {
+  const rows = await db
+    .select({
+      songId: songs.id,
+      slug: songs.slug,
+      category: songs.category,
+      defaultLang: songs.defaultLang,
+      isPublished: songs.isPublished,
+      languageCode: songTranslations.languageCode,
+      languageName: languages.name,
+      languageNativeName: languages.nativeName,
+      languageFontStack: languages.fontStack,
+      languageSortOrder: languages.sortOrder,
+      title: songTranslations.title,
+      lyrics: songTranslations.lyrics,
+      englishMeaning: songTranslations.englishMeaning,
+    })
+    .from(songs)
+    .leftJoin(songTranslations, eq(songTranslations.songId, songs.id))
+    .leftJoin(languages, eq(songTranslations.languageCode, languages.code))
+    .orderBy(
+      asc(songs.id),
+      asc(languages.sortOrder),
+      asc(songTranslations.languageCode)
+    );
+
+  const collator = new Intl.Collator(undefined, { sensitivity: "base" });
+  const songsById = new Map<
+    number,
+    {
+      id: number;
+      slug: string;
+      category: string | null;
+      defaultLang: string | null;
+      isPublished: boolean | null;
+      translations: Array<{
+        languageCode: string;
+        languageName: string | null;
+        languageNativeName: string | null;
+        fontStack: string | null;
+        sortOrder: number | null;
+        title: string;
+        lyrics: string;
+        englishMeaning: string | null;
+      }>;
+    }
+  >();
+
+  for (const row of rows) {
+    const existingSong = songsById.get(row.songId);
+
+    if (existingSong) {
+      if (row.languageCode && row.title && row.lyrics) {
+        existingSong.translations.push({
+          languageCode: row.languageCode,
+          languageName: row.languageName ?? null,
+          languageNativeName: row.languageNativeName ?? null,
+          fontStack: row.languageFontStack ?? null,
+          sortOrder: row.languageSortOrder ?? null,
+          title: row.title,
+          lyrics: row.lyrics,
+          englishMeaning: row.englishMeaning ?? null,
+        });
+      }
+
+      continue;
+    }
+
+    songsById.set(row.songId, {
+      id: row.songId,
+      slug: row.slug,
+      category: row.category,
+      defaultLang: row.defaultLang ?? "en",
+      isPublished: row.isPublished,
+      translations:
+        row.languageCode && row.title && row.lyrics
+          ? [
+              {
+                languageCode: row.languageCode,
+                languageName: row.languageName ?? null,
+                languageNativeName: row.languageNativeName ?? null,
+                fontStack: row.languageFontStack ?? null,
+                sortOrder: row.languageSortOrder ?? null,
+                title: row.title,
+                lyrics: row.lyrics,
+                englishMeaning: row.englishMeaning ?? null,
+              },
+            ]
+          : [],
+    });
+  }
+
+  const exportSongs = Array.from(songsById.values()).map((song) => {
+    const translations = [...song.translations].sort((left, right) => {
+      const leftSortOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
+      const rightSortOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
+
+      if (leftSortOrder !== rightSortOrder) {
+        return leftSortOrder - rightSortOrder;
+      }
+
+      return collator.compare(left.languageCode, right.languageCode);
+    });
+
+    const title =
+      deriveSongPrimaryTitle(translations, song.defaultLang) ||
+      song.slug ||
+      `Song ${song.id}`;
+
+    return {
+      ...song,
+      title,
+      translations,
+    };
+  });
+
+  exportSongs.sort(
+    (left, right) =>
+      collator.compare(left.title, right.title) || left.id - right.id
+  );
+
+  return exportSongs;
+}
+
 export async function getMostViewedSongs(limit = 5) {
   const safeLimit = Math.min(Math.max(limit, 1), 20);
 
@@ -308,13 +431,6 @@ export async function getMostViewedSongs(limit = 5) {
 
       return songRows.map((song) => {
         const songTranslationsForSong = translationsBySongId.get(song.id) ?? [];
-        const englishTitle = songTranslationsForSong.find(
-          (translation) => translation.languageCode === "en"
-        )?.title;
-        const defaultTitle = songTranslationsForSong.find(
-          (translation) =>
-            translation.languageCode === (song.defaultLang ?? "en")
-        )?.title;
 
         return {
           id: song.id,
@@ -324,9 +440,7 @@ export async function getMostViewedSongs(limit = 5) {
           viewCount: song.viewCount,
           isPublished: song.isPublished,
           title:
-            englishTitle ??
-            defaultTitle ??
-            songTranslationsForSong[0]?.title ??
+            deriveSongPrimaryTitle(songTranslationsForSong, song.defaultLang) ||
             "Untitled",
           languages: songTranslationsForSong.map(
             (translation) => translation.languageCode
