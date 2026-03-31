@@ -278,6 +278,7 @@ export async function getSongsForExport() {
       title: songTranslations.title,
       lyrics: songTranslations.lyrics,
       englishMeaning: songTranslations.englishMeaning,
+      youtubeUrl: songTranslations.youtubeUrl,
     })
     .from(songs)
     .leftJoin(songTranslations, eq(songTranslations.songId, songs.id))
@@ -306,6 +307,7 @@ export async function getSongsForExport() {
         title: string;
         lyrics: string;
         englishMeaning: string | null;
+        youtubeUrl: string | null;
       }>;
     }
   >();
@@ -324,6 +326,7 @@ export async function getSongsForExport() {
           title: row.title,
           lyrics: row.lyrics,
           englishMeaning: row.englishMeaning ?? null,
+          youtubeUrl: row.youtubeUrl ?? null,
         });
       }
 
@@ -348,6 +351,7 @@ export async function getSongsForExport() {
                 title: row.title,
                 lyrics: row.lyrics,
                 englishMeaning: row.englishMeaning ?? null,
+                youtubeUrl: row.youtubeUrl ?? null,
               },
             ]
           : [],

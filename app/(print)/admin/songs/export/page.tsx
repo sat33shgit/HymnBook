@@ -206,6 +206,22 @@ export default async function AdminSongsExportPage({
                             </div>
                           </div>
                         )}
+
+                        {translation.youtubeUrl && (
+                          <div className="mt-5 border-t border-dashed border-stone-300 pt-4">
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                              YouTube URL
+                            </p>
+                            <a
+                              href={translation.youtubeUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mt-3 block break-all text-[14px] text-blue-700 underline underline-offset-2"
+                            >
+                              {translation.youtubeUrl}
+                            </a>
+                          </div>
+                        )}
                       </section>
                     ))}
                   </div>
