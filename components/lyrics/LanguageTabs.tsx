@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 interface LanguageTabsProps {
   languages: { code: string; nativeName: string }[];
   activeLanguage: string;
@@ -11,6 +13,28 @@ export function LanguageTabs({
   activeLanguage,
   onSelect,
 }: LanguageTabsProps) {
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  useEffect(() => {
+    const activeTab = tabRefs.current[activeLanguage];
+
+    if (!activeTab) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      activeTab.scrollIntoView({
+        block: "nearest",
+        inline: "center",
+        behavior: "auto",
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [activeLanguage, languages]);
+
   return (
     <div
       className="scrollbar-hide flex gap-2.5 overflow-x-auto"
@@ -22,6 +46,9 @@ export function LanguageTabs({
         return (
           <button
             key={lang.code}
+            ref={(node) => {
+              tabRefs.current[lang.code] = node;
+            }}
             role="tab"
             aria-selected={isActive}
             aria-controls={`lyrics-panel-${lang.code}`}
