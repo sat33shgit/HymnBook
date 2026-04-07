@@ -34,6 +34,135 @@ interface SongFormProps {
 
 const AUTOSAVE_KEY = "hymnbook_draft";
 
+interface PresignedAudioUploadResponse {
+  uploadUrl?: string;
+  url?: string;
+  contentType?: string;
+  error?: string;
+}
+
+function isLocalAudioUploadHost() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const hostname = window.location.hostname;
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
+async function uploadAudioFileViaProxy(params: {
+  file: File;
+  slug: string;
+  existingUrl?: string | null;
+}) {
+  const { file, slug, existingUrl } = params;
+
+  const uploadBody = new FormData();
+  uploadBody.append("file", file);
+  uploadBody.append("slug", slug);
+
+  if (existingUrl) {
+    uploadBody.append("existingUrl", existingUrl);
+  }
+
+  const uploadRes = await fetch("/api/songs/audio", {
+    method: "POST",
+    body: uploadBody,
+  });
+
+  const uploadData = (await uploadRes.json().catch(() => ({}))) as {
+    url?: string;
+    error?: string;
+  };
+
+  if (!uploadRes.ok) {
+    throw new Error(uploadData.error || "Audio upload failed");
+  }
+
+  if (!uploadData.url) {
+    throw new Error("Audio upload completed without a file URL");
+  }
+
+  return uploadData.url;
+}
+
+async function uploadAudioFileViaPresignedUrl(params: {
+  file: File;
+  slug: string;
+  existingUrl?: string | null;
+}) {
+  const { file, slug, existingUrl } = params;
+
+  const presignRes = await fetch("/api/songs/audio/presign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fileName: file.name,
+      mimeType: file.type,
+      size: file.size,
+      slug,
+    }),
+  });
+
+  const presignData =
+    (await presignRes.json().catch(() => ({}))) as PresignedAudioUploadResponse;
+
+  if (!presignRes.ok) {
+    throw new Error(presignData.error || "Failed to prepare audio upload");
+  }
+
+  const uploadUrl = presignData.uploadUrl?.trim();
+  const nextAudioUrl = presignData.url?.trim();
+  const contentType =
+    presignData.contentType?.trim() || file.type || "application/octet-stream";
+
+  if (!uploadUrl || !nextAudioUrl) {
+    throw new Error("Audio upload could not be initialized");
+  }
+
+  try {
+    const uploadRes = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": contentType },
+      body: file,
+    });
+
+    if (!uploadRes.ok) {
+      throw new Error(`Audio upload failed with status ${uploadRes.status}`);
+    }
+  } catch (error) {
+    if (error instanceof TypeError) {
+      throw new Error(
+        "Direct audio upload failed. Check the R2 bucket CORS settings for this site origin."
+      );
+    }
+
+    throw error;
+  }
+
+  if (existingUrl) {
+    void fetch("/api/songs/audio", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: existingUrl, slug }),
+    }).catch(() => undefined);
+  }
+
+  return nextAudioUrl;
+}
+
+async function uploadAudioFile(params: {
+  file: File;
+  slug: string;
+  existingUrl?: string | null;
+}) {
+  if (isLocalAudioUploadHost()) {
+    return uploadAudioFileViaProxy(params);
+  }
+
+  return uploadAudioFileViaPresignedUrl(params);
+}
+
 export function SongForm({ languages, initialData, mode }: SongFormProps) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -231,28 +360,11 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
 
           const file = audioFilesByLang[translation.languageCode];
           if (file) {
-            const uploadBody = new FormData();
-            uploadBody.append("file", file);
-            uploadBody.append("slug", `${slug}-${translation.languageCode}`);
-            if (translation.audioUrl) {
-              uploadBody.append("existingUrl", translation.audioUrl);
-            }
-
-            const uploadRes = await fetch("/api/songs/audio", {
-              method: "POST",
-              body: uploadBody,
+            nextAudioUrl = await uploadAudioFile({
+              file,
+              slug: `${slug}-${translation.languageCode}`,
+              existingUrl: translation.audioUrl,
             });
-
-            if (!uploadRes.ok) {
-              const errorData = await uploadRes.json().catch(() => ({}));
-              throw new Error(
-                errorData.error ||
-                  `Audio upload failed for ${translation.languageCode}`
-              );
-            }
-
-            const uploaded = await uploadRes.json();
-            nextAudioUrl = uploaded.url;
           }
 
           return {

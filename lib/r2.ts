@@ -1,4 +1,5 @@
 import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "node:crypto";
 import { AUDIO_SIZE_ERROR_MESSAGE, MAX_AUDIO_SIZE_BYTES } from "@/lib/audio";
 
@@ -44,18 +45,21 @@ function detectExtension(fileName: string, mimeType: string): string {
   return "";
 }
 
-export async function uploadSongAudioToR2(params: {
+function getAudioContentType(extension: ".mp3" | ".m4a") {
+  return extension === ".m4a" ? "audio/mp4" : "audio/mpeg";
+}
+
+function validateSongAudioUpload(params: {
   fileName: string;
   mimeType: string;
-  fileBytes: Uint8Array;
-  songSlug: string;
+  fileSize: number;
 }) {
-  const { fileName, mimeType, fileBytes, songSlug } = params;
+  const { fileName, mimeType, fileSize } = params;
 
-  if (fileBytes.byteLength === 0) {
+  if (fileSize === 0) {
     throw new Error("Uploaded file is empty");
   }
-  if (fileBytes.byteLength > MAX_AUDIO_SIZE_BYTES) {
+  if (fileSize > MAX_AUDIO_SIZE_BYTES) {
     throw new Error(AUDIO_SIZE_ERROR_MESSAGE);
   }
 
@@ -63,6 +67,67 @@ export async function uploadSongAudioToR2(params: {
   if (extension !== ".mp3" && extension !== ".m4a") {
     throw new Error("Only MP3 and M4A files are supported");
   }
+
+  return extension;
+}
+
+function getPublicR2ObjectUrl(key: string) {
+  const publicBaseUrl = getRequiredEnv("R2_PUBLIC_BASE_URL").replace(/\/$/, "");
+  return `${publicBaseUrl}/${key}`;
+}
+
+export async function createSongAudioUploadUrl(params: {
+  fileName: string;
+  mimeType: string;
+  fileSize: number;
+  songSlug: string;
+  expiresInSeconds?: number;
+}) {
+  const {
+    fileName,
+    mimeType,
+    fileSize,
+    songSlug,
+    expiresInSeconds = 600,
+  } = params;
+
+  const extension = validateSongAudioUpload({ fileName, mimeType, fileSize });
+  const bucket = getRequiredEnv("R2_BUCKET_NAME");
+  const key = buildObjectKey(songSlug, extension);
+  const contentType = getAudioContentType(extension);
+
+  const client = getR2Client();
+  const uploadUrl = await getSignedUrl(
+    client,
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ContentType: contentType,
+      CacheControl: "public, max-age=31536000, immutable",
+    }),
+    { expiresIn: expiresInSeconds }
+  );
+
+  return {
+    key,
+    url: getPublicR2ObjectUrl(key),
+    uploadUrl,
+    contentType,
+  };
+}
+
+export async function uploadSongAudioToR2(params: {
+  fileName: string;
+  mimeType: string;
+  fileBytes: Uint8Array;
+  songSlug: string;
+}) {
+  const { fileName, mimeType, fileBytes, songSlug } = params;
+  const extension = validateSongAudioUpload({
+    fileName,
+    mimeType,
+    fileSize: fileBytes.byteLength,
+  });
 
   const bucket = getRequiredEnv("R2_BUCKET_NAME");
   const key = buildObjectKey(songSlug, extension);
@@ -73,13 +138,12 @@ export async function uploadSongAudioToR2(params: {
       Bucket: bucket,
       Key: key,
       Body: fileBytes,
-      ContentType: extension === ".m4a" ? "audio/mp4" : "audio/mpeg",
+      ContentType: getAudioContentType(extension),
       CacheControl: "public, max-age=31536000, immutable",
     })
   );
 
-  const publicBaseUrl = getRequiredEnv("R2_PUBLIC_BASE_URL").replace(/\/$/, "");
-  const url = `${publicBaseUrl}/${key}`;
+  const url = getPublicR2ObjectUrl(key);
 
   return { key, url };
 }
