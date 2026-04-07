@@ -4,6 +4,8 @@ import { uploadSongAudioToR2, extractR2ObjectKeyFromUrl, deleteSongAudioFromR2, 
 
 const headers = { "X-API-Version": "1" };
 
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();

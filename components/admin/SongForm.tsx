@@ -41,6 +41,26 @@ interface PresignedAudioUploadResponse {
   error?: string;
 }
 
+type AudioUploadMode = "auto" | "direct" | "proxy";
+
+class RetryableDirectAudioUploadError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "RetryableDirectAudioUploadError";
+  }
+}
+
+function getConfiguredAudioUploadMode(): AudioUploadMode {
+  const configuredMode =
+    process.env.NEXT_PUBLIC_AUDIO_UPLOAD_MODE?.trim().toLowerCase() || "auto";
+
+  if (configuredMode === "direct" || configuredMode === "proxy") {
+    return configuredMode;
+  }
+
+  return "auto";
+}
+
 function isLocalAudioUploadHost() {
   if (typeof window === "undefined") {
     return false;
@@ -48,6 +68,19 @@ function isLocalAudioUploadHost() {
 
   const hostname = window.location.hostname;
   return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
+function shouldUseProxyAudioUpload() {
+  const uploadMode = getConfiguredAudioUploadMode();
+  if (uploadMode === "proxy") {
+    return true;
+  }
+
+  if (uploadMode === "direct") {
+    return false;
+  }
+
+  return isLocalAudioUploadHost();
 }
 
 async function uploadAudioFileViaProxy(params: {
@@ -132,8 +165,8 @@ async function uploadAudioFileViaPresignedUrl(params: {
     }
   } catch (error) {
     if (error instanceof TypeError) {
-      throw new Error(
-        "Direct audio upload failed. Check the R2 bucket CORS settings for this site origin."
+      throw new RetryableDirectAudioUploadError(
+        "Direct audio upload failed because the storage origin rejected the browser request."
       );
     }
 
@@ -156,11 +189,23 @@ async function uploadAudioFile(params: {
   slug: string;
   existingUrl?: string | null;
 }) {
-  if (isLocalAudioUploadHost()) {
+  if (shouldUseProxyAudioUpload()) {
     return uploadAudioFileViaProxy(params);
   }
 
-  return uploadAudioFileViaPresignedUrl(params);
+  try {
+    return await uploadAudioFileViaPresignedUrl(params);
+  } catch (error) {
+    if (
+      getConfiguredAudioUploadMode() === "auto" &&
+      error instanceof RetryableDirectAudioUploadError
+    ) {
+      console.warn("Direct audio upload failed, retrying via server proxy.", error);
+      return uploadAudioFileViaProxy(params);
+    }
+
+    throw error;
+  }
 }
 
 export function SongForm({ languages, initialData, mode }: SongFormProps) {
