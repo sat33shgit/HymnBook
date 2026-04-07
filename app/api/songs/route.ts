@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSongs, createSong } from "@/lib/db/queries";
+import { getSongs, createSong, ensureUniqueSongSlug } from "@/lib/db/queries";
 import { createSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
-import { revalidatePath, revalidateTag } from "next/cache";
-import { CACHE_TAGS, songIdTag, songSlugTag } from "@/lib/cache";
 import { deriveSongDefaultLanguage, deriveSongSlug } from "@/lib/song-utils";
+import { revalidateSongMutationCaches } from "@/lib/song-cache-revalidation";
 
 const headers = { "X-API-Version": "1" };
+export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
@@ -50,7 +50,9 @@ export async function POST(request: NextRequest) {
 
     const { category, isPublished, translations } = parsed.data;
     const defaultLang = deriveSongDefaultLanguage(translations);
-    const slug = deriveSongSlug(translations, { defaultLanguageCode: defaultLang });
+    const slug = await ensureUniqueSongSlug(
+      deriveSongSlug(translations, { defaultLanguageCode: defaultLang })
+    );
 
     const song = await createSong({
       slug,
@@ -60,19 +62,10 @@ export async function POST(request: NextRequest) {
       translations,
     });
 
-    revalidateTag(CACHE_TAGS.songs, "max");
-    revalidateTag(CACHE_TAGS.mostViewed, "max");
-    revalidateTag(CACHE_TAGS.categories, "max");
-    revalidateTag(CACHE_TAGS.slugs, "max");
-    revalidateTag(CACHE_TAGS.search, "max");
-    if (song?.id) {
-      revalidateTag(songIdTag(song.id), "max");
-    }
-    if (song?.slug) {
-      revalidateTag(songSlugTag(song.slug), "max");
-    }
-    revalidatePath("/admin");
-    revalidatePath("/admin/songs");
+    revalidateSongMutationCaches(
+      { id: song?.id ?? null, slug: song?.slug ?? slug },
+      ["/admin", "/admin/songs"]
+    );
 
     return NextResponse.json(song, { status: 201, headers });
   } catch (error) {

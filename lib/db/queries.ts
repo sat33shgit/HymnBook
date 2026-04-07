@@ -7,6 +7,7 @@ import { deriveSongPrimaryTitle } from "@/lib/song-utils";
 
 const PUBLIC_SONG_AUDIO_VISIBLE_KEY = "public_song_audio_visible";
 const PUBLIC_SONG_YOUTUBE_VISIBLE_KEY = "public_song_youtube_visible";
+const SONG_SLUG_MAX_LENGTH = 255;
 
 // ─── Languages ───────────────────────────────────────────────
 
@@ -210,23 +211,7 @@ export async function getSongs({
 
 export async function getSongBySlug(slug: string) {
   return unstable_cache(
-    async () => {
-      const songRows = await db
-        .select()
-        .from(songs)
-        .where(eq(songs.slug, slug))
-        .limit(1);
-
-      if (!songRows[0]) return null;
-
-      const song = songRows[0];
-      const translations = await db
-        .select()
-        .from(songTranslations)
-        .where(eq(songTranslations.songId, song.id));
-
-      return { ...song, translations };
-    },
+    () => getSongBySlugUncached(slug),
     ["getSongBySlug", slug],
     {
       revalidate: CACHE_TTL.song,
@@ -237,29 +222,83 @@ export async function getSongBySlug(slug: string) {
 
 export async function getSongById(id: number) {
   return unstable_cache(
-    async () => {
-      const songRows = await db
-        .select()
-        .from(songs)
-        .where(eq(songs.id, id))
-        .limit(1);
-
-      if (!songRows[0]) return null;
-
-      const song = songRows[0];
-      const translations = await db
-        .select()
-        .from(songTranslations)
-        .where(eq(songTranslations.songId, song.id));
-
-      return { ...song, translations };
-    },
+    () => getSongByIdUncached(id),
     ["getSongById", String(id)],
     {
       revalidate: CACHE_TTL.song,
       tags: [CACHE_TAGS.songs, songIdTag(id)],
     }
   )();
+}
+
+export async function getSongBySlugUncached(slug: string) {
+  const songRows = await db
+    .select()
+    .from(songs)
+    .where(eq(songs.slug, slug))
+    .limit(1);
+
+  if (!songRows[0]) {
+    return null;
+  }
+
+  const song = songRows[0];
+  const translations = await db
+    .select()
+    .from(songTranslations)
+    .where(eq(songTranslations.songId, song.id));
+
+  return { ...song, translations };
+}
+
+export async function getSongByIdUncached(id: number) {
+  const songRows = await db
+    .select()
+    .from(songs)
+    .where(eq(songs.id, id))
+    .limit(1);
+
+  if (!songRows[0]) {
+    return null;
+  }
+
+  const song = songRows[0];
+  const translations = await db
+    .select()
+    .from(songTranslations)
+    .where(eq(songTranslations.songId, song.id));
+
+  return { ...song, translations };
+}
+
+function buildSongSlugCandidate(baseSlug: string, attempt: number) {
+  const normalizedBase = baseSlug.trim().replace(/^-+|-+$/g, "") || "song";
+  const suffix = attempt === 0 ? "" : `-${attempt + 1}`;
+  const maxBaseLength = Math.max(1, SONG_SLUG_MAX_LENGTH - suffix.length);
+  const truncatedBase =
+    normalizedBase.slice(0, maxBaseLength).replace(/-+$/g, "") || "song";
+
+  return `${truncatedBase}${suffix}`;
+}
+
+export async function ensureUniqueSongSlug(
+  baseSlug: string,
+  options: { excludeSongId?: number } = {}
+) {
+  for (let attempt = 0; attempt < 1000; attempt += 1) {
+    const candidate = buildSongSlugCandidate(baseSlug, attempt);
+    const existing = await db
+      .select({ id: songs.id })
+      .from(songs)
+      .where(eq(songs.slug, candidate))
+      .limit(1);
+
+    if (!existing[0] || existing[0].id === options.excludeSongId) {
+      return candidate;
+    }
+  }
+
+  throw new Error("Unable to generate a unique song slug");
 }
 
 export async function getSongsForExport() {
@@ -599,7 +638,7 @@ export async function createSong(data: {
     sql`UPDATE song_translations SET search_vector = to_tsvector('english', coalesce(title, '') || ' ' || coalesce(lyrics, '')) WHERE song_id = ${song.id}`
   );
 
-  return getSongById(song.id);
+  return getSongByIdUncached(song.id);
 }
 
 export async function updateSong(
@@ -653,7 +692,7 @@ export async function updateSong(
     );
   }
 
-  return getSongById(id);
+  return getSongByIdUncached(id);
 }
 
 export async function deleteSong(id: number) {

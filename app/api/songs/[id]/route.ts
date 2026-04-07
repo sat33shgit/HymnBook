@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSongById, updateSong, deleteSong } from "@/lib/db/queries";
+import {
+  getSongById,
+  getSongByIdUncached,
+  updateSong,
+  deleteSong,
+  ensureUniqueSongSlug,
+} from "@/lib/db/queries";
 import { extractR2ObjectKeyFromUrl, deleteSongAudioFromR2, deleteObjectsByPrefix, deleteObjectsMatchingSong } from "@/lib/r2";
 import { updateSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
-import { revalidatePath, revalidateTag } from "next/cache";
-import { CACHE_TAGS, songIdTag, songSlugTag } from "@/lib/cache";
 import { deriveSongDefaultLanguage, deriveSongSlug } from "@/lib/song-utils";
+import { revalidateSongMutationCaches } from "@/lib/song-cache-revalidation";
 
 const headers = { "X-API-Version": "1" };
+export const runtime = "nodejs";
 
 export async function GET(
   _request: NextRequest,
@@ -76,7 +82,7 @@ export async function PUT(
     // Delete any removed/replaced audio objects from R2. If any deletion fails,
     // abort and do NOT modify the DB so that the audioUrl remains in the table.
     const deletionErrors: Array<{ lang: string; error: unknown }> = [];
-    const existing = await getSongById(songId);
+    const existing = await getSongByIdUncached(songId);
     if (!existing) {
       return NextResponse.json(
         { error: "Song not found" },
@@ -120,10 +126,13 @@ export async function PUT(
       })
     );
     const defaultLang = deriveSongDefaultLanguage(nextTranslations);
-    const slug = deriveSongSlug(nextTranslations, {
-      defaultLanguageCode: defaultLang,
-      existingSlug: existing.slug,
-    });
+    const slug = await ensureUniqueSongSlug(
+      deriveSongSlug(nextTranslations, {
+        defaultLanguageCode: defaultLang,
+        existingSlug: existing.slug,
+      }),
+      { excludeSongId: songId }
+    );
 
     const song = await updateSong(songId, {
       ...parsed.data,
@@ -131,18 +140,10 @@ export async function PUT(
       slug,
     });
 
-    revalidateTag(CACHE_TAGS.songs, "max");
-    revalidateTag(CACHE_TAGS.mostViewed, "max");
-    revalidateTag(CACHE_TAGS.categories, "max");
-    revalidateTag(CACHE_TAGS.slugs, "max");
-    revalidateTag(CACHE_TAGS.search, "max");
-    revalidateTag(songIdTag(songId), "max");
-    if (song?.slug) {
-      revalidateTag(songSlugTag(song.slug), "max");
-    }
-    revalidatePath("/admin");
-    revalidatePath("/admin/songs");
-    revalidatePath(`/admin/songs/${songId}/edit`);
+    revalidateSongMutationCaches(
+      { id: songId, slug: song?.slug ?? slug },
+      ["/admin", "/admin/songs", `/admin/songs/${songId}/edit`]
+    );
 
     return NextResponse.json(song, { headers });
   } catch (error) {
@@ -176,7 +177,7 @@ export async function DELETE(
       );
     }
 
-    const existingSong = await getSongById(songId);
+    const existingSong = await getSongByIdUncached(songId);
     // Delete audio objects for all translations first. If any deletion fails,
     // abort and do NOT remove DB records so URLs remain intact.
     const deletionErrors: Array<{ lang?: string; error: unknown }> = [];
@@ -275,18 +276,10 @@ export async function DELETE(
 
     await deleteSong(songId);
 
-    revalidateTag(CACHE_TAGS.songs, "max");
-    revalidateTag(CACHE_TAGS.mostViewed, "max");
-    revalidateTag(CACHE_TAGS.categories, "max");
-    revalidateTag(CACHE_TAGS.slugs, "max");
-    revalidateTag(CACHE_TAGS.search, "max");
-    revalidateTag(songIdTag(songId), "max");
-    if (existingSong?.slug) {
-      revalidateTag(songSlugTag(existingSong.slug), "max");
-    }
-    revalidatePath("/admin");
-    revalidatePath("/admin/songs");
-    revalidatePath(`/admin/songs/${songId}/edit`);
+    revalidateSongMutationCaches(
+      { id: songId, slug: existingSong?.slug ?? null },
+      ["/admin", "/admin/songs", `/admin/songs/${songId}/edit`]
+    );
 
     return NextResponse.json({ success: true }, { headers });
   } catch (error) {
