@@ -1,249 +1,163 @@
 # HymnBook
 
-A modern hymn library web app built with Next.js and TypeScript.
+HymnBook is a Next.js application for browsing and managing Christian song lyrics in multiple languages. It includes a public hymn library, search, favorites, an admin CMS, and optional audio uploads backed by Cloudflare R2.
 
-## Project overview
+## Features
 
-- Purpose: browse, search, and manage hymns with translations and favorites.
-- Structure: Next.js app (app/), serverless API routes (app/api/), components in `components/`, and Drizzle ORM database schema in `db/`.
-
-## Tech stack
-
-- Next.js 16 (App Router)
-- React 19 + TypeScript
-- Tailwind CSS + PostCSS
-- Drizzle ORM (drizzle-orm + drizzle-kit)
-- Authentication: `next-auth`
-- State / data fetching: `@tanstack/react-query`
-- Vercel platform integrations: `@vercel/postgres`, `@vercel/kv`
-- UI primitives and utilities: `shadcn`, `lucide-react`, `framer-motion`, `sonner`, `class-variance-authority`
-
-See `package.json` for exact dependency versions.
-
-## Getting started
-
-Prerequisites:
-
-- Node.js (recommended version compatible with Next.js 16)
-- A Postgres database for production or local development
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run development server:
-
-```bash
-npm run dev
-```
-
-Build for production:
-
-```bash
-npm run build
-npm run start
-```
-
-## Database / Drizzle
-
-Useful scripts (see `package.json`):
-
-- `npm run db:generate` — generate migrations/types
-- `npm run db:push` — push schema to the database
-- `npm run db:migrate` — run migrations
-- `npm run db:studio` — open Drizzle Studio
-- `npm run db:seed` — seed the database (runs `scripts/seed.ts`)
-
-## Environment variables
-
-Create a `.env.local` with at least the following keys (names may vary depending on your setup):
-
-- `DATABASE_URL` — Postgres connection string
-- `NEXTAUTH_SECRET` — secret for NextAuth
-- `NEXTAUTH_URL` — your app URL for auth callbacks
-
-Also configure any Vercel-specific variables if deploying (e.g., Vercel Postgres / KV credentials).
-
-## Contributing
-
-- Fork and create a feature branch
-- Open a pull request describing changes
-
-## Where to look
-
-- App entry: `app/`
-- Components: `components/`
-- DB schema and queries: `db/`
-- Scripts: `scripts/`
-
-## License
-
-This repository does not include a license file. Add one if you intend to make this project public.
-
----
-
-If you'd like, I can also add a `CONTRIBUTING.md`, a sample `.env.local.example`, or commit the README for you. What would you like next?
-# HymnBook — Christian Song Lyrics Website
-
-A full-stack Next.js application for browsing Christian song lyrics in multiple languages (English, Telugu, Hindi, Tamil, Malayalam). Built with a gold-and-deep-blue color scheme, mobile-first responsive design, fullscreen reading mode, and an admin CMS.
-
----
+- Public hymn browsing with category-based discovery
+- Multi-language song pages
+- Search across titles and lyrics
+- Favorites stored in the browser
+- Admin area for managing songs and languages
+- Optional song audio uploads with Cloudflare R2
+- Direct browser uploads with presigned URLs and server-side fallback uploads
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router, RSC) |
-| Language | TypeScript 5 |
-| Styling | Tailwind CSS v4, shadcn/ui |
-| Database | PostgreSQL (Vercel Postgres / Neon) |
-| ORM | Drizzle ORM |
-| Auth | NextAuth v5 (credentials) |
-| State | React Query, localStorage |
-| Animation | Framer Motion |
-| Deployment | Vercel |
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- Drizzle ORM
+- PostgreSQL
+- NextAuth v5
+- Cloudflare R2 for audio storage
 
----
+## Project Structure
+
+```text
+app/          Next.js routes, layouts, and API handlers
+components/   UI and admin components
+lib/          Auth, DB access, R2 helpers, utilities
+scripts/      Project scripts such as seeding and R2 CORS updates
+drizzle/      Generated database artifacts
+public/       Static assets
+```
 
 ## Getting Started
 
-### 1. Clone & install
+### 1. Install dependencies
 
 ```bash
-git clone <repo-url>
-cd ChristianSongsWebSite
 npm install
 ```
 
-### 2. Environment variables
-
-Copy and fill in your values:
+### 2. Create your local environment file
 
 ```bash
 cp .env.example .env.local
 ```
 
-You need:
-- `POSTGRES_URL` — PostgreSQL connection string
-- `AUTH_SECRET` — random string for NextAuth (`openssl rand -base64 32`)
-- `ADMIN_EMAIL` / `ADMIN_PASSWORD` — admin login (password must be a bcrypt hash)
+On PowerShell:
 
-Generate a password hash:
-
-```bash
-node -e "require('bcryptjs').hash('yourpassword',12).then(h=>console.log(h))"
+```powershell
+Copy-Item .env.example .env.local
 ```
 
-### 3. Database setup
+### 3. Configure required environment variables
+
+Minimum variables for local development:
+
+- `POSTGRES_URL` - PostgreSQL connection string used by Drizzle
+- `AUTH_SECRET` - secret used by NextAuth
+- `AUTH_URL` - app URL for auth callbacks, for example `http://localhost:3000`
+- `ADMIN_EMAIL` - admin login email
+- `ADMIN_PASSWORD` - bcrypt hash for the admin password
+- `NEXT_PUBLIC_BASE_URL` - public site URL
+
+Generate a bcrypt hash for `ADMIN_PASSWORD`:
 
 ```bash
-npm run db:push     # push schema to database
-npm run db:seed     # seed sample songs & languages
+node -e "require('bcryptjs').hash('yourpassword', 12).then(h => console.log(h))"
 ```
 
-### 4. Run dev server
+### 4. Set up the database
+
+```bash
+npm run db:push
+npm run db:seed
+```
+
+### 5. Start the app
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+The app will be available at `http://localhost:3000`.
 
----
+## Audio Uploads with Cloudflare R2
 
-## Project Structure
+Audio uploads are optional. If you want song audio support, configure these additional variables:
 
+- `R2_ACCOUNT_ID`
+- `R2_BUCKET_NAME`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `R2_PUBLIC_BASE_URL`
+- `R2_ENDPOINT` - optional override; defaults to the standard Cloudflare R2 endpoint for the account
+- `NEXT_PUBLIC_AUDIO_UPLOAD_MODE` - `auto`, `direct`, or `proxy`
+
+### Upload behavior
+
+- Supported file types: `mp3`, `m4a`
+- Maximum audio size: `10 MB`
+- In `direct` mode, the browser uploads to R2 using a presigned URL
+- In `proxy` mode, the app uploads through the server
+- In `auto` mode, local development uses proxy uploads and production prefers direct uploads with proxy fallback where possible
+
+The production proxy fallback is intended for smaller uploads. Larger files depend on direct browser-to-R2 uploads, so the bucket CORS policy must allow your site origin.
+
+## R2 CORS Policy
+
+This repo includes a dashboard-ready Cloudflare R2 CORS policy file:
+
+- `scripts/r2-cors.hymnbook.json`
+
+It currently allows:
+
+- `https://hb.sateeshboggarapu.com`
+- `http://localhost:3000`
+- `http://127.0.0.1:3000`
+
+To update the bucket CORS policy through the Cloudflare API, set:
+
+- `CLOUDFLARE_API_TOKEN`
+- `R2_ACCOUNT_ID`
+- `R2_BUCKET_NAME`
+
+Then run:
+
+```bash
+npm run r2:cors:set
 ```
-├── app/
-│   ├── (public)/              # Public routes (home, songs, search, favorites)
-│   │   ├── page.tsx           # Home page with song grid
-│   │   ├── songs/[slug]/      # Song detail with lyrics viewer
-│   │   ├── search/            # Full-text search
-│   │   └── favorites/         # Local favorites
-│   ├── admin/                 # Admin area (login, dashboard, CRUD)
-│   │   ├── songs/             # Song management
-│   │   └── languages/         # Language management
-│   ├── api/                   # REST API routes
-│   │   ├── songs/             # GET (list), POST (create)
-│   │   ├── songs/[id]/        # GET, PUT, DELETE
-│   │   ├── search/            # Full-text search endpoint
-│   │   ├── favorites/         # Favorites CRUD
-│   │   └── languages/         # Language CRUD
-│   ├── layout.tsx             # Root layout (fonts, providers)
-│   ├── not-found.tsx          # 404 page
-│   ├── sitemap.ts             # Dynamic sitemap
-│   └── robots.ts              # Robots.txt
-├── components/
-│   ├── ui/                    # shadcn/ui primitives
-│   ├── layout/                # Header, Footer, MobileNav
-│   ├── songs/                 # SongCard, SongList, CategoryFilter
-│   ├── lyrics/                # LyricsViewer, LanguageTabs, FullscreenReader
-│   ├── search/                # SearchBar, SearchResults
-│   └── admin/                 # SongForm, TranslationEditor, AdminSignOut
-├── hooks/                     # useFavorites, useSearch, useFullscreen
-├── lib/
-│   ├── db/                    # schema.ts, queries.ts, index.ts
-│   ├── validations/           # Zod schemas
-│   ├── auth.ts                # NextAuth v5 config
-│   ├── favorites.ts           # localStorage helpers
-│   └── utils.ts               # cn() helper
-├── types/                     # TypeScript interfaces
-├── scripts/                   # seed.ts
-├── middleware.ts               # Admin auth guard
-└── drizzle.config.ts          # Drizzle Kit config
-```
 
----
+Optional:
 
-## Key Features
+- `R2_CORS_FILE` - path to a different CORS policy file
 
-### Public
-- **Home** — Song grid with category badges and language indicators
-- **Category Filter** — Filter songs by category (Worship, Hymns, Praise, etc.)
-- **Song Detail** — Multi-language lyrics viewer with language pill tabs
-- **Fullscreen Reader** — Distraction-free reading with font size controls, light/dark backgrounds, and swipe-to-switch language
-- **Search** — Full-text search across titles and lyrics in all languages (PostgreSQL tsvector)
-- **Favorites** — Heart button saves to localStorage; sort by recent or A-Z
-- **Share** — Native Web Share API with WhatsApp, Telegram, email fallbacks
-- **Dark Mode** — System-aware theme toggle
-
-### Admin (`/admin`)
-- **Dashboard** — Song/language counts, quick actions
-- **Song Editor** — Multi-language translation editor with live preview, category autocomplete, draft autosave
-- **Language Manager** — Add/edit/delete languages, toggle active
-- **Auth** — Credentials-based login with bcrypt password hashing
-
----
+The script accepts either the Cloudflare dashboard JSON array format or the API-style `{ "rules": [...] }` format and normalizes it before sending the update request.
 
 ## Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run lint` | ESLint check |
-| `npm run db:generate` | Generate Drizzle migrations |
-| `npm run db:push` | Push schema to database |
-| `npm run db:migrate` | Run migrations |
-| `npm run db:studio` | Open Drizzle Studio |
-| `npm run db:seed` | Seed sample data |
+- `npm run dev` - start the development server
+- `npm run build` - create a production build
+- `npm run start` - run the production build
+- `npm run lint` - run ESLint
+- `npm run db:generate` - generate Drizzle migrations
+- `npm run db:push` - push the schema to the database
+- `npm run db:migrate` - run migrations
+- `npm run db:studio` - open Drizzle Studio
+- `npm run db:seed` - seed the database
+- `npm run r2:cors:set` - update the R2 bucket CORS policy
 
----
+## Deployment Notes
 
-## Deployment (Vercel)
-
-1. Push to GitHub
-2. Import in Vercel
-3. Add a **Vercel Postgres** database (or connect Neon)
-4. Set environment variables
-5. Deploy — Vercel runs `next build` automatically
-6. Run `npm run db:push` and `npm run db:seed` via Vercel CLI or locally
-
----
+- Deploy the app on Vercel or another Node.js-compatible host
+- Configure all required environment variables in the deployment target
+- Ensure the public site URL matches `NEXT_PUBLIC_BASE_URL`
+- If audio uploads are enabled, ensure the R2 bucket public URL and CORS policy are configured before using direct uploads
 
 ## License
 
-MIT
+This repository does not currently include a license file.
