@@ -33,6 +33,8 @@ interface SongFormProps {
 }
 
 const AUTOSAVE_KEY = "hymnbook_draft";
+const MAX_REMOTE_PROXY_AUDIO_UPLOAD_BYTES = 4 * 1024 * 1024;
+const MAX_REMOTE_PROXY_AUDIO_UPLOAD_MB = 4;
 
 interface PresignedAudioUploadResponse {
   uploadUrl?: string;
@@ -48,6 +50,26 @@ class RetryableDirectAudioUploadError extends Error {
     super(message);
     this.name = "RetryableDirectAudioUploadError";
   }
+}
+
+function getCurrentAudioUploadOrigin() {
+  if (typeof window === "undefined") {
+    return "this site";
+  }
+
+  return window.location.origin;
+}
+
+function canRetryAudioUploadViaRemoteProxy(file: File) {
+  return file.size <= MAX_REMOTE_PROXY_AUDIO_UPLOAD_BYTES;
+}
+
+function getProxyAudioUploadTooLargeMessage() {
+  return `This production upload route only supports audio files up to about ${MAX_REMOTE_PROXY_AUDIO_UPLOAD_MB} MB. Larger files must upload directly to R2, so the bucket CORS policy must allow ${getCurrentAudioUploadOrigin()}.`;
+}
+
+function getDirectAudioUploadCorsMessage() {
+  return `Direct audio upload failed because the R2 bucket CORS policy does not allow ${getCurrentAudioUploadOrigin()}. Update the bucket CORS policy for this origin and try again.`;
 }
 
 function getConfiguredAudioUploadMode(): AudioUploadMode {
@@ -102,6 +124,10 @@ async function uploadAudioFileViaProxy(params: {
     method: "POST",
     body: uploadBody,
   });
+
+  if (uploadRes.status === 413) {
+    throw new Error(getProxyAudioUploadTooLargeMessage());
+  }
 
   const uploadData = (await uploadRes.json().catch(() => ({}))) as {
     url?: string;
@@ -166,7 +192,7 @@ async function uploadAudioFileViaPresignedUrl(params: {
   } catch (error) {
     if (error instanceof TypeError) {
       throw new RetryableDirectAudioUploadError(
-        "Direct audio upload failed because the storage origin rejected the browser request."
+        getDirectAudioUploadCorsMessage()
       );
     }
 
@@ -189,7 +215,15 @@ async function uploadAudioFile(params: {
   slug: string;
   existingUrl?: string | null;
 }) {
-  if (shouldUseProxyAudioUpload()) {
+  const { file } = params;
+  const useProxyUpload = shouldUseProxyAudioUpload();
+  const localUploadHost = isLocalAudioUploadHost();
+
+  if (useProxyUpload) {
+    if (!localUploadHost && !canRetryAudioUploadViaRemoteProxy(file)) {
+      throw new Error(getProxyAudioUploadTooLargeMessage());
+    }
+
     return uploadAudioFileViaProxy(params);
   }
 
@@ -200,6 +234,10 @@ async function uploadAudioFile(params: {
       getConfiguredAudioUploadMode() === "auto" &&
       error instanceof RetryableDirectAudioUploadError
     ) {
+      if (!canRetryAudioUploadViaRemoteProxy(file)) {
+        throw error;
+      }
+
       console.warn("Direct audio upload failed, retrying via server proxy.", error);
       return uploadAudioFileViaProxy(params);
     }
