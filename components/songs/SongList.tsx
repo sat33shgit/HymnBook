@@ -31,7 +31,7 @@ export function SongList({
   }
 
   return (
-    <div className={cn("grid grid-cols-1 gap-4 md:grid-cols-2 xl:gap-5", className)}>
+    <div className={cn("grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4 xl:gap-5", className)}>
       {songs.map((song, i) => (
         <SongCard
           key={song.id}

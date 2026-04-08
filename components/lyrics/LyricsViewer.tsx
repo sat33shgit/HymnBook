@@ -242,26 +242,26 @@ export function LyricsViewer({
 
   return (
     <div>
-      <div className="space-y-5 md:hidden">
-        <section className="rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
+      <div className="space-y-4 md:hidden">
+        <section className="rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-3.5 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
           <div className="flex items-center justify-between gap-3">
             <Button
               variant="ghost"
               onClick={handleBack}
-              className="h-11 rounded-full border border-[var(--desktop-chip-border)] bg-[var(--desktop-panel-soft)] px-4 text-[0.88rem] font-semibold text-[var(--desktop-chip-foreground)] hover:bg-[var(--desktop-chip)]"
+              className="h-9 rounded-full border border-[var(--desktop-chip-border)] bg-[var(--desktop-panel-soft)] px-3 text-[0.8rem] font-semibold text-[var(--desktop-chip-foreground)] hover:bg-[var(--desktop-chip)]"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
               Back
             </Button>
-            <span className="rounded-full bg-[var(--desktop-chip)] px-3 py-1.5 text-[0.82rem] font-semibold text-[var(--desktop-chip-foreground)]">
+            <span className="rounded-full bg-[var(--desktop-chip)] px-2.5 py-1 text-[0.74rem] font-semibold text-[var(--desktop-chip-foreground)]">
               {activeLanguageLabel}
             </span>
           </div>
 
           {showAudio && activeAudioUrl && (
-            <div className="mt-4 rounded-[1.4rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] p-3">
-              <div className="mb-3 flex items-center gap-2 text-[0.82rem] font-semibold text-[var(--desktop-chip-foreground)]">
-                <Volume2 className="h-4 w-4" />
+            <div className="mt-3.5 rounded-[1.2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] p-2.5">
+              <div className="mb-2.5 flex items-center gap-2 text-[0.76rem] font-semibold text-[var(--desktop-chip-foreground)]">
+                <Volume2 className="h-3.5 w-3.5" />
                 Audio
               </div>
               <audio
@@ -280,19 +280,19 @@ export function LyricsViewer({
               href={activeTranslation.youtubeUrl}
               target="_blank"
               rel="noreferrer"
-              className="mt-4 inline-flex h-11 items-center rounded-full border border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-4 text-[0.88rem] font-semibold text-[var(--desktop-chip-foreground)] transition-all hover:border-[var(--desktop-chip-hover-border)] hover:bg-[var(--desktop-chip-hover)] hover:text-[var(--desktop-chip-hover-foreground)]"
+              className="mt-3.5 inline-flex h-9 items-center rounded-full border border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-3.5 text-[0.8rem] font-semibold text-[var(--desktop-chip-foreground)] transition-all hover:border-[var(--desktop-chip-hover-border)] hover:bg-[var(--desktop-chip-hover)] hover:text-[var(--desktop-chip-hover-foreground)]"
             >
-              <Youtube className="mr-2 h-4 w-4" />
+              <Youtube className="mr-1.5 h-3.5 w-3.5" />
               Watch on YouTube
-              <ExternalLink className="ml-2 h-4 w-4" />
+              <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
             </a>
           )}
 
-          <div className="mt-5">
-            <p className="text-[0.76rem] font-semibold uppercase tracking-[0.16em] text-[var(--desktop-nav-muted)]">
+          <div className="mt-4">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
               Select language
             </p>
-            <div className="mt-3">
+            <div className="mt-2.5">
               <LanguageTabs
                 languages={languages}
                 activeLanguage={resolvedActiveLanguage}
@@ -301,12 +301,12 @@ export function LyricsViewer({
             </div>
           </div>
 
-          <div className="mt-5">
-            <p className="text-[0.76rem] font-semibold uppercase tracking-[0.16em] text-[var(--desktop-nav-muted)]">
+          <div className="mt-4">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
               Reader tools
             </p>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-[0.78rem] text-[var(--desktop-nav-muted)]">
+            <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+              <span className="text-[0.74rem] text-[var(--desktop-nav-muted)]">
                 Size:
               </span>
               {SIZES.map((size) => (
@@ -315,7 +315,7 @@ export function LyricsViewer({
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-9 min-w-9 rounded-full border px-3 text-[0.82rem] font-semibold",
+                    "h-8 min-w-8 rounded-full border px-2.5 text-[0.74rem] font-semibold",
                     fontSize === size
                       ? "border-transparent bg-[var(--desktop-nav-active)] text-[var(--desktop-nav-active-foreground)]"
                       : "border-[var(--desktop-chip-border)] bg-[var(--desktop-panel)] text-[var(--desktop-chip-foreground)] hover:bg-[var(--desktop-chip)]",
@@ -330,38 +330,38 @@ export function LyricsViewer({
           </div>
 
           {canShowEnglishTranslation && (
-            <div className="mt-5 flex items-center gap-3 rounded-[1.2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] px-4 py-3">
+            <div className="mt-4 flex items-center gap-2.5 rounded-[1rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] px-3 py-2.5">
               <Switch
                 checked={showEnglishTranslation}
                 onCheckedChange={setShowEnglishTranslation}
                 aria-label="Show English Text"
               />
-              <span className="text-[0.88rem] font-medium text-foreground">
+              <span className="text-[0.8rem] font-medium text-foreground">
                 Show English Text
               </span>
             </div>
           )}
         </section>
 
-        <section className="rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] p-5 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
+        <section className="rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[0.76rem] font-semibold uppercase tracking-[0.16em] text-[var(--desktop-nav-muted)]">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
                 Lyrics
               </p>
-              <h2 className="mt-2 font-heading text-[1.55rem] font-semibold leading-[1.04] tracking-[-0.04em] text-foreground">
+              <h2 className="mt-1.5 font-heading text-[1.3rem] font-semibold leading-[1.04] tracking-[-0.04em] text-foreground">
                 Focused reader
               </h2>
-              <p className="mt-2 text-[0.9rem] leading-7 text-[var(--desktop-nav-muted)]">
+              <p className="mt-2 text-[0.82rem] leading-6 text-[var(--desktop-nav-muted)]">
                 Use the toolbar below to save, share, or go fullscreen.
               </p>
             </div>
-            <span className="rounded-full bg-[var(--desktop-panel)] px-3 py-1.5 text-[0.82rem] font-semibold text-foreground shadow-[0_10px_20px_rgba(15,23,42,0.06)] dark:shadow-[0_10px_20px_rgba(2,6,23,0.18)]">
+            <span className="rounded-full bg-[var(--desktop-panel)] px-2.5 py-1 text-[0.74rem] font-semibold text-foreground shadow-[0_10px_20px_rgba(15,23,42,0.06)] dark:shadow-[0_10px_20px_rgba(2,6,23,0.18)]">
               {activeLanguageLabel}
             </span>
           </div>
 
-          <div className="mt-5">
+          <div className="mt-4">
             <AnimatePresence mode="wait">
               <motion.div
                 key={resolvedActiveLanguage}
@@ -374,9 +374,9 @@ export function LyricsViewer({
                 aria-labelledby={`lang-tab-${resolvedActiveLanguage}`}
               >
                 {activeTranslation ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {showEnglishInPlace && (
-                      <p className="text-[0.76rem] font-semibold uppercase tracking-[0.16em] text-[var(--desktop-nav-muted)]">
+                      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
                         Text In English
                       </p>
                     )}
@@ -387,7 +387,7 @@ export function LyricsViewer({
                     />
                   </div>
                 ) : (
-                  <p className="py-12 text-center text-[var(--desktop-nav-muted)]">
+                  <p className="py-10 text-center text-[0.82rem] text-[var(--desktop-nav-muted)]">
                     No lyrics available for this language.
                   </p>
                 )}
@@ -663,14 +663,14 @@ export function LyricsViewer({
         </section>
       </div>
 
-      <div className="fixed bottom-[calc(6.35rem+env(safe-area-inset-bottom))] left-4 right-4 z-40 md:hidden">
-        <div className="mx-auto flex max-w-md items-center gap-2 rounded-[1.65rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-sidebar)] p-2 shadow-[0_20px_44px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:shadow-[0_20px_44px_rgba(2,6,23,0.38)]">
+      <div className="fixed bottom-[calc(5.35rem+env(safe-area-inset-bottom))] left-4 right-4 z-40 md:hidden">
+        <div className="mx-auto flex max-w-md items-center gap-1.5 rounded-[1.4rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-sidebar)] p-1.5 shadow-[0_20px_44px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:shadow-[0_20px_44px_rgba(2,6,23,0.38)]">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => toggleFavorite(songId)}
             className={cn(
-              "h-14 min-w-0 flex-1 flex-col gap-1 rounded-[1.2rem] px-3",
+              "h-11 min-w-0 flex-1 flex-col gap-0.5 rounded-[1rem] px-2",
               favorited
                 ? "bg-[var(--desktop-nav-active)] text-[var(--desktop-nav-active-foreground)] hover:bg-[var(--desktop-nav-active)]/95"
                 : "text-[var(--desktop-nav-muted)] hover:bg-[var(--desktop-panel-soft)] hover:text-foreground",
@@ -679,12 +679,12 @@ export function LyricsViewer({
           >
             <Heart
               className={cn(
-                "h-5 w-5",
+                "h-4 w-4",
                 favorited &&
                   "fill-[var(--desktop-nav-active-foreground)] text-[var(--desktop-nav-active-foreground)]",
               )}
             />
-            <span className="text-[0.78rem] font-semibold">
+            <span className="text-[0.7rem] font-semibold">
               {favorited ? "Saved" : "Favorite"}
             </span>
           </Button>
@@ -693,20 +693,20 @@ export function LyricsViewer({
             variant="ghost"
             size="sm"
             onClick={handleShare}
-            className="h-14 min-w-0 flex-1 flex-col gap-1 rounded-[1.2rem] px-3 text-[var(--desktop-nav-muted)] hover:bg-[var(--desktop-panel-soft)] hover:text-foreground"
+            className="h-11 min-w-0 flex-1 flex-col gap-0.5 rounded-[1rem] px-2 text-[var(--desktop-nav-muted)] hover:bg-[var(--desktop-panel-soft)] hover:text-foreground"
           >
-            <Share2 className="h-5 w-5" />
-            <span className="text-[0.78rem] font-semibold">Share</span>
+            <Share2 className="h-4 w-4" />
+            <span className="text-[0.7rem] font-semibold">Share</span>
           </Button>
 
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsFullscreen(true)}
-            className="h-14 min-w-0 flex-1 flex-col gap-1 rounded-[1.2rem] px-3 text-[var(--desktop-nav-muted)] hover:bg-[var(--desktop-panel-soft)] hover:text-foreground"
+            className="h-11 min-w-0 flex-1 flex-col gap-0.5 rounded-[1rem] px-2 text-[var(--desktop-nav-muted)] hover:bg-[var(--desktop-panel-soft)] hover:text-foreground"
           >
-            <Maximize2 className="h-5 w-5" />
-            <span className="text-[0.78rem] font-semibold">Fullscreen</span>
+            <Maximize2 className="h-4 w-4" />
+            <span className="text-[0.7rem] font-semibold">Fullscreen</span>
           </Button>
         </div>
       </div>

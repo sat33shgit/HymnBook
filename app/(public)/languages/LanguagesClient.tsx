@@ -88,7 +88,7 @@ export function LanguagesClient({
   };
 
   return (
-    <div className="space-y-6 px-4 py-6 md:space-y-8 md:px-0 md:py-0">
+    <div className="space-y-5 px-4 py-5 md:space-y-8 md:px-0 md:py-0">
       <BrowseByLanguageSection
         languages={languageOverview}
         selectedCode={selectedLanguage}
@@ -97,13 +97,13 @@ export function LanguagesClient({
         description="English is selected by default. Switch to another language to view songs available in that language."
       />
 
-      <section className="rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-6 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
-        <div className="mb-6 flex items-start justify-between gap-4">
+      <section className="rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:rounded-[2rem] md:p-6">
+        <div className="mb-5 flex items-start justify-between gap-4 md:mb-6">
           <div>
-            <h2 className="font-heading text-[1.85rem] font-semibold leading-[1.05] tracking-[-0.04em] text-foreground">
+            <h2 className="font-heading text-[1.45rem] font-semibold leading-[1.05] tracking-[-0.04em] text-foreground md:text-[1.85rem]">
               {activeLabel} songs
             </h2>
-            <p className="mt-2 text-[0.94rem] text-[var(--desktop-nav-muted)]">
+            <p className="mt-1.5 text-[0.84rem] leading-6 text-[var(--desktop-nav-muted)] md:mt-2 md:text-[0.94rem] md:leading-7">
               Showing songs that have lyrics available in {activeLabel}.
             </p>
           </div>
@@ -120,10 +120,10 @@ export function LanguagesClient({
         />
 
         {page < totalPages && (
-          <div className="mt-8 flex justify-center md:mt-10">
+          <div className="mt-6 flex justify-center md:mt-10">
             <Button
               variant="outline"
-              className="rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-6 text-[var(--desktop-chip-foreground)]"
+              className="h-9 rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-4 text-[0.84rem] text-[var(--desktop-chip-foreground)] md:h-10 md:px-6 md:text-sm"
               onClick={loadMore}
               disabled={loading}
             >

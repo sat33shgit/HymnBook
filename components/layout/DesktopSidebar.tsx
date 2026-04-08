@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useFavorites } from "@/hooks/useFavorites";
+import { publicSiteTitle } from "@/lib/site";
 import { publicNavItems } from "./publicNavItems";
 
 export function DesktopSidebar() {
@@ -25,7 +26,7 @@ export function DesktopSidebar() {
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <div
-              className="flex size-12 items-center justify-center rounded-2xl text-[var(--desktop-hero-foreground)] shadow-[0_18px_32px_rgba(6,78,59,0.24)]"
+              className="flex size-12 items-center justify-center rounded-full text-[var(--desktop-hero-foreground)] shadow-[0_18px_32px_rgba(6,78,59,0.24)]"
               style={{
                 backgroundImage:
                   "linear-gradient(135deg, var(--desktop-hero-start), var(--desktop-hero-end))",
@@ -34,8 +35,8 @@ export function DesktopSidebar() {
               <BookOpenText className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[0.74rem] font-semibold uppercase tracking-[0.24em] text-[var(--desktop-nav-muted)]">
-                Hymn Book
+              <p className="font-heading text-[1.15rem] font-semibold leading-[1.05] tracking-[-0.03em] text-foreground">
+                {publicSiteTitle}
               </p>
             </div>
           </div>
