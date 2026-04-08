@@ -89,18 +89,19 @@ export function HomeClient({
           {stats.map(({ label, value, icon: Icon }) => (
             <article
               key={label}
-              className="min-h-[5.4rem] rounded-[1.2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-2.5 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]"
+              className="min-h-[5.4rem] rounded-[1.2rem] border border-white/10 p-2.5 text-[var(--desktop-hero-foreground)] shadow-[0_22px_42px_rgba(6,78,59,0.18)]"
+              style={HERO_GRADIENT_STYLE}
             >
-              <div className="flex items-center justify-between gap-1 text-[var(--desktop-nav-muted)]">
-                <div className="flex size-7 items-center justify-center rounded-[0.8rem] bg-[var(--desktop-panel-soft)]">
+              <div className="flex items-center justify-between gap-1 text-[var(--desktop-hero-muted)]">
+                <div className="flex size-7 items-center justify-center rounded-[0.8rem] bg-white/10">
                   <Icon className="h-3.5 w-3.5" />
                 </div>
-                <p className="font-heading text-[1.2rem] font-semibold leading-none tracking-[-0.05em] text-foreground">
+                <p className="font-heading text-[1.2rem] font-semibold leading-none tracking-[-0.05em]">
                   {value}
                 </p>
               </div>
               <p
-                className="mt-2 text-left text-[0.56rem] font-semibold uppercase tracking-[0.12em] text-[var(--desktop-nav-muted)]"
+                className="mt-2 text-left text-[0.56rem] font-semibold uppercase tracking-[0.12em] text-[var(--desktop-hero-muted)]"
                 title={label}
               >
                 {label}
@@ -150,17 +151,18 @@ export function HomeClient({
           {stats.map(({ label, value, icon: Icon }) => (
             <article
               key={label}
-              className="rounded-[2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-5 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]"
+              className="rounded-[2rem] border border-white/10 p-5 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.18)]"
+              style={HERO_GRADIENT_STYLE}
             >
-              <div className="flex items-center gap-3 text-[var(--desktop-nav-muted)]">
-                <div className="flex size-11 items-center justify-center rounded-2xl bg-[var(--desktop-panel-soft)]">
+              <div className="flex items-center gap-3 text-[var(--desktop-hero-muted)]">
+                <div className="flex size-11 items-center justify-center rounded-2xl bg-white/10">
                   <Icon className="h-5 w-5" />
                 </div>
                 <span className="text-[0.82rem] font-semibold uppercase tracking-[0.16em]">
                   {label}
                 </span>
               </div>
-              <p className="mt-5 font-heading text-[2.1rem] font-semibold leading-none tracking-[-0.05em] text-foreground">
+              <p className="mt-5 font-heading text-[2.1rem] font-semibold leading-none tracking-[-0.05em]">
                 {value}
               </p>
             </article>
