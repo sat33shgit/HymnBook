@@ -3,16 +3,23 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
-import { defaultOgImagePath, siteMetadataBase } from "@/lib/site";
+import {
+  defaultOgImagePath,
+  publicSiteTitle,
+  siteMetadataBase,
+} from "@/lib/site";
+
+const siteDescription =
+  "Browse and read Christian song lyrics in multiple languages including English, Telugu, Hindi, Tamil and Malayalam.";
+const defaultSiteTitle = `${publicSiteTitle} - Christian Song Lyrics`;
 
 export const metadata: Metadata = {
   metadataBase: siteMetadataBase,
   title: {
-    default: "HymnBook - Christian Song Lyrics",
-    template: "%s | HymnBook",
+    default: defaultSiteTitle,
+    template: `%s | ${publicSiteTitle}`,
   },
-  description:
-    "Browse and read Christian song lyrics in multiple languages including English, Telugu, Hindi, Tamil and Malayalam.",
+  description: siteDescription,
   keywords: ["christian songs", "hymns", "lyrics", "worship", "praise"],
   icons: {
     icon: "/favicon.svg",
@@ -22,24 +29,22 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/",
-    siteName: "HymnBook",
-    title: "HymnBook - Christian Song Lyrics",
-    description:
-      "Browse and read Christian song lyrics in multiple languages including English, Telugu, Hindi, Tamil and Malayalam.",
+    siteName: publicSiteTitle,
+    title: defaultSiteTitle,
+    description: siteDescription,
     images: [
       {
         url: defaultOgImagePath,
         width: 1200,
         height: 630,
-        alt: "HymnBook preview image",
+        alt: `${publicSiteTitle} preview image`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "HymnBook - Christian Song Lyrics",
-    description:
-      "Browse and read Christian song lyrics in multiple languages including English, Telugu, Hindi, Tamil and Malayalam.",
+    title: defaultSiteTitle,
+    description: siteDescription,
     images: [defaultOgImagePath],
   },
 };

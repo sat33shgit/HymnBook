@@ -3,7 +3,7 @@ import { getSongBySlug, getLanguages, getAllSlugs, isPublicSongAudioVisible } fr
 import { LyricsViewer } from "@/components/lyrics/LyricsViewer";
 import type { Metadata } from "next";
 import { truncate } from "@/lib/utils";
-import { defaultOgImagePath } from "@/lib/site";
+import { defaultOgImagePath, publicSiteTitle } from "@/lib/site";
 import { deriveSongDisplayTitle, deriveSongPrimaryTitle } from "@/lib/song-utils";
 
 export const revalidate = 300;
@@ -43,7 +43,7 @@ export async function generateMetadata({
     title,
     description: lyricsPreview,
     openGraph: {
-      title: `${title} | HymnBook`,
+      title: `${title} | ${publicSiteTitle}`,
       description: lyricsPreview,
       url: `/songs/${slug}`,
       type: "article",
@@ -52,13 +52,13 @@ export async function generateMetadata({
           url: defaultOgImagePath,
           width: 1200,
           height: 630,
-          alt: "HymnBook preview image",
+          alt: `${publicSiteTitle} preview image`,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} | HymnBook`,
+      title: `${title} | ${publicSiteTitle}`,
       description: lyricsPreview,
       images: [defaultOgImagePath],
     },

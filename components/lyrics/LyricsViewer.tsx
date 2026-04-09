@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { publicSiteTitle } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/hooks/useFavorites";
 import type { FontSize, SongTranslation } from "@/types";
@@ -120,7 +121,7 @@ export function LyricsViewer({
 
     try {
       if (currentTitle) {
-        document.title = `${currentTitle} | HymnBook`;
+        document.title = `${currentTitle} | ${publicSiteTitle}`;
       }
 
       const headerEl = document.getElementById(`song-title-${songId}`);
@@ -214,7 +215,7 @@ export function LyricsViewer({
       try {
         await navigator.share({
           title: currentTitle,
-          text: "Check out this song on HymnBook",
+          text: `Check out this song on ${publicSiteTitle}`,
           url: shareUrl,
         });
       } catch {
@@ -767,7 +768,7 @@ export function LyricsViewer({
 
             <a
               href={`mailto:?subject=${encodeURIComponent(
-                `${currentTitle} | HymnBook`
+                `${currentTitle} | ${publicSiteTitle}`
               )}&body=${encodeURIComponent(`Check out this song: ${shareUrl}`)}`}
               className={buttonVariants({
                 variant: "outline",
