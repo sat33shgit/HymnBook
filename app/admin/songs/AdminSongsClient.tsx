@@ -84,6 +84,12 @@ export function AdminSongsClient({
   const collatorRef = useRef(
     new Intl.Collator(undefined, { sensitivity: "base" })
   );
+  const getDisplayTitle = (song: SongListItem) =>
+    selectedLanguage !== "all"
+      ? song.titlesByLanguage?.[selectedLanguage] ??
+        song.localizedTitle ??
+        song.title
+      : song.title;
 
   const isSearching = searchQuery.trim().length > 0;
   const hasActiveFilters =
@@ -113,7 +119,10 @@ export function AdminSongsClient({
       const direction = sortDirection === "asc" ? 1 : -1;
 
       if (sortKey === "title") {
-        return direction * collatorRef.current.compare(left.title, right.title);
+        return (
+          direction *
+          collatorRef.current.compare(getDisplayTitle(left), getDisplayTitle(right))
+        );
       }
 
       if (sortKey === "languages") {
@@ -537,7 +546,7 @@ export function AdminSongsClient({
               <tr key={`${song.id}-${idx}`} className="border-b last:border-0">
                 <td className="px-4 py-3 font-medium">
                   <div className="flex items-center gap-2">
-                    <span>{song.title}</span>
+                    <span>{getDisplayTitle(song)}</span>
                     {song.hasAudio && (
                       <MusicIcon
                         className="h-4 w-4 text-muted-foreground"
@@ -573,7 +582,7 @@ export function AdminSongsClient({
                     }
                     aria-label={`${
                       song.isPublished ? "Unpublish" : "Publish"
-                    } ${song.title}`}
+                    } ${getDisplayTitle(song)}`}
                   />
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -583,7 +592,7 @@ export function AdminSongsClient({
                       className={buttonVariants({ variant: "ghost", size: "icon" })}
                     >
                       <Pencil className="h-4 w-4" />
-                      <span className="sr-only">Edit {song.title}</span>
+                      <span className="sr-only">Edit {getDisplayTitle(song)}</span>
                     </Link>
                     <Button
                       variant="ghost"
@@ -592,7 +601,7 @@ export function AdminSongsClient({
                       className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete {song.title}</span>
+                      <span className="sr-only">Delete {getDisplayTitle(song)}</span>
                     </Button>
                   </div>
                 </td>

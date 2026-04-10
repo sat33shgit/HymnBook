@@ -46,6 +46,7 @@ export interface SongListItem {
   isPublished: boolean | null;
   title: string;
   localizedTitle?: string | null;
+  titlesByLanguage?: Record<string, string>;
   languages: string[];
   hasAudio?: boolean;
   hasYoutube?: boolean;

@@ -161,6 +161,15 @@ export async function getSongs({
         const localizedTitle = language
           ? songTrans.find((t) => t.languageCode === language)?.title ?? null
           : null;
+        const titlesByLanguage = Object.fromEntries(
+          songTrans
+            .filter(
+              (translation) =>
+                translation.languageCode.trim().length > 0 &&
+                translation.title.trim().length > 0
+            )
+            .map((translation) => [translation.languageCode, translation.title])
+        );
 
         return {
           id: song.id,
@@ -172,6 +181,7 @@ export async function getSongs({
           title:
             deriveSongPrimaryTitle(songTrans, song.defaultLang) || "Untitled",
           localizedTitle,
+          titlesByLanguage,
           languages: songTrans.map((t) => t.languageCode),
           hasAudio: songTrans.some((t) => (t.audioUrl ?? "").toString().trim() !== ""),
           hasYoutube: songTrans.some((t) => (t.youtubeUrl ?? "").toString().trim() !== ""),
