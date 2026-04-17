@@ -11,11 +11,12 @@ async function seed() {
   // 1. Create languages
   console.log("  → Languages...");
   const langs = [
-    { code: "en", name: "English", nativeName: "English", sortOrder: 0 },
-    { code: "te", name: "Telugu", nativeName: "తెలుగు", sortOrder: 1 },
+    { code: "te", name: "Telugu", nativeName: "తెలుగు", sortOrder: 0 },
+    { code: "en", name: "English", nativeName: "English", sortOrder: 1 },
     { code: "hi", name: "Hindi", nativeName: "हिन्दी", sortOrder: 2 },
     { code: "ta", name: "Tamil", nativeName: "தமிழ்", sortOrder: 3 },
     { code: "ml", name: "Malayalam", nativeName: "മലയാളം", sortOrder: 4 },
+    
     { code: "kn", name: "Kannada", nativeName: "ಕನ್ನಡ", sortOrder: 5 },
   ];
 

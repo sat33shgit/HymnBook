@@ -106,10 +106,10 @@ export default async function SongDetailPage({
   const mobileSummary = `${new Intl.NumberFormat("en-US").format(song.viewCount ?? 0)} views / Available in ${songLanguages.length} ${songLanguages.length === 1 ? "language" : "languages"}`;
 
   return (
-    <article className="px-4 py-5 pb-14 md:px-0 md:py-0 md:pb-0">
+    <article className="px-4 py-5 pb-14 md:px-0 md:py-0 md:pb-0 overflow-x-hidden max-w-full">
       <header className="mb-5 md:hidden">
         <div
-          className="rounded-[1.8rem] px-4 py-5 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)]"
+          className="rounded-[1.8rem] px-4 py-5 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] overflow-x-hidden max-w-full"
           style={{
             backgroundImage:
               "linear-gradient(135deg, var(--desktop-hero-start), var(--desktop-hero-end))",
@@ -137,7 +137,7 @@ export default async function SongDetailPage({
           </div>
           <h1
             id={`song-title-${song.id}`}
-            className="mt-3 font-heading text-[clamp(1.85rem,8vw,2.9rem)] font-semibold leading-[0.97] tracking-[-0.05em]"
+            className="mt-3 font-heading text-[clamp(1.85rem,8vw,2.9rem)] font-semibold leading-[0.97] tracking-[-0.05em] break-words overflow-x-hidden max-w-full"
           >
             {title}
           </h1>

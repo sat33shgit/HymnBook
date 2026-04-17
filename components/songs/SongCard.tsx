@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { ChevronRight, Globe2, Heart, Star } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/hooks/useFavorites";
 import type { SongListItem } from "@/types";
@@ -76,30 +75,43 @@ export function SongCard({
                   </span>
                   <div className="mt-2 flex flex-wrap items-center gap-1.5 md:mt-3 md:gap-2">
                     {song.category && (
-                      <Badge
-                        variant="secondary"
-                        className="rounded-full bg-[var(--desktop-panel-soft)] px-2.5 py-0.5 text-[0.68rem] font-semibold text-[var(--desktop-chip-foreground)] md:px-3 md:py-1 md:text-[0.78rem]"
-                      >
+                      <span className="inline-flex items-center rounded-md bg-[var(--desktop-panel-soft)] px-2 py-0.5 text-[0.68rem] font-semibold text-[var(--desktop-nav-muted)] md:px-3 md:py-1 md:text-[0.78rem]">
                         {song.category}
-                      </Badge>
+                      </span>
                     )}
-                    {song.languages.slice(0, 4).map((lang) => (
-                      <Badge
-                        key={lang}
-                        variant="outline"
-                        className="rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-2.5 py-0.5 text-[0.68rem] font-semibold text-[var(--desktop-chip-foreground)] md:px-3 md:py-1 md:text-[0.76rem]"
-                      >
-                        {LANGUAGE_NAMES[lang] ?? lang}
-                      </Badge>
-                    ))}
-                    {song.languages.length > 4 && (
-                      <Badge
-                        variant="outline"
-                        className="rounded-full border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-2.5 py-0.5 text-[0.68rem] font-semibold text-[var(--desktop-chip-foreground)] md:px-3 md:py-1 md:text-[0.76rem]"
-                      >
-                        +{song.languages.length - 4}
-                      </Badge>
-                    )}
+                    {/* Desktop / tablet: show up to 4 chips and +N */}
+                    <div className="hidden md:flex items-center gap-1.5 flex-wrap">
+                      {song.languages.slice(0, 4).map((lang) => (
+                        <span
+                          key={lang}
+                          className="inline-flex items-center rounded-md bg-[var(--desktop-panel-soft)] px-2 py-0.5 text-[0.68rem] font-semibold text-[var(--desktop-nav-muted)] md:px-3 md:py-1 md:text-[0.76rem]"
+                        >
+                          {LANGUAGE_NAMES[lang] ?? lang}
+                        </span>
+                      ))}
+                      {song.languages.length > 4 && (
+                        <span className="inline-flex items-center rounded-md bg-[var(--desktop-panel-soft)] px-2 py-0.5 text-[0.68rem] font-semibold text-[var(--desktop-nav-muted)] md:px-3 md:py-1 md:text-[0.76rem]">
+                          +{song.languages.length - 4}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Mobile: single-line compact chips with +N overflow */}
+                    <div className="flex md:hidden items-center gap-1.5 overflow-hidden whitespace-nowrap">
+                      {song.languages.slice(0, 3).map((lang) => (
+                        <span
+                          key={lang}
+                          className="inline-flex items-center rounded-md bg-[var(--desktop-panel-soft)] px-2 py-0.5 text-[0.64rem] font-semibold text-[var(--desktop-nav-muted)]"
+                        >
+                          {LANGUAGE_NAMES[lang] ?? lang}
+                        </span>
+                      ))}
+                      {song.languages.length > 3 && (
+                        <span className="inline-flex items-center rounded-md bg-[var(--desktop-panel-soft)] px-2 py-0.5 text-[0.64rem] font-semibold text-[var(--desktop-nav-muted)]">
+                          +{song.languages.length - 3}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <Button

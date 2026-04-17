@@ -243,7 +243,7 @@ export function LyricsViewer({
 
   return (
     <div>
-      <div className="space-y-4 md:hidden">
+      <div className="space-y-4 overflow-x-hidden max-w-full md:hidden">
         <section className="rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-3.5 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
           <div className="flex items-center justify-between gap-3">
             <Button
@@ -344,7 +344,7 @@ export function LyricsViewer({
           )}
         </section>
 
-        <section className="rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
+        <section className="overflow-x-hidden max-w-full rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
