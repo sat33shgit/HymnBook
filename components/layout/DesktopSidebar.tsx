@@ -14,7 +14,7 @@ import { publicSiteTitle } from "@/lib/site";
 import { publicNavItems } from "./publicNavItems";
 
 export function DesktopSidebar() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
   const { theme, setTheme } = useTheme();
   const { favorites } = useFavorites();
 

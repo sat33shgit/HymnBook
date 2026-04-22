@@ -6,7 +6,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { publicNavItems } from "./publicNavItems";
 
 export function MobileNav() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
   const { favorites } = useFavorites();
   const hideNav = pathname.startsWith("/admin");
 
