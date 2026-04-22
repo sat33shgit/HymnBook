@@ -1,7 +1,7 @@
 "use client";
 
 import { Search as SearchIcon, Mic, MicOff, AudioLines } from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -84,7 +84,19 @@ export function SearchBar({
     }, 300);
   };
 
-  const handlePointerDown = () => {
+  const handlePointerDown = (event?: React.PointerEvent | React.TouchEvent | React.MouseEvent) => {
+    if (event && 'preventDefault' in event) {
+      try {
+        event.preventDefault();
+        // stop propagation so the WebView doesn't interpret the long-press
+        event.stopPropagation();
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    console.debug("[SearchBar] handlePointerDown", { isListening, isTouchDevice });
+
     if (isListening) {
       return;
     }
@@ -95,6 +107,8 @@ export function SearchBar({
   };
 
   const handlePointerUp = () => {
+    console.debug("[SearchBar] handlePointerUp", { isListening, isTouchDevice });
+
     // For press-and-hold on touch devices, stop on release
     pointerStartedRef.current = false;
     if (isListening) {
@@ -103,6 +117,7 @@ export function SearchBar({
   };
 
   const handleClick = () => {
+    console.debug("[SearchBar] handleClick", { isListening, isTouchDevice });
     if (pointerStartedRef.current) {
       pointerStartedRef.current = false;
       return;
@@ -147,14 +162,16 @@ export function SearchBar({
         />
         {isClient && isSupported && (
           <Tooltip>
-              <TooltipTrigger
-                onPointerDown={!isTouchDevice ? handlePointerDown : undefined}
-                onPointerUp={!isTouchDevice ? handlePointerUp : undefined}
-                onTouchStart={isTouchDevice ? handlePointerDown : undefined}
-                onTouchEnd={isTouchDevice ? handlePointerUp : undefined}
-                onClick={!isTouchDevice ? handleClick : undefined}
-              data-slot="tooltip-trigger"
-              className={cn(
+                  <TooltipTrigger
+                    onPointerDown={!isTouchDevice ? handlePointerDown : undefined}
+                    onPointerUp={!isTouchDevice ? handlePointerUp : undefined}
+                    onTouchStart={isTouchDevice ? (e) => { e.preventDefault(); handlePointerDown(e); } : undefined}
+                    onTouchEnd={isTouchDevice ? (e) => { e.preventDefault(); handlePointerUp(); } : undefined}
+                    onClick={!isTouchDevice ? handleClick : undefined}
+                    onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    data-slot="tooltip-trigger"
+                    style={{ touchAction: "none", WebkitUserSelect: "none", userSelect: "none" }}
+                    className={cn(
                 "absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[0.95rem] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:right-2 md:h-11 md:w-11 md:rounded-[1rem]",
                 showVoicePrompt
                   ? "scale-105 bg-[var(--desktop-panel-soft)] text-[var(--desktop-chip-hover-foreground)] shadow-[0_10px_22px_rgba(15,23,42,0.12)] ring-4 ring-[var(--desktop-chip-hover-border)]/35"
