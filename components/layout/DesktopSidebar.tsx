@@ -14,9 +14,20 @@ import { publicSiteTitle } from "@/lib/site";
 import { publicNavItems } from "./publicNavItems";
 
 export function DesktopSidebar() {
-  const pathname = usePathname() ?? "/";
+  const rawPathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { favorites } = useFavorites();
+
+  const clientPathname = rawPathname ?? (typeof window !== "undefined" ? window.location.pathname : "/");
+
+  const pathname = (() => {
+    const p = clientPathname ?? "/";
+    const withoutQuery = p.split("?")[0].split("#")[0];
+    if (withoutQuery !== "/" && withoutQuery.endsWith("/")) {
+      return withoutQuery.replace(/\/+$/, "");
+    }
+    return withoutQuery || "/";
+  })();
 
   if (pathname.startsWith("/admin")) return null;
 
