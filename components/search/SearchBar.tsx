@@ -37,6 +37,7 @@ export function SearchBar({
   voiceLang,
 }: SearchBarProps) {
   const [showSpeakNow, setShowSpeakNow] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const pointerStartedRef = useRef(false);
   const speakNowTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const isClient = useSyncExternalStore(subscribeToClientRender, () => true, () => false);
@@ -47,6 +48,12 @@ export function SearchBar({
         clearTimeout(speakNowTimerRef.current);
       }
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsTouchDevice((window as any).ontouchstart !== undefined || navigator.maxTouchPoints > 0);
+    }
   }, []);
 
   const { state, isSupported, errorMessage, start, stop } = useVoiceSearch({
@@ -85,6 +92,14 @@ export function SearchBar({
     pointerStartedRef.current = true;
     showSpeakNowPrompt();
     start();
+  };
+
+  const handlePointerUp = () => {
+    // For press-and-hold on touch devices, stop on release
+    pointerStartedRef.current = false;
+    if (isListening) {
+      stop();
+    }
   };
 
   const handleClick = () => {
@@ -132,9 +147,12 @@ export function SearchBar({
         />
         {isClient && isSupported && (
           <Tooltip>
-            <TooltipTrigger
-              onPointerDown={handlePointerDown}
-              onClick={handleClick}
+              <TooltipTrigger
+                onPointerDown={!isTouchDevice ? handlePointerDown : undefined}
+                onPointerUp={!isTouchDevice ? handlePointerUp : undefined}
+                onTouchStart={isTouchDevice ? handlePointerDown : undefined}
+                onTouchEnd={isTouchDevice ? handlePointerUp : undefined}
+                onClick={!isTouchDevice ? handleClick : undefined}
               data-slot="tooltip-trigger"
               className={cn(
                 "absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[0.95rem] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:right-2 md:h-11 md:w-11 md:rounded-[1rem]",
