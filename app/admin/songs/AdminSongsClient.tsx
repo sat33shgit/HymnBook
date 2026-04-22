@@ -81,6 +81,10 @@ export function AdminSongsClient({
   const [deleting, setDeleting] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const lastFocusedRef = useRef<HTMLElement | null>(null);
   const collatorRef = useRef(
     new Intl.Collator(undefined, { sensitivity: "base" })
   );
@@ -145,6 +149,7 @@ export function AdminSongsClient({
   const clearSearch = () => {
     setSearchQuery("");
     setSearchResults(null);
+    searchInputRef.current?.focus();
   };
 
   const clearFilters = () => {
@@ -190,6 +195,44 @@ export function AdminSongsClient({
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    searchInputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const onFocusIn = (e: FocusEvent) => {
+      lastFocusedRef.current = e.target as HTMLElement | null;
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Backspace") return;
+
+      if (lastFocusedRef.current === searchInputRef.current) {
+        setTimeout(() => {
+          if (document.activeElement !== searchInputRef.current) {
+            searchInputRef.current?.focus();
+          }
+        }, 0);
+      }
+    };
+
+    window.addEventListener("focusin", onFocusIn);
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
   const scrollToTop = () => {
@@ -251,6 +294,7 @@ export function AdminSongsClient({
       toast.error("Search failed");
     } finally {
       setSearchLoading(false);
+      searchInputRef.current?.focus();
     }
   };
 
@@ -277,6 +321,55 @@ export function AdminSongsClient({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, selectedLanguage]);
+
+  const scheduleTypingEnd = () => {
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      typingTimeoutRef.current = null;
+      setIsTyping(false);
+    }, 800);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setIsTyping(true);
+    scheduleTypingEnd();
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    setIsTyping(true);
+    scheduleTypingEnd();
+
+    if (e.key === "Backspace") {
+      e.stopPropagation();
+      return;
+    }
+
+    if (e.key === "Enter") {
+      void handleSearch();
+    }
+  };
+
+  useEffect(() => {
+    if (!isTyping) return;
+
+    const onFocusInWhileTyping = () => {
+      if (document.activeElement !== searchInputRef.current) {
+        setTimeout(() => {
+          searchInputRef.current?.focus();
+        }, 0);
+      }
+    };
+
+    window.addEventListener("focusin", onFocusInWhileTyping, true);
+
+    return () => {
+      window.removeEventListener("focusin", onFocusInWhileTyping, true);
+    };
+  }, [isTyping]);
 
   const handleTogglePublish = async (id: number, isPublished: boolean) => {
     try {
@@ -423,14 +516,11 @@ export function AdminSongsClient({
 
         <div className="flex items-center gap-2">
           <input
+            ref={searchInputRef}
             type="search"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                void handleSearch();
-              }
-            }}
+            onChange={handleInputChange}
+            onKeyDown={handleInputKeyDown}
             placeholder="Search by title or lyrics..."
             className="w-full max-w-lg rounded-md border px-3 py-2"
             disabled={searchLoading}

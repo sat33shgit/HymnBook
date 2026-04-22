@@ -59,6 +59,15 @@ export function TranslationEditor({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
   const audioPreviewRef = useRef<HTMLAudioElement>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [selectedFileSize, setSelectedFileSize] = useState<number | null>(null);
+
+  const formatBytes = (bytes: number) => {
+    if (!bytes || bytes <= 0) return "0 bytes";
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    if (bytes >= 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+    return `${bytes} bytes`;
+  };
 
   // Count lines
   const lineCount = lyrics.split("\n").length;
@@ -70,6 +79,8 @@ export function TranslationEditor({
     if (audioInputRef.current) {
       audioInputRef.current.value = "";
     }
+    setSelectedFileName(null);
+    setSelectedFileSize(null);
   };
 
   const rejectAudioSelection = (message: string) => {
@@ -81,11 +92,16 @@ export function TranslationEditor({
   const handleAudioSelection = (file: File | null) => {
     if (!file) {
       onAudioFileChange(null);
+      setSelectedFileName(null);
+      setSelectedFileSize(null);
       setAudioError(null);
       return;
     }
 
-    const fileName = file.name.toLowerCase();
+    const rawFileName = file.name;
+    const fileSize = file.size;
+
+    const fileName = rawFileName.toLowerCase();
     const isMp3ByName = fileName.endsWith(".mp3");
     const isM4aByName = fileName.endsWith(".m4a");
     const isMp3ByType = file.type === "audio/mpeg";
@@ -105,6 +121,8 @@ export function TranslationEditor({
     }
 
     setAudioError(null);
+    setSelectedFileName(rawFileName);
+    setSelectedFileSize(fileSize);
     onAudioFileChange(file);
     onRemoveAudioChange(false);
   };
@@ -271,11 +289,15 @@ export function TranslationEditor({
             />
           )}
 
-          {audioFileName && (
+          {selectedFileName ? (
+            <p className="text-xs text-muted-foreground">
+              Selected file: {selectedFileName} ({formatBytes(selectedFileSize ?? 0)})
+            </p>
+          ) : audioFileName ? (
             <p className="text-xs text-muted-foreground">
               Selected file: {audioFileName}
             </p>
-          )}
+          ) : null}
 
           {audioError && (
             <p className="text-xs text-destructive">{audioError}</p>
