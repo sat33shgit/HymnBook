@@ -9,7 +9,7 @@ export default function ContactPage() {
 
   const MAX_NAME = 40;
   const MAX_EMAIL = 60;
-  const MAX_MESSAGE = 500;
+  const MAX_MESSAGE = 1000;
   const REQUEST_TYPES = ["Song request", "Correction", "General feedback"];
 
   const validate = () => {
@@ -37,6 +37,12 @@ export default function ContactPage() {
     return Object.keys(errs).length === 0;
   };
 
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const target = e.target;
     const name = target.name;
@@ -48,6 +54,14 @@ export default function ContactPage() {
     }
 
     const value = (target as HTMLInputElement | HTMLTextAreaElement).value;
+
+    if (name === "name") {
+      const sanitized = value.replace(/\d/g, "").slice(0, MAX_NAME);
+      setForm((prev) => ({ ...prev, [name]: sanitized }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+      return;
+    }
+
     setForm((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
@@ -64,9 +78,8 @@ export default function ContactPage() {
       <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
         {/* Left content */}
         <section className="relative px-5 py-5 sm:px-8 sm:py-8 lg:px-12 lg:py-12 bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] transition-colors">
-                <div className="max-w-xl">
+                <div className="max-w-xl text-center ">
                   <div className="inline-flex items-center gap-2 rounded-full bg-blue-600/10 dark:bg-blue-400/10 px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-400 mb-5">
-                    <span className="h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
                     We would love to hear from you
                   </div>
     
@@ -119,7 +132,7 @@ export default function ContactPage() {
                       </div>
                       <a
                         href="mailto:singuntothelord.contact@gmail.com"
-                        className="hidden sm:inline-flex items-center justify-center rounded-2xl bg-white dark:bg-blue-700 px-5 py-3 text-sm font-semibold text-slate-900 dark:text-white shadow-lg hover:translate-y-[-1px] transition"
+                        className="hidden sm:inline-flex items-center justify-center rounded-2xl bg-white dark:bg-[#181f2e] px-5 py-3 text-sm font-semibold text-slate-900 dark:text-white shadow-lg transform hover:translate-y-[-1px] hover:scale-105 hover:shadow-xl transition dark:hover:bg-[#0b2336] cursor-pointer"
                         tabIndex={0}
                       >
                         Contact us
@@ -141,7 +154,20 @@ export default function ContactPage() {
     
                   {submitted ? (
                     <div className="rounded-xl bg-green-50 border border-green-200 px-6 py-5 text-center text-green-800 font-semibold shadow-sm">
-                      Thank you — we received your message and will reply soon.
+                      <p>Thank you — we received your message and will reply soon.</p>
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSubmitted(false);
+                            setForm({ name: "", email: "", message: "", type: "Song request", consent: true });
+                            setErrors({});
+                          }}
+                          className="rounded-2xl bg-white px-5 py-2 text-sm font-semibold text-green-800 shadow hover:scale-105 transform transition cursor-pointer"
+                        >
+                          Send another request
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-5">
@@ -153,6 +179,8 @@ export default function ContactPage() {
                             name="name"
                             value={form.name}
                             onChange={handleChange}
+                            onKeyDown={handleNameKeyDown}
+                            maxLength={MAX_NAME}
                             placeholder="Enter your name"
                             className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#232b3d] px-4 py-4 text-base outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-500 focus:bg-white dark:focus:bg-[#232b3d] focus:ring-4 focus:ring-blue-100"
                           />
@@ -186,7 +214,7 @@ export default function ContactPage() {
                             <button
                               key={type}
                               type="button"
-                              className={`rounded-2xl border px-4 py-3 text-sm font-semibold text-left transition-all
+                              className={`rounded-2xl border px-4 py-3 text-sm font-semibold text-left transition-all cursor-pointer
                                 ${form.type === type
                                   ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-400 dark:text-blue-300'
                                   : 'bg-white border-slate-200 text-slate-700 dark:bg-[#232b3d] dark:border-slate-700 dark:text-slate-200'}
@@ -207,26 +235,31 @@ export default function ContactPage() {
                           value={form.message}
                           onChange={handleChange}
                           placeholder="Share the song name, language, correction details, or any suggestion you have..."
+                          maxLength={MAX_MESSAGE}
                           className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#232b3d] px-4 py-4 text-base outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-500 focus:bg-white dark:focus:bg-[#232b3d] focus:ring-4 focus:ring-blue-100"
                         />
+
                         <div className="mt-2 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
                           <span className="text-rose-500">{errors.message}</span>
-                          <span>Please avoid sharing sensitive personal information.</span>
+                          <div className="flex flex-col items-end">
+                            <span className="text-slate-400 dark:text-slate-500">{form.message.length}/{MAX_MESSAGE}</span>
+                            <span>Please avoid sharing sensitive personal information.</span>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 px-4 py-4 text-sm text-emerald-900 dark:text-emerald-200 ring-1 ring-emerald-200 dark:ring-emerald-700">
-                        <input type="checkbox" name="consent" checked={form.consent} onChange={handleChange} className="mt-1 h-4 w-4 rounded border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:bg-[#232b3d]" />
-                        <p>
+                      <label className="flex items-start gap-3 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 px-4 py-4 text-sm text-emerald-900 dark:text-emerald-200 ring-1 ring-emerald-200 dark:ring-emerald-700 cursor-pointer">
+                        <input type="checkbox" name="consent" checked={form.consent} onChange={handleChange} className="mt-1 h-4 w-4 rounded border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:bg-[#232b3d] cursor-pointer" />
+                        <span>
                           I agree to be contacted about this request if more details are needed.
-                        </p>
-                      </div>
+                        </span>
+                      </label>
 
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
                         <p className="text-sm text-slate-500 dark:text-slate-400">Response time: usually within a few days</p>
                         <button
                           type="submit"
-                          className="inline-flex items-center justify-center rounded-2xl bg-slate-950 dark:bg-blue-700 px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:translate-y-[-1px] hover:shadow-xl hover:bg-blue-700 dark:hover:bg-blue-800"
+                          className="inline-flex items-center justify-center rounded-2xl bg-slate-950 dark:bg-[#0e2a43] px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:translate-y-[-1px] hover:shadow-xl hover:bg-blue-700 dark:hover:bg-[#0b2336] cursor-pointer"
                         >
                           Send message
                         </button>
