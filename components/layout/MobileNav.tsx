@@ -26,10 +26,10 @@ export function MobileNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 px-4 pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 px-0 pb-[env(safe-area-inset-bottom)] md:hidden"
       aria-label="Mobile navigation"
     >
-      <div className="mx-auto flex max-w-lg items-center gap-1.5 rounded-[1.5rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-sidebar)] p-2 shadow-[0_20px_48px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:shadow-[0_20px_48px_rgba(2,6,23,0.4)]">
+      <div className="flex w-full items-center gap-1.5 rounded-[1.5rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-sidebar)] p-2 shadow-[0_20px_48px_rgba(15,23,42,0.16)] backdrop-blur-xl dark:shadow-[0_20px_48px_rgba(2,6,23,0.4)]">
         {publicNavItems.map(({ href, label, icon: Icon, matches }) => {
           const isActive = matches(pathname);
           const badge = href === "/favorites" && favorites.length > 0 ? favorites.length : null;

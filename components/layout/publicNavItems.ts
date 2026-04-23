@@ -3,6 +3,7 @@ import {
   Home,
   Languages,
   Search,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,5 +38,11 @@ export const publicNavItems: PublicNavItem[] = [
     label: "Saved",
     icon: Bookmark,
     matches: (pathname) => pathname.startsWith("/favorites"),
+  },
+  {
+    href: "/contact",
+    label: "Contact",
+    icon: Mail,
+    matches: (pathname) => pathname.startsWith("/contact"),
   },
 ];

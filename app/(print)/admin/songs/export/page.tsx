@@ -148,7 +148,7 @@ export default async function AdminSongsExportPage({
           <h2 className="text-2xl font-bold mb-4 text-center">Table of Contents</h2>
           <ol className="ml-6 space-y-1">
             {songs.flatMap((song, songIdx) =>
-              song.translations.map((translation, transIdx, arr) => {
+              song.translations.map((translation, transIdx) => {
                 // Calculate the flat index for song number
                 const flatIndex = songs.slice(0, songIdx).reduce((acc, s) => acc + s.translations.length, 0) + transIdx + 1;
                 return (

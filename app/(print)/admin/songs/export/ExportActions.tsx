@@ -26,7 +26,7 @@ export function ExportActions({ autoprint }: ExportActionsProps) {
       setTimeout(() => {
         document.title = prevTitle;
       }, 700);
-    } catch (e) {
+    } catch {
       window.print();
     }
   }, [getMMDDYYYY]);

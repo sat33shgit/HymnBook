@@ -37,7 +37,14 @@ export function SearchBar({
   voiceLang,
 }: SearchBarProps) {
   const [showSpeakNow, setShowSpeakNow] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isTouchDevice] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+    } catch {
+      return false;
+    }
+  });
   const pointerStartedRef = useRef(false);
   const speakNowTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const isClient = useSyncExternalStore(subscribeToClientRender, () => true, () => false);
@@ -50,11 +57,7 @@ export function SearchBar({
     };
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsTouchDevice((window as any).ontouchstart !== undefined || navigator.maxTouchPoints > 0);
-    }
-  }, []);
+  
 
   const { state, isSupported, errorMessage, start, stop } = useVoiceSearch({
     onResult: (candidates) => {
@@ -87,12 +90,12 @@ export function SearchBar({
   const handlePointerDown = (event?: React.PointerEvent | React.TouchEvent | React.MouseEvent) => {
     if (event && 'preventDefault' in event) {
       try {
-        event.preventDefault();
-        // stop propagation so the WebView doesn't interpret the long-press
-        event.stopPropagation();
-      } catch (e) {
-        // ignore
-      }
+          event.preventDefault();
+          // stop propagation so the WebView doesn't interpret the long-press
+          event.stopPropagation();
+        } catch {
+          // ignore
+        }
     }
 
     console.debug("[SearchBar] handlePointerDown", { isListening, isTouchDevice });

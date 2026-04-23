@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export type VoiceSearchState = "idle" | "listening" | "error";
 
 interface UseVoiceSearchOptions {
@@ -101,7 +103,7 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
         // Generic postMessage fallback
         window.postMessage({ type: "hymnbook.voice", command: "stop" }, "*");
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, []);
@@ -127,7 +129,6 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
     // If browser Speech API is available, use it.
     if (isSpeechAPI) {
       console.debug("[useVoiceSearch] using browser SpeechRecognition API");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const SpeechAPI = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
       const recognition: SpeechRecognition = new SpeechAPI();
       recognition.continuous = false;
@@ -203,7 +204,7 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
           // best-effort: call startVoiceRecognition if present
           try {
             w.Android.startVoiceRecognition?.();
-          } catch (e) {}
+          } catch {}
         }
       } else if (w.webkit?.messageHandlers?.voice) {
         w.webkit.messageHandlers.voice.postMessage({ command: "start", lang });
@@ -213,13 +214,13 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
 
       // Set listening state; native host should call back via global callbacks below.
       setState("listening");
-    } catch (e) {
-      console.debug("[useVoiceSearch] native start failed", e);
+    } catch {
+      console.debug("[useVoiceSearch] native start failed");
       setErrorMessage("Voice search failed to start.");
       setState("error");
       setTimeout(() => setState("idle"), 3000);
     }
-  }, [flushBufferedCandidates, isSupported, lang, stop]);
+  }, [flushBufferedCandidates, isSupported, lang, stop, hasNativeBridge, isSpeechAPI]);
 
   useEffect(() => {
     // Install global callbacks so native hosts can call back into the page with results.
@@ -243,7 +244,7 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
             bufferedCandidatesRef.current = candidates;
             flushBufferedCandidates();
           }
-        } catch (e) {
+        } catch {
           // ignore
         }
       };
@@ -291,7 +292,7 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
           delete w.__hymnbookOnVoiceError;
           delete w.__hymnbookOnVoiceStart;
           delete w.__hymnbookOnVoiceEnd;
-        } catch (e) {
+        } catch {
           // ignore
         }
 
@@ -300,7 +301,9 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
     }
 
     return () => {};
-  }, []);
+  }, [flushBufferedCandidates]);
+
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   return { state, isSupported, errorMessage, start, stop };
 }

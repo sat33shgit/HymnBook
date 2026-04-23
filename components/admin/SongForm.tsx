@@ -230,7 +230,7 @@ async function uploadAudioFile(params: {
   try {
     return await uploadAudioFileViaPresignedUrl(params);
   } catch (error) {
-    if (
+      if (
       getConfiguredAudioUploadMode() === "auto" &&
       error instanceof RetryableDirectAudioUploadError
     ) {
@@ -238,7 +238,9 @@ async function uploadAudioFile(params: {
         throw error;
       }
 
-      console.warn("Direct audio upload failed, retrying via server proxy.", error);
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("Direct audio upload failed, retrying via server proxy.", error);
+      }
       return uploadAudioFileViaProxy(params);
     }
 

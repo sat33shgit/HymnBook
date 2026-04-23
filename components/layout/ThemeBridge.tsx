@@ -13,7 +13,7 @@ export function ThemeBridge() {
     const readVar = (name: string) => {
       try {
         return cs.getPropertyValue(name).trim() || null;
-      } catch (e) {
+      } catch {
         return null;
       }
     };
@@ -34,7 +34,12 @@ export function ThemeBridge() {
     });
 
     try {
-      const w = window as any;
+      type NativeThemeBridgeWindow = {
+        Android?: { onThemeChange?: (s: string) => void };
+        webkit?: { messageHandlers?: { theme?: { postMessage?: (payload: unknown) => void } } };
+      };
+
+      const w = window as unknown as NativeThemeBridgeWindow;
 
       // Android JS interface
       if (w.Android && typeof w.Android.onThemeChange === "function") {
@@ -50,7 +55,7 @@ export function ThemeBridge() {
 
       // generic postMessage fallback
       window.postMessage({ type: "hymnbook.theme.change", payload: colors }, "*");
-    } catch (e) {
+    } catch {
       // ignore failures
     }
   }, [theme, resolvedTheme]);
