@@ -106,3 +106,27 @@ export const appSettings = pgTable("app_settings", {
   boolValue: boolean("bool_value").notNull().default(true),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Contact Messages
+export const contactMessages = pgTable(
+  "contact_messages",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 40 }).notNull(),
+    email: varchar("email", { length: 60 }).notNull(),
+    country: varchar("country", { length: 120 }),
+    deviceType: varchar("device_type", { length: 20 }),
+    requestType: varchar("request_type", { length: 50 }).notNull(),
+    message: text("message").notNull(),
+    consentToContact: boolean("consent_to_contact").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_contact_messages_created_at").on(table.createdAt),
+    index("idx_contact_messages_request_type").on(table.requestType),
+    index("idx_contact_messages_email").on(table.email),
+    index("idx_contact_messages_country").on(table.country),
+    index("idx_contact_messages_device_type").on(table.deviceType),
+  ]
+);

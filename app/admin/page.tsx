@@ -1,4 +1,11 @@
-import { BookHeart, BookOpenText, Languages, Plus, Shapes } from "lucide-react";
+import {
+  BookHeart,
+  BookOpenText,
+  Languages,
+  Mail,
+  Plus,
+  Shapes,
+} from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button-variants";
 
@@ -9,24 +16,28 @@ export default async function AdminDashboard() {
   let totalLanguages = 0;
   let totalCategories = 0;
   let totalFavorites = 0;
+  let totalMessages = 0;
 
   try {
     const {
       getCategories,
+      getContactMessagesCount,
       getFavoritesCount,
       getPublishedSongTranslationCount,
       getLanguages,
     } = await import("@/lib/db/queries");
-    const [publishedSongCount, languages, categories, favoritesCount] = await Promise.all([
+    const [publishedSongCount, languages, categories, favoritesCount, messagesCount] = await Promise.all([
       getPublishedSongTranslationCount(),
       getLanguages(),
       getCategories(),
       getFavoritesCount(),
+      getContactMessagesCount(),
     ]);
     totalSongs = publishedSongCount;
     totalLanguages = languages.length;
     totalCategories = categories.length;
     totalFavorites = favoritesCount;
+    totalMessages = messagesCount;
   } catch {
     // DB not available
   }
@@ -51,6 +62,11 @@ export default async function AdminDashboard() {
       label: "Favorites",
       value: totalFavorites,
       icon: BookHeart,
+    },
+    {
+      label: "Messages",
+      value: totalMessages,
+      icon: Mail,
     },
   ];
 
@@ -105,6 +121,9 @@ export default async function AdminDashboard() {
             </Link>
             <Link href="/admin/languages" className={buttonVariants({ variant: "outline" })}>
               Manage Languages
+            </Link>
+            <Link href="/admin/messages" className={buttonVariants({ variant: "outline" })}>
+              View Messages
             </Link>
           </div>
         </div>

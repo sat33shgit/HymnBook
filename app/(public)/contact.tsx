@@ -1,16 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import {
+  CONTACT_EMAIL_MAX,
+  CONTACT_MESSAGE_MAX,
+  CONTACT_NAME_MAX,
+  CONTACT_REQUEST_TYPES,
+} from "@/lib/validations/contact";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [form, setForm] = useState({ name: "", email: "", message: "", type: "Song request", consent: true });
   const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
-
-  const MAX_NAME = 40;
-  const MAX_EMAIL = 60;
-  const MAX_MESSAGE = 1000;
-  const REQUEST_TYPES = ["Song request", "Correction", "General feedback"];
 
   const validate = () => {
     const errs: { name?: string; email?: string; message?: string } = {};
@@ -18,20 +21,20 @@ export default function ContactPage() {
       errs.name = "Name is required.";
     } else if (/\d/.test(form.name)) {
       errs.name = "Name cannot contain numbers.";
-    } else if (form.name.length > MAX_NAME) {
-      errs.name = `Name must be at most ${MAX_NAME} characters.`;
+    } else if (form.name.length > CONTACT_NAME_MAX) {
+      errs.name = `Name must be at most ${CONTACT_NAME_MAX} characters.`;
     }
     if (!form.email.trim()) {
       errs.email = "Email is required.";
     } else if (!/^\S+@\S+\.\S+$/.test(form.email)) {
       errs.email = "Enter a valid email address.";
-    } else if (form.email.length > MAX_EMAIL) {
-      errs.email = `Email must be at most ${MAX_EMAIL} characters.`;
+    } else if (form.email.length > CONTACT_EMAIL_MAX) {
+      errs.email = `Email must be at most ${CONTACT_EMAIL_MAX} characters.`;
     }
     if (!form.message.trim()) {
       errs.message = "Message is required.";
-    } else if (form.message.length > MAX_MESSAGE) {
-      errs.message = `Message must be at most ${MAX_MESSAGE} characters.`;
+    } else if (form.message.length > CONTACT_MESSAGE_MAX) {
+      errs.message = `Message must be at most ${CONTACT_MESSAGE_MAX} characters.`;
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -56,7 +59,7 @@ export default function ContactPage() {
     const value = (target as HTMLInputElement | HTMLTextAreaElement).value;
 
     if (name === "name") {
-      const sanitized = value.replace(/\d/g, "").slice(0, MAX_NAME);
+      const sanitized = value.replace(/\d/g, "").slice(0, CONTACT_NAME_MAX);
       setForm((prev) => ({ ...prev, [name]: sanitized }));
       setErrors((prev) => ({ ...prev, [name]: undefined }));
       return;
@@ -66,11 +69,34 @@ export default function ContactPage() {
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    // Here you would send the form data to your backend or email service
-    setSubmitted(true);
+    setSubmitting(true);
+    setSubmitError("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to send message");
+      }
+
+      setSubmitted(true);
+      setForm({ name: "", email: "", message: "", type: "Song request", consent: true });
+      setErrors({});
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "Failed to send message"
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -153,17 +179,17 @@ export default function ContactPage() {
                   </div>
     
                   {submitted ? (
-                    <div className="rounded-xl bg-green-50 border border-green-200 px-6 py-5 text-center text-green-800 font-semibold shadow-sm">
+                    <div className="rounded-xl border border-green-200 bg-green-50 px-6 py-5 text-center font-semibold text-green-800 shadow-sm dark:border-emerald-800/70 dark:bg-emerald-950/55 dark:text-emerald-200">
                       <p>Thank you — we received your message and will reply soon.</p>
                       <div className="mt-4 flex justify-center">
                         <button
                           type="button"
                           onClick={() => {
                             setSubmitted(false);
-                            setForm({ name: "", email: "", message: "", type: "Song request", consent: true });
+                            setSubmitError("");
                             setErrors({});
                           }}
-                          className="rounded-2xl bg-white px-5 py-2 text-sm font-semibold text-green-800 shadow hover:scale-105 transform transition cursor-pointer"
+                          className="transform cursor-pointer rounded-2xl bg-white px-5 py-2 text-sm font-semibold text-green-800 shadow transition hover:scale-105 dark:bg-emerald-100 dark:text-emerald-950 dark:hover:bg-emerald-200"
                         >
                           Send another request
                         </button>
@@ -180,13 +206,13 @@ export default function ContactPage() {
                             value={form.name}
                             onChange={handleChange}
                             onKeyDown={handleNameKeyDown}
-                            maxLength={MAX_NAME}
+                            maxLength={CONTACT_NAME_MAX}
                             placeholder="Enter your name"
                             className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#232b3d] px-4 py-4 text-base outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-500 focus:bg-white dark:focus:bg-[#232b3d] focus:ring-4 focus:ring-blue-100"
                           />
                           <div className="mt-2 flex justify-between text-xs">
                             <span className="text-rose-500">{errors.name}</span>
-                            <span className="text-slate-400 dark:text-slate-500">{form.name.length}/{MAX_NAME}</span>
+                            <span className="text-slate-400 dark:text-slate-500">{form.name.length}/{CONTACT_NAME_MAX}</span>
                           </div>
                         </div>
 
@@ -197,12 +223,13 @@ export default function ContactPage() {
                             name="email"
                             value={form.email}
                             onChange={handleChange}
+                            maxLength={CONTACT_EMAIL_MAX}
                             placeholder="you@example.com"
                             className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#232b3d] px-4 py-4 text-base outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-500 focus:bg-white dark:focus:bg-[#232b3d] focus:ring-4 focus:ring-blue-100"
                           />
                           <div className="mt-2 flex justify-between text-xs">
                             <span className="text-rose-500">{errors.email}</span>
-                            <span className="text-slate-400 dark:text-slate-500">{form.email.length}/{MAX_EMAIL}</span>
+                            <span className="text-slate-400 dark:text-slate-500">{form.email.length}/{CONTACT_EMAIL_MAX}</span>
                           </div>
                         </div>
                       </div>
@@ -210,7 +237,7 @@ export default function ContactPage() {
                       <div>
                         <label className="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200">Type of request</label>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                          {REQUEST_TYPES.map((type) => (
+                          {CONTACT_REQUEST_TYPES.map((type) => (
                             <button
                               key={type}
                               type="button"
@@ -235,18 +262,24 @@ export default function ContactPage() {
                           value={form.message}
                           onChange={handleChange}
                           placeholder="Share the song name, language, correction details, or any suggestion you have..."
-                          maxLength={MAX_MESSAGE}
+                          maxLength={CONTACT_MESSAGE_MAX}
                           className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#232b3d] px-4 py-4 text-base outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-500 focus:bg-white dark:focus:bg-[#232b3d] focus:ring-4 focus:ring-blue-100"
                         />
 
                         <div className="mt-2 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
                           <span className="text-rose-500">{errors.message}</span>
                           <div className="flex flex-col items-end">
-                            <span className="text-slate-400 dark:text-slate-500">{form.message.length}/{MAX_MESSAGE}</span>
+                            <span className="text-slate-400 dark:text-slate-500">{form.message.length}/{CONTACT_MESSAGE_MAX}</span>
                             <span>Please avoid sharing sensitive personal information.</span>
                           </div>
                         </div>
                       </div>
+
+                      {submitError ? (
+                        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                          {submitError}
+                        </div>
+                      ) : null}
 
                       <label className="flex items-start gap-3 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 px-4 py-4 text-sm text-emerald-900 dark:text-emerald-200 ring-1 ring-emerald-200 dark:ring-emerald-700 cursor-pointer">
                         <input type="checkbox" name="consent" checked={form.consent} onChange={handleChange} className="mt-1 h-4 w-4 rounded border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:bg-[#232b3d] cursor-pointer" />
@@ -259,9 +292,10 @@ export default function ContactPage() {
                         <p className="text-sm text-slate-500 dark:text-slate-400">Response time: usually within a few days</p>
                         <button
                           type="submit"
+                          disabled={submitting}
                           className="inline-flex items-center justify-center rounded-2xl bg-slate-950 dark:bg-[#0e2a43] px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:translate-y-[-1px] hover:shadow-xl hover:bg-blue-700 dark:hover:bg-[#0b2336] cursor-pointer"
                         >
-                          Send message
+                          {submitting ? "Sending..." : "Send message"}
                         </button>
                       </div>
                     </form>

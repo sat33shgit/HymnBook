@@ -98,8 +98,6 @@ export function SearchBar({
         }
     }
 
-    if (process.env.NODE_ENV === "development") console.debug("[SearchBar] handlePointerDown", { isListening, isTouchDevice });
-
     if (isListening) {
       return;
     }
@@ -110,8 +108,6 @@ export function SearchBar({
   };
 
   const handlePointerUp = () => {
-    if (process.env.NODE_ENV === "development") console.debug("[SearchBar] handlePointerUp", { isListening, isTouchDevice });
-
     // For press-and-hold on touch devices, stop on release
     pointerStartedRef.current = false;
     if (isListening) {
@@ -120,7 +116,6 @@ export function SearchBar({
   };
 
   const handleClick = () => {
-    if (process.env.NODE_ENV === "development") console.debug("[SearchBar] handleClick", { isListening, isTouchDevice });
     if (pointerStartedRef.current) {
       pointerStartedRef.current = false;
       return;

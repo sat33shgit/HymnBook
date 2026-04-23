@@ -61,6 +61,19 @@ export interface SearchResultItem {
   category: string | null;
 }
 
+export interface ContactMessage {
+  id: number;
+  name: string;
+  email: string;
+  country: string | null;
+  deviceType: string | null;
+  requestType: string;
+  message: string;
+  consentToContact: boolean;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
 export type FontSize = "S" | "M" | "L" | "XL";
 
 export const FONT_SIZE_MAP: Record<FontSize, number> = {

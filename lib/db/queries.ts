@@ -1,5 +1,12 @@
 import { db } from "./index";
-import { songs, songTranslations, languages, userFavorites, appSettings } from "./schema";
+import {
+  songs,
+  songTranslations,
+  languages,
+  userFavorites,
+  appSettings,
+  contactMessages,
+} from "./schema";
 import { eq, sql, and, desc, asc, inArray } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { CACHE_TAGS, CACHE_TTL, songIdTag, songSlugTag } from "@/lib/cache";
@@ -993,4 +1000,96 @@ export async function syncFavorites(userId: string, songIds: number[]) {
       .onConflictDoNothing();
   }
   return getUserFavorites(userId);
+}
+
+// Contact messages
+
+export async function createContactMessage(data: {
+  name: string;
+  email: string;
+  country?: string | null;
+  deviceType?: string | null;
+  type: string;
+  message: string;
+  consent: boolean;
+}) {
+  const result = await db
+    .insert(contactMessages)
+    .values({
+      name: data.name.trim(),
+      email: data.email.trim().toLowerCase(),
+      country: data.country?.trim() || null,
+      deviceType: data.deviceType?.trim() || null,
+      requestType: data.type,
+      message: data.message.trim(),
+      consentToContact: data.consent,
+      updatedAt: new Date(),
+    })
+    .returning();
+
+  return result[0] ?? null;
+}
+
+export async function getContactMessages() {
+  return db
+    .select()
+    .from(contactMessages)
+    .orderBy(desc(contactMessages.createdAt), desc(contactMessages.id));
+}
+
+export async function getContactMessageById(id: number) {
+  const result = await db
+    .select()
+    .from(contactMessages)
+    .where(eq(contactMessages.id, id))
+    .limit(1);
+
+  return result[0] ?? null;
+}
+
+export async function getContactMessageNavigation(id: number) {
+  const rows = await db
+    .select({
+      id: contactMessages.id,
+    })
+    .from(contactMessages)
+    .orderBy(desc(contactMessages.createdAt), desc(contactMessages.id));
+
+  const currentIndex = rows.findIndex((row) => row.id === id);
+  if (currentIndex === -1) {
+    return { previousId: null, nextId: null };
+  }
+
+  return {
+    previousId: rows[currentIndex - 1]?.id ?? null,
+    nextId: rows[currentIndex + 1]?.id ?? null,
+  };
+}
+
+export async function deleteContactMessage(id: number) {
+  const result = await db
+    .delete(contactMessages)
+    .where(eq(contactMessages.id, id))
+    .returning({ id: contactMessages.id });
+
+  return result[0] ?? null;
+}
+
+export async function getContactMessagesCount() {
+  return unstable_cache(
+    async () => {
+      const result = await db
+        .select({
+          count: sql<number>`count(*)`,
+        })
+        .from(contactMessages);
+
+      return Number(result[0]?.count ?? 0);
+    },
+    ["getContactMessagesCount"],
+    {
+      revalidate: CACHE_TTL.messages,
+      tags: [CACHE_TAGS.messages],
+    }
+  )();
 }
