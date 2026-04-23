@@ -49,7 +49,7 @@ export function ThemeBridge() {
 
       // iOS message handler
       if (w.webkit?.messageHandlers?.theme) {
-        w.webkit.messageHandlers.theme.postMessage(colors);
+        w.webkit.messageHandlers.theme.postMessage?.(colors);
         return;
       }
 

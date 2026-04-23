@@ -38,8 +38,17 @@ export default function ContactPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+    const target = e.target;
+    const name = target.name;
+
+    if (target instanceof HTMLInputElement && target.type === "checkbox") {
+      setForm((prev) => ({ ...prev, [name]: target.checked }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+      return;
+    }
+
+    const value = (target as HTMLInputElement | HTMLTextAreaElement).value;
+    setForm((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
