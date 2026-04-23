@@ -3,6 +3,8 @@ import { revalidateTag } from "next/cache";
 import { createContactMessage } from "@/lib/db/queries";
 import { CACHE_TAGS } from "@/lib/cache";
 import { createContactMessageSchema } from "@/lib/validations/contact";
+import { sendEmail } from "@/lib/email";
+import { buildContactConfirmationEmail } from "@/lib/email-templates/contact-confirmation";
 
 const headers = { "X-API-Version": "1" };
 export const runtime = "nodejs";
@@ -59,12 +61,28 @@ export async function POST(request: NextRequest) {
         "cloudfront-viewer-country",
       ])
     );
+    const deviceType = getDeviceType(userAgent);
+    const submittedAt = new Date();
 
     const message = await createContactMessage({
       ...parsed.data,
       country,
-      deviceType: getDeviceType(userAgent),
+      deviceType,
     });
+
+    const confirmationEmail = buildContactConfirmationEmail({
+      form: parsed.data,
+      submittedAt,
+    });
+
+    await sendEmail({
+      to: parsed.data.email,
+      subject: confirmationEmail.subject,
+      html: confirmationEmail.html,
+      text: confirmationEmail.text,
+      replyTo: process.env.GMAIL_SMTP_USER,
+    });
+
     revalidateTag(CACHE_TAGS.messages, "max");
 
     return NextResponse.json(
@@ -77,7 +95,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("POST /api/contact error:", error);
     return NextResponse.json(
-      { error: "Failed to send message" },
+      { error: "Failed to send message or confirmation email" },
       { status: 500, headers }
     );
   }
