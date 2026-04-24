@@ -50,6 +50,13 @@
       "when": 1776942600000,
       "tag": "0007_remove_contact_message_city",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1777003200000,
+      "tag": "0008_app_settings_contact_visibility",
+      "breakpoints": true
     }
   ]
 }

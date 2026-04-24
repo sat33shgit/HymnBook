@@ -1,15 +1,8 @@
 import { auth } from "@/lib/auth";
 import Link from "next/link";
-import {
-  Music,
-  LayoutDashboard,
-  Music2,
-  Globe,
-  Mail,
-  ExternalLink,
-} from "lucide-react";
+import { Music, ExternalLink } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { AdminSignOut } from "@/components/admin/AdminSignOut";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
 
 export default async function AdminLayout({
   children,
@@ -25,47 +18,7 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      {session?.user && (
-        <aside className="hidden w-64 shrink-0 border-r bg-muted/30 md:block">
-          <div className="flex h-16 items-center gap-2 border-b px-6">
-            <Music className="h-6 w-6 text-primary" />
-            <span className="font-heading text-lg font-bold">HymnBook</span>
-          </div>
-          <nav className="flex flex-col gap-1 p-4" role="navigation">
-            <Link
-              href="/admin"
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              Dashboard
-            </Link>
-            <Link
-              href="/admin/songs"
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              <Music2 className="h-4 w-4" />
-              Songs
-            </Link>
-            <Link
-              href="/admin/languages"
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              <Globe className="h-4 w-4" />
-              Languages
-            </Link>
-            <Link
-              href="/admin/messages"
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              <Mail className="h-4 w-4" />
-              Messages
-            </Link>
-          </nav>
-          <div className="mt-auto border-t p-4">
-            <AdminSignOut />
-          </div>
-        </aside>
-      )}
+      {session?.user && <AdminSidebar />}
 
       {/* Main content */}
       <div className="flex-1">

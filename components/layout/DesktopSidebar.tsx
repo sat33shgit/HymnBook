@@ -11,12 +11,17 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useFavorites } from "@/hooks/useFavorites";
 import { publicSiteTitle } from "@/lib/site";
-import { publicNavItems } from "./publicNavItems";
+import { getPublicNavItems } from "./publicNavItems";
 
-export function DesktopSidebar() {
+export function DesktopSidebar({
+  contactVisible = true,
+}: {
+  contactVisible?: boolean;
+}) {
   const rawPathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { favorites } = useFavorites();
+  const publicNavItems = getPublicNavItems({ contactVisible });
 
   const clientPathname = rawPathname ?? (typeof window !== "undefined" ? window.location.pathname : "/");
 

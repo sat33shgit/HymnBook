@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useFavorites } from "@/hooks/useFavorites";
-import { publicNavItems } from "./publicNavItems";
+import { getPublicNavItems } from "./publicNavItems";
 
-export function MobileNav() {
+export function MobileNav({
+  contactVisible = true,
+}: {
+  contactVisible?: boolean;
+}) {
   const rawPathname = usePathname();
   const { favorites } = useFavorites();
+  const publicNavItems = getPublicNavItems({ contactVisible });
 
   const clientPathname = rawPathname ?? (typeof window !== "undefined" ? window.location.pathname : "/");
 

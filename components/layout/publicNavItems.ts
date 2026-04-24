@@ -14,35 +14,45 @@ export interface PublicNavItem {
   matches: (pathname: string) => boolean;
 }
 
-export const publicNavItems: PublicNavItem[] = [
-  {
-    href: "/",
-    label: "Home",
-    icon: Home,
-    matches: (pathname) => pathname === "/",
-  },
-  {
-    href: "/search",
-    label: "Search",
-    icon: Search,
-    matches: (pathname) => pathname.startsWith("/search"),
-  },
-  {
-    href: "/languages",
-    label: "Languages",
-    icon: Languages,
-    matches: (pathname) => pathname.startsWith("/languages"),
-  },
-  {
-    href: "/favorites",
-    label: "Saved",
-    icon: Bookmark,
-    matches: (pathname) => pathname.startsWith("/favorites"),
-  },
-  {
-    href: "/contact",
-    label: "Contact",
-    icon: Mail,
-    matches: (pathname) => pathname.startsWith("/contact"),
-  },
-];
+export function getPublicNavItems(options?: {
+  contactVisible?: boolean;
+}): PublicNavItem[] {
+  const contactVisible = options?.contactVisible ?? true;
+
+  return [
+    {
+      href: "/",
+      label: "Home",
+      icon: Home,
+      matches: (pathname) => pathname === "/",
+    },
+    {
+      href: "/search",
+      label: "Search",
+      icon: Search,
+      matches: (pathname) => pathname.startsWith("/search"),
+    },
+    {
+      href: "/languages",
+      label: "Languages",
+      icon: Languages,
+      matches: (pathname) => pathname.startsWith("/languages"),
+    },
+    {
+      href: "/favorites",
+      label: "Saved",
+      icon: Bookmark,
+      matches: (pathname) => pathname.startsWith("/favorites"),
+    },
+    ...(contactVisible
+      ? [
+          {
+            href: "/contact",
+            label: "Contact",
+            icon: Mail,
+            matches: (pathname: string) => pathname.startsWith("/contact"),
+          },
+        ]
+      : []),
+  ];
+}

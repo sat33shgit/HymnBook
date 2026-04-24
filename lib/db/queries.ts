@@ -14,6 +14,7 @@ import { deriveSongPrimaryTitle } from "@/lib/song-utils";
 
 const PUBLIC_SONG_AUDIO_VISIBLE_KEY = "public_song_audio_visible";
 const PUBLIC_SONG_YOUTUBE_VISIBLE_KEY = "public_song_youtube_visible";
+const PUBLIC_CONTACT_VISIBLE_KEY = "public_contact_visible";
 const SONG_SLUG_MAX_LENGTH = 255;
 
 // ─── Languages ───────────────────────────────────────────────
@@ -842,6 +843,55 @@ export async function setPublicSongYoutubeVisible(isVisible: boolean) {
     .onConflictDoUpdate({
       target: appSettings.key,
       set: { boolValue: isVisible, updatedAt: new Date() },
+    })
+    .returning({ boolValue: appSettings.boolValue });
+
+  return result[0]?.boolValue ?? true;
+}
+
+export async function isPublicContactVisible() {
+  return unstable_cache(
+    async () => {
+      try {
+        const rows = await db
+          .select({ boolValue: appSettings.boolValue })
+          .from(appSettings)
+          .where(eq(appSettings.key, PUBLIC_CONTACT_VISIBLE_KEY))
+          .limit(1);
+
+        return rows[0]?.boolValue ?? true;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes('relation "app_settings" does not exist')
+        ) {
+          return true;
+        }
+        throw error;
+      }
+    },
+    ["isPublicContactVisible"],
+    {
+      revalidate: CACHE_TTL.settings,
+      tags: [CACHE_TAGS.settings],
+    }
+  )();
+}
+
+export async function setPublicContactVisible(isVisible: boolean) {
+  const result = await db
+    .insert(appSettings)
+    .values({
+      key: PUBLIC_CONTACT_VISIBLE_KEY,
+      boolValue: isVisible,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: appSettings.key,
+      set: {
+        boolValue: isVisible,
+        updatedAt: new Date(),
+      },
     })
     .returning({ boolValue: appSettings.boolValue });
 
