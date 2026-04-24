@@ -227,10 +227,7 @@ function SearchContent({
     <div className="space-y-5 pt-2 md:space-y-8 md:pt-0">
       <section
         className="mx-4 rounded-[1.8rem] px-4 py-5 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] md:mx-0 md:rounded-[2.35rem] md:px-8 md:py-9"
-        style={{
-          backgroundImage:
-            "linear-gradient(135deg, var(--desktop-hero-start), var(--desktop-hero-end))",
-        }}
+        style={{ backgroundColor: "var(--desktop-hero-start)" }}
       >
         <div className="flex items-start justify-between gap-4 md:gap-8">
           <div className="max-w-4xl">

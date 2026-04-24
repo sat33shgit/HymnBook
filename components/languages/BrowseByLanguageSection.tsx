@@ -18,9 +18,8 @@ interface BrowseByLanguageSectionProps {
   onSelect?: (languageCode: string) => void;
 }
 
-const HERO_GRADIENT_STYLE = {
-  backgroundImage:
-    "linear-gradient(135deg, var(--desktop-hero-start), var(--desktop-hero-end))",
+const HERO_HEADER_STYLE = {
+  backgroundColor: "var(--desktop-hero-start)",
 };
 
 export function BrowseByLanguageSection({
@@ -39,7 +38,7 @@ export function BrowseByLanguageSection({
     <section
       id={id}
       className="rounded-[1.65rem] p-4 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] md:rounded-[2rem] md:p-6"
-      style={HERO_GRADIENT_STYLE}
+      style={HERO_HEADER_STYLE}
     >
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -65,7 +64,7 @@ export function BrowseByLanguageSection({
               type="button"
               onClick={() => onSelect?.(language.code)}
               className={cn(
-                "group inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[0.82rem] font-semibold transition-all duration-200 md:gap-2 md:px-4 md:py-2 md:text-[0.95rem]",
+                "group inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[0.82rem] font-semibold transition-all duration-200 md:gap-2 md:px-4 md:py-2 md:text-[0.95rem] cursor-pointer",
                 isSelected
                   ? "border-white/80 bg-white text-[var(--desktop-hero-start)] shadow-[0_14px_28px_rgba(15,23,42,0.14)]"
                   : "border-white/10 bg-white/10 text-[var(--desktop-hero-foreground)] hover:-translate-y-px hover:border-white/20 hover:bg-white/16 hover:shadow-[0_12px_24px_rgba(15,23,42,0.08)] dark:hover:shadow-[0_12px_24px_rgba(2,6,23,0.32)]",

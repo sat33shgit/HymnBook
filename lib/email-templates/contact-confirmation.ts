@@ -97,7 +97,7 @@ export function buildContactConfirmationEmail(input: {
                     </tr>
                   </table>
                   <p style="margin:24px 0 0; font-size:13px; line-height:1.7; color:#5b746b;">
-                    This is an automated confirmation from HymnBook.
+                    This is an automated confirmation from Sing unto the Lord.
                   </p>
                 </td>
               </tr>

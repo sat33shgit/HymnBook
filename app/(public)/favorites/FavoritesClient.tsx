@@ -18,9 +18,8 @@ function getSortButtonClassName(isActive: boolean) {
 const browseSongsLinkClassName =
   "inline-flex h-9 w-full max-w-[12rem] items-center justify-center whitespace-nowrap rounded-full border border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-4 text-[0.8rem] font-semibold text-[var(--desktop-chip-foreground)] transition-all hover:border-[var(--desktop-chip-hover-border)] hover:bg-[var(--desktop-chip-hover)] hover:text-[var(--desktop-chip-hover-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]/35 md:h-12 md:w-auto md:max-w-none md:border-[var(--desktop-panel-border)] md:bg-[var(--desktop-panel)] md:px-6 md:text-[0.94rem] md:text-foreground md:shadow-[0_10px_24px_rgba(15,23,42,0.08)] md:hover:-translate-y-px md:hover:border-[var(--desktop-chip-hover-border)] md:hover:bg-[var(--desktop-chip-hover)] md:hover:text-[var(--desktop-chip-hover-foreground)] md:hover:shadow-[0_16px_32px_rgba(15,23,42,0.12)] dark:md:shadow-[0_12px_24px_rgba(2,6,23,0.28)] dark:md:hover:shadow-[0_16px_32px_rgba(2,6,23,0.36)]";
 
-const HERO_GRADIENT_STYLE = {
-  backgroundImage:
-    "linear-gradient(135deg, var(--desktop-hero-start), var(--desktop-hero-end))",
+const HERO_HEADER_STYLE = {
+  backgroundColor: "var(--desktop-hero-start)",
 };
 
 export function FavoritesClient() {
@@ -100,7 +99,7 @@ export function FavoritesClient() {
     <div className="space-y-5 pt-2 md:space-y-8 md:pt-0">
       <section
         className="mx-4 rounded-[1.8rem] px-4 py-5 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] md:mx-0 md:rounded-[2.35rem] md:px-8 md:py-9"
-        style={HERO_GRADIENT_STYLE}
+          style={HERO_HEADER_STYLE}
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
           <div className="flex items-start gap-4">
