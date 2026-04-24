@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   CONTACT_EMAIL_MAX,
   CONTACT_MESSAGE_MAX,
@@ -14,6 +14,29 @@ export default function ContactPage() {
   const [submitError, setSubmitError] = useState("");
   const [form, setForm] = useState({ name: "", email: "", message: "", type: "Song request", consent: true });
   const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
+
+  // Left-side subscribe controls
+  const [subscribeEmail, setSubscribeEmail] = useState("");
+  const [subscribeLoading, setSubscribeLoading] = useState(false);
+  const [subscribeSuccess, setSubscribeSuccess] = useState("");
+  const [subscribeError, setSubscribeError] = useState("");
+  const [subscribeValid, setSubscribeValid] = useState(false);
+
+  // Validate subscribe email as the user types
+  useEffect(() => {
+    const email = subscribeEmail.trim();
+    if (!email) {
+      setSubscribeValid(false);
+      setSubscribeError("");
+      return;
+    }
+
+    const ok = /^\S+@\S+\.\S+$/.test(email);
+    setSubscribeValid(ok);
+    if (!ok) {
+      setSubscribeError("");
+    }
+  }, [subscribeEmail]);
 
   const validate = () => {
     const errs: { name?: string; email?: string; message?: string } = {};
@@ -99,6 +122,44 @@ export default function ContactPage() {
     }
   };
 
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubscribeError("");
+    setSubscribeSuccess("");
+
+    const email = subscribeEmail.trim();
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      setSubscribeError("Enter a valid email address.");
+      setSubscribeValid(false);
+      return;
+    }
+
+    setSubscribeLoading(true);
+    try {
+      const res = await fetch("/api/subscribers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to subscribe");
+      }
+
+      if (data.exists) {
+        setSubscribeSuccess("You're already subscribed.");
+      } else {
+        setSubscribeSuccess("Subscribed — please check your email for confirmation.");
+      }
+      setSubscribeEmail("");
+    } catch (err) {
+      setSubscribeError(err instanceof Error ? err.message : "Failed to subscribe");
+    } finally {
+      setSubscribeLoading(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-6xl overflow-hidden rounded-[32px] bg-white dark:bg-[#101624] shadow-[0_20px_60px_rgba(15,23,42,0.12)] dark:shadow-[0_20px_60px_rgba(15,23,42,0.32)] transition-colors mt-4 sm:mt-0">
       <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
@@ -164,6 +225,38 @@ export default function ContactPage() {
                         Contact us
                       </a>
                     </div>
+                  </div>
+                  {/* Subscribe card (left side) */}
+                  <div className="mt-6 rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">Subscribe to updates</h3>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Get an email when new songs are added.</p>
+                    <form onSubmit={handleSubscribe} className="mt-3">
+                      <div className="flex gap-2">
+                        <input
+                          type="email"
+                          placeholder="you@example.com"
+                          value={subscribeEmail}
+                          onChange={(e) => setSubscribeEmail(e.target.value)}
+                          aria-invalid={!subscribeValid && subscribeEmail.length > 0}
+                          className="flex-1 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#232b3d] px-4 py-2 text-sm outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        />
+                        <button
+                          type="submit"
+                          disabled={subscribeLoading || !subscribeValid}
+                          className="rounded-2xl bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-700 disabled:opacity-60"
+                        >
+                          {subscribeLoading ? "Subscribing..." : "Subscribe"}
+                        </button>
+                      </div>
+
+                      {subscribeEmail.length > 0 && !subscribeValid ? (
+                        <p className="mt-2 text-sm text-rose-600">Enter a valid email address.</p>
+                      ) : subscribeError ? (
+                        <p className="mt-2 text-sm text-rose-600">{subscribeError}</p>
+                      ) : subscribeSuccess ? (
+                        <p className="mt-2 text-sm text-emerald-700">{subscribeSuccess}</p>
+                      ) : null}
+                    </form>
                   </div>
                 </div>
               </section>
@@ -287,6 +380,8 @@ export default function ContactPage() {
                           I agree to be contacted about this request if more details are needed.
                         </span>
                       </label>
+
+                      {/* Subscribe moved to left column */}
 
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
                         <p className="text-sm text-slate-500 dark:text-slate-400">Response time: usually within a few days</p>

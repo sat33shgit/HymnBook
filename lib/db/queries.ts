@@ -6,8 +6,10 @@ import {
   userFavorites,
   appSettings,
   contactMessages,
+  subscribers,
 } from "./schema";
 import { eq, sql, and, desc, asc, inArray } from "drizzle-orm";
+import { randomBytes } from "crypto";
 import { unstable_cache } from "next/cache";
 import { CACHE_TAGS, CACHE_TTL, songIdTag, songSlugTag } from "@/lib/cache";
 import { deriveSongPrimaryTitle } from "@/lib/song-utils";
@@ -1142,4 +1144,59 @@ export async function getContactMessagesCount() {
       tags: [CACHE_TAGS.messages],
     }
   )();
+}
+
+// ─── Subscribers ────────────────────────────────────────────
+
+export async function createSubscriber(email: string, location?: string) {
+  const normalized = email.trim().toLowerCase();
+  const normalizedLocation = location?.trim() || null;
+
+  const existing = await db.select().from(subscribers).where(eq(subscribers.email, normalized)).limit(1);
+  if (existing[0]) {
+    // Update location if provided and different
+    if (normalizedLocation && existing[0].location !== normalizedLocation) {
+      await db.update(subscribers).set({ location: normalizedLocation }).where(eq(subscribers.id, existing[0].id));
+      const updated = await db.select().from(subscribers).where(eq(subscribers.id, existing[0].id)).limit(1);
+      return updated[0] ?? existing[0];
+    }
+    return existing[0];
+  }
+
+  const token = randomBytes(24).toString("hex");
+
+  const result = await db.insert(subscribers).values({
+    email: normalized,
+    token,
+    location: normalizedLocation,
+    createdAt: new Date(),
+  }).returning();
+
+  return result[0] ?? null;
+}
+
+export async function getSubscriberByEmail(email: string) {
+  const normalized = email.trim().toLowerCase();
+  const rows = await db.select().from(subscribers).where(eq(subscribers.email, normalized)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getSubscriberByToken(token: string) {
+  const rows = await db.select().from(subscribers).where(eq(subscribers.token, token)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getSubscribers() {
+  return db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
+}
+
+export async function removeSubscriberByToken(token: string) {
+  const result = await db.delete(subscribers).where(eq(subscribers.token, token)).returning({ id: subscribers.id, email: subscribers.email });
+  return result[0] ?? null;
+}
+
+export async function removeSubscriberByEmail(email: string) {
+  const normalized = email.trim().toLowerCase();
+  const result = await db.delete(subscribers).where(eq(subscribers.email, normalized)).returning({ id: subscribers.id, email: subscribers.email });
+  return result[0] ?? null;
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Music, LayoutDashboard, Music2, Globe, Mail } from "lucide-react";
+import { Music, LayoutDashboard, Music2, Globe, Mail, Users } from "lucide-react";
 import { AdminSignOut } from "@/components/admin/AdminSignOut";
 
 export function AdminSidebar() {
@@ -25,6 +25,7 @@ export function AdminSidebar() {
     { href: "/admin/songs", label: "Songs", icon: Music2, matches: (p: string) => p.startsWith("/admin/songs") },
     { href: "/admin/languages", label: "Languages", icon: Globe, matches: (p: string) => p.startsWith("/admin/languages") },
     { href: "/admin/messages", label: "Messages", icon: Mail, matches: (p: string) => p.startsWith("/admin/messages") },
+    { href: "/admin/subscribers", label: "Subscribers", icon: Users, matches: (p: string) => p.startsWith("/admin/subscribers") },
   ];
 
   return (

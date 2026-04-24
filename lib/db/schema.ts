@@ -130,3 +130,15 @@ export const contactMessages = pgTable(
     index("idx_contact_messages_device_type").on(table.deviceType),
   ]
 );
+
+// ─── Subscribers ─────────────────────────────────────────────
+export const subscribers = pgTable("subscribers", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  token: varchar("token", { length: 128 }).notNull(),
+  location: varchar("location", { length: 120 }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  unique("uq_subscribers_email").on(table.email),
+  unique("uq_subscribers_token").on(table.token),
+]);
