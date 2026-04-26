@@ -171,7 +171,13 @@ async function run() {
     let snippet: string | null = null;
     if (rep && rep.lyrics) {
       const lines = String(rep.lyrics).split(/\r?\n/).map((l: string) => l.trim()).filter(Boolean);
-      snippet = lines.slice(0, 3).join("\n");
+      if (lines.length > 0) {
+        const top = lines.slice(0, 3);
+        if (lines.length > 3) {
+          top[top.length - 1] = `${top[top.length - 1]}...`;
+        }
+        snippet = top.join("\n");
+      }
     }
 
     const langCode = rep?.languageCode ?? s.defaultLang ?? null;

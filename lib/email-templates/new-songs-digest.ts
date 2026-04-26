@@ -13,7 +13,7 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
   const { songs, unsubscribeUrl } = input;
   const safeUnsubscribe = escapeHtml(/^https?:\/\//i.test(unsubscribeUrl) ? unsubscribeUrl : `${siteUrl.replace(/\/$/, "")}${unsubscribeUrl.startsWith("/") ? "" : "/"}${unsubscribeUrl}`);
 
-  const subject = `${songs.length} new songs have been added to the library`;
+  const subject = `🎵 New Songs Added — Sing unto the Lord`;
 
   const songsHtml = songs
     .map((s) => {
@@ -31,7 +31,7 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
           <h2 style="margin:0 0 8px; font-size:18px; color:#071033;">🎵 ${safeTitle}</h2>
           <div style="margin:0 0 10px;">${langPill}${categoryPill}</div>
           ${safeSnippet ? `<p style="margin:0 0 12px; font-style:italic; color:#0b1220;">${safeSnippet}</p>` : ""}
-          <p style="margin:0;"><a href="${escapeHtml(songUrl)}" style="display:inline-block; white-space:nowrap; background:#0ea5e9; color:#fff; padding:10px 12px; border-radius:8px; text-decoration:none; font-weight:600;">👉 View Song</a></p>
+          <p style="margin:0;"><a href="${escapeHtml(songUrl)}" style="text-decoration:underline; color:#0ea5e9; font-weight:600;">👉 View Song</a></p>
         </div>
       `;
     })
@@ -49,8 +49,9 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
           <div style="background:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e6edf3;">
             <div style="padding:18px 14px;">
               <p style="margin:0 0 12px;">Hi there,</p>
-              <p style="margin:0 0 12px; color:#0b1220; font-size:20px;">${songs.length} new ${songs.length === 1 ? "song has" : "songs have"} been added to your library</p>
-              <p style="margin:8px 0 18px; color:#475569;">Explore the latest additions below:</p>
+              <p style="margin:0 0 12px; color:#0b1220; font-size:20px;">🎶 ${songs.length} new ${songs.length === 1 ? "song has" : "songs have"} been added to your library</p>
+              <p style="margin:8px 0 12px; color:#475569;">Explore the latest additions below:</p>
+              <hr style="border:none; border-top:1px solid #eef2f6; margin:8px 0 18px;" />
 
               ${songsHtml}
 
