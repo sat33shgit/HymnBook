@@ -2,8 +2,8 @@ name: Send daily song notifications
 
 on:
   schedule:
-    # run hourly at minute 45; script only sends when local time matches configured schedule
-    - cron: '45 * * * *'
+    # run hourly at minute 00; script only sends when local time matches configured schedule
+    - cron: '00 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -32,8 +32,8 @@ jobs:
           NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
           # Scheduling (defaults used if not provided)
           SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
-          SONG_NOTIFICATIONS_HOUR: '18'
-          SONG_NOTIFICATIONS_MINUTE: '45'
+          SONG_NOTIFICATIONS_HOUR: '21'
+          SONG_NOTIFICATIONS_MINUTE: '00'
           SEND_BATCH_SIZE: '50'
           FORCE_SEND: '0'
         run: npm run send:notifications
