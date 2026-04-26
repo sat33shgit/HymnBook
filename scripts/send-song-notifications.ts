@@ -111,14 +111,23 @@ async function run() {
     return;
   }
 
+  // Compute the window to query for new songs. Prefer the last-sent marker when it
+  // exists and is older than 24 hours; otherwise use the past 24 hours as the safe
+  // fallback. This avoids the case where a recent last-sent timestamp (e.g. from a
+  // manual test run) would set the window to 'now' and return no songs.
+  const fallback = DateTime.now().toUTC().minus({ hours: 24 });
   let since: Date;
   if (lastSent) {
-    // Use last-sent marker to avoid re-notifying the same window
-    since = lastSent;
+    const lastSentDt = DateTime.fromJSDate(lastSent).toUTC();
+    // If lastSent is older than the 24h window, use it (we haven't sent in >24h).
+    // If lastSent is within the last 24h (e.g. a recent test run), use fallback
+    // so we still scan the full 24-hour window.
+    if (lastSentDt < fallback) {
+      since = lastSent;
+    } else {
+      since = fallback.toJSDate();
+    }
   } else {
-    // No last-sent marker: default to the past 24 hours from now (UTC)
-    // This ensures we pick up songs added in the last day regardless of schedule timing
-    const fallback = DateTime.now().toUTC().minus({ hours: 24 });
     since = fallback.toJSDate();
   }
 
