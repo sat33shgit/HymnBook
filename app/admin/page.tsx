@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { ContactVisibilitySetting } from "./ContactVisibilitySetting";
 import { SiteSettingsControls } from "@/components/admin/SiteSettingsControls";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +22,7 @@ export default async function AdminDashboard() {
   let contactVisible = true;
   let audioVisible = true;
   let youtubeVisible = true;
+  let songNotificationsEnabled = false;
 
   try {
     const {
@@ -34,8 +34,9 @@ export default async function AdminDashboard() {
       isPublicContactVisible,
       isPublicSongAudioVisible,
       isPublicSongYoutubeVisible,
+      isSongNotificationsEnabled,
     } = await import("@/lib/db/queries");
-    const [publishedSongCount, languages, categories, favoritesCount, messagesCount, contactPageVisible, audioVisibleValue, youtubeVisibleValue] = await Promise.all([
+    const [publishedSongCount, languages, categories, favoritesCount, messagesCount, contactPageVisible, audioVisibleValue, youtubeVisibleValue, isSongNotificationsEnabledValue] = await Promise.all([
       getPublishedSongTranslationCount(),
       getLanguages(),
       getCategories(),
@@ -44,6 +45,7 @@ export default async function AdminDashboard() {
       isPublicContactVisible(),
       isPublicSongAudioVisible(),
       isPublicSongYoutubeVisible(),
+      isSongNotificationsEnabled(),
     ]);
     totalSongs = publishedSongCount;
     totalLanguages = languages.length;
@@ -53,6 +55,7 @@ export default async function AdminDashboard() {
     contactVisible = contactPageVisible;
     audioVisible = audioVisibleValue;
     youtubeVisible = youtubeVisibleValue;
+    songNotificationsEnabled = isSongNotificationsEnabledValue;
   } catch {
     // DB not available
   }
@@ -125,7 +128,7 @@ export default async function AdminDashboard() {
       
 
       <section className="mt-8 rounded-[2rem] border bg-card p-5 shadow-[0_18px_38px_rgba(15,23,42,0.06)]">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4">
           <div>
             <div className="flex items-center gap-2">
               <MessageSquareMore className="h-5 w-5 text-muted-foreground" />
@@ -134,10 +137,15 @@ export default async function AdminDashboard() {
             <p className="mt-1 text-sm text-muted-foreground">
               Control which public pages appear in the app navigation.
             </p>
-          </div>
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
-            <ContactVisibilitySetting initialVisible={contactVisible} />
-            <SiteSettingsControls initialAudioVisible={audioVisible} initialYoutubeVisible={youtubeVisible} />
+
+            <div className="mt-4 max-w-lg">
+              <SiteSettingsControls
+                initialAudioVisible={audioVisible}
+                initialYoutubeVisible={youtubeVisible}
+                initialSongNotificationsEnabled={songNotificationsEnabled}
+                initialContactVisible={contactVisible}
+              />
+            </div>
           </div>
         </div>
       </section>

@@ -30,7 +30,7 @@ export function buildSubscriberWelcomeEmail(input: { email: string; unsubscribeU
         <div style="max-width:720px; width:100%; margin:0 auto; padding:0 4px;">
           <div style="background:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e6edf3;">
             <div style="padding:14px 12px;">
-              <p style="margin:0 0 12px;">Hi there,</p>
+              <p style="margin:0 0 12px;">Dear Friend,</p>
               <h1 style="margin:0 0 12px; font-size:20px;">Thank you for subscribing to <strong>Sing Unto The Lord</strong> 🙏</h1>
 
               <p style="margin:12px 0 18px;">You’ll now receive updates about:</p>

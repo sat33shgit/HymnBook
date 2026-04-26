@@ -8,7 +8,7 @@ import {
   contactMessages,
   subscribers,
 } from "./schema";
-import { eq, sql, and, desc, asc, inArray } from "drizzle-orm";
+import { eq, sql, and, desc, asc, inArray, gt } from "drizzle-orm";
 import { randomBytes } from "crypto";
 import { unstable_cache } from "next/cache";
 import { CACHE_TAGS, CACHE_TTL, songIdTag, songSlugTag } from "@/lib/cache";
@@ -900,6 +900,55 @@ export async function setPublicContactVisible(isVisible: boolean) {
   return result[0]?.boolValue ?? true;
 }
 
+// Song notifications enabled flag
+const SONG_NOTIFICATIONS_ENABLED_KEY = "song_notifications_enabled";
+
+export async function isSongNotificationsEnabled() {
+  return unstable_cache(
+    async () => {
+      try {
+        const rows = await db
+          .select({ boolValue: appSettings.boolValue })
+          .from(appSettings)
+          .where(eq(appSettings.key, SONG_NOTIFICATIONS_ENABLED_KEY))
+          .limit(1);
+
+        return rows[0]?.boolValue ?? false;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes('relation "app_settings" does not exist')
+        ) {
+          return false;
+        }
+        throw error;
+      }
+    },
+    ["isSongNotificationsEnabled"],
+    {
+      revalidate: CACHE_TTL.settings,
+      tags: [CACHE_TAGS.settings],
+    }
+  )();
+}
+
+export async function setSongNotificationsEnabled(isEnabled: boolean) {
+  const result = await db
+    .insert(appSettings)
+    .values({
+      key: SONG_NOTIFICATIONS_ENABLED_KEY,
+      boolValue: isEnabled,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: appSettings.key,
+      set: { boolValue: isEnabled, updatedAt: new Date() },
+    })
+    .returning({ boolValue: appSettings.boolValue });
+
+  return result[0]?.boolValue ?? isEnabled;
+}
+
 // ─── Search ──────────────────────────────────────────────────
 
 export async function searchSongs(
@@ -1188,6 +1237,68 @@ export async function getSubscriberByToken(token: string) {
 
 export async function getSubscribers() {
   return db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
+}
+
+export async function getSongsAddedSince(since: Date) {
+  const songRows = await db
+    .select()
+    .from(songs)
+    .where(and(eq(songs.isPublished, true), gt(songs.createdAt, since)))
+    .orderBy(asc(songs.createdAt));
+
+  if (songRows.length === 0) return [];
+
+  const songIds = songRows.map((s) => s.id);
+
+  const translations = await db
+    .select({ songId: songTranslations.songId, languageCode: songTranslations.languageCode, title: songTranslations.title })
+    .from(songTranslations)
+    .where(inArray(songTranslations.songId, songIds))
+    .orderBy(asc(songTranslations.languageCode));
+
+  const translationsBySongId = new Map<number, { languageCode: string; title: string }[]>();
+  for (const t of translations) {
+    const arr = translationsBySongId.get(t.songId) ?? [];
+    arr.push({ languageCode: t.languageCode, title: t.title });
+    translationsBySongId.set(t.songId, arr);
+  }
+
+  return songRows.map((song) => {
+    const songTranslations = translationsBySongId.get(song.id) ?? [];
+    return {
+      id: song.id,
+      slug: song.slug,
+      category: song.category,
+      defaultLang: song.defaultLang,
+      isPublished: song.isPublished,
+      createdAt: song.createdAt,
+      translations: songTranslations,
+      title: deriveSongPrimaryTitle(songTranslations, song.defaultLang) || song.slug,
+    };
+  });
+}
+
+export async function getLastSongNotificationTime() {
+  const rows = await db
+    .select({ updatedAt: appSettings.updatedAt })
+    .from(appSettings)
+    .where(eq(appSettings.key, "last_song_notifications"))
+    .limit(1);
+
+  return rows[0]?.updatedAt ?? null;
+}
+
+export async function touchLastSongNotificationTime() {
+  const res = await db
+    .insert(appSettings)
+    .values({ key: "last_song_notifications", boolValue: true, updatedAt: new Date() })
+    .onConflictDoUpdate({
+      target: appSettings.key,
+      set: { boolValue: true, updatedAt: new Date() },
+    })
+    .returning({ updatedAt: appSettings.updatedAt });
+
+  return res[0]?.updatedAt ?? null;
 }
 
 export async function removeSubscriberByToken(token: string) {

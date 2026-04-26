@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSongs, createSong, ensureUniqueSongSlug, getSubscribers } from "@/lib/db/queries";
+import { getSongs, createSong, ensureUniqueSongSlug, getSubscribers, getLanguageByCode, isSongNotificationsEnabled } from "@/lib/db/queries";
 import { createSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
 import { deriveSongDefaultLanguage, deriveSongSlug } from "@/lib/song-utils";
@@ -71,24 +71,31 @@ export async function POST(request: NextRequest) {
       ["/admin", "/admin/songs"]
     );
 
-    // Notify subscribers about the new song (best-effort)
-    try {
-      const subscribers = await getSubscribers();
-      if (subscribers && subscribers.length > 0) {
-        const title = deriveSongPrimaryTitle(song?.translations ?? [], song?.defaultLang ?? defaultLang) || (translations[0]?.title ?? slug);
+    // Notify subscribers about the new song when it's published (best-effort, run in background)
+    if (song?.isPublished) {
+      void (async () => {
+        try {
+          const enabled = await isSongNotificationsEnabled();
+          if (!enabled) return;
+          const subscribers = await getSubscribers();
+          if (!subscribers || subscribers.length === 0) return;
 
-        await Promise.allSettled(subscribers.map(async (sub) => {
-          try {
-            const unsubscribeUrl = `${siteUrl.replace(/\/$/, "")}/api/subscribers/unsubscribe?token=${encodeURIComponent(sub.token)}`;
-            const email = buildNewSongNotificationEmail({ title, slug: song?.slug ?? slug, unsubscribeUrl });
-            await sendEmail({ to: sub.email, subject: email.subject, html: email.html, text: email.text, replyTo: process.env.GMAIL_SMTP_USER });
-          } catch (err) {
-            console.error("Failed to send new-song notification to", sub.email, err);
-          }
-        }));
-      }
-    } catch (err) {
-      console.error("Failed to notify subscribers:", err);
+          const title = deriveSongPrimaryTitle(song?.translations ?? [], song?.defaultLang ?? defaultLang) || (translations[0]?.title ?? slug);
+
+          await Promise.allSettled(subscribers.map(async (sub) => {
+            try {
+              const unsubscribeUrl = `${siteUrl.replace(/\/$/, "")}/api/subscribers/unsubscribe?token=${encodeURIComponent(sub.token)}`;
+              const langName = (await getLanguageByCode(song?.defaultLang ?? defaultLang))?.name ?? (song?.defaultLang ?? defaultLang);
+              const email = buildNewSongNotificationEmail({ title, slug: song?.slug ?? slug, unsubscribeUrl, language: langName, category: song?.category ?? undefined });
+              await sendEmail({ to: sub.email, subject: email.subject, html: email.html, text: email.text, replyTo: process.env.GMAIL_SMTP_USER });
+            } catch (err) {
+              console.error("Failed to send new-song notification to", sub?.email, err);
+            }
+          }));
+        } catch (err) {
+          console.error("Failed to notify subscribers:", err);
+        }
+      })();
     }
 
     return NextResponse.json(song, { status: 201, headers });

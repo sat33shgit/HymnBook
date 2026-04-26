@@ -1,0 +1,39 @@
+name: Send daily song notifications
+
+on:
+  schedule:
+    # run hourly at minute 0; script only sends when local time matches configured schedule
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  send-notifications:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run send notifications script
+        env:
+          NODE_ENV: production
+          GMAIL_SMTP_USER: ${{ secrets.GMAIL_SMTP_USER }}
+          GMAIL_SMTP_APP_PASSWORD: ${{ secrets.GMAIL_SMTP_APP_PASSWORD }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+          # Scheduling (defaults used if not provided)
+          SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
+          SONG_NOTIFICATIONS_HOUR: '17'
+          SONG_NOTIFICATIONS_MINUTE: '0'
+          SEND_BATCH_SIZE: '50'
+          FORCE_SEND: '0'
+        run: npm run send:notifications
