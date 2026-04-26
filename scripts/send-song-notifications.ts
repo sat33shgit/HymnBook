@@ -113,16 +113,13 @@ async function run() {
 
   let since: Date;
   if (lastSent) {
+    // Use last-sent marker to avoid re-notifying the same window
     since = lastSent;
   } else {
-    // If we've never sent, compute the previous day's scheduled time in the configured timezone
-    const nowTz = DateTime.now().setZone(TZ);
-    let scheduledToday = nowTz.set({ hour: HOUR, minute: MINUTE, second: 0, millisecond: 0 });
-    if (nowTz < scheduledToday) {
-      scheduledToday = scheduledToday.minus({ days: 1 });
-    }
-    const prevRun = scheduledToday.minus({ days: 1 });
-    since = prevRun.toUTC().toJSDate();
+    // No last-sent marker: default to the past 24 hours from now (UTC)
+    // This ensures we pick up songs added in the last day regardless of schedule timing
+    const fallback = DateTime.now().toUTC().minus({ hours: 24 });
+    since = fallback.toJSDate();
   }
 
   console.log("Fetching songs added since:", since.toISOString());
