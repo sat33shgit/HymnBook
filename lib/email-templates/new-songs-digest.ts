@@ -13,16 +13,14 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
   const { songs, unsubscribeUrl } = input;
   const safeUnsubscribe = escapeHtml(/^https?:\/\//i.test(unsubscribeUrl) ? unsubscribeUrl : `${siteUrl.replace(/\/$/, "")}${unsubscribeUrl.startsWith("/") ? "" : "/"}${unsubscribeUrl}`);
 
-  const subject = songs.length === 1
-    ? `${songs.length} new song has been added to the library`
-    : `${songs.length} new songs have been added to the library`;
+  const subject = `${songs.length} new songs have been added to the library`;
 
   const songsHtml = songs
     .map((s) => {
       const safeTitle = escapeHtml(s.title || s.slug);
       const safeLang = s.language ? escapeHtml(s.language) : null;
       const safeCategory = s.category ? escapeHtml(s.category) : null;
-      const safeSnippet = s.snippet ? escapeHtml(String(s.snippet)) : null;
+      const safeSnippet = s.snippet ? escapeHtml(String(s.snippet)).replace(/\r?\n/g, '<br/>') : null;
       const songUrl = `${siteUrl.replace(/\/$/, "")}/songs/${encodeURIComponent(s.slug)}`;
 
       const langPill = safeLang ? `<span style="display:inline-block; margin-right:8px; padding:2px 8px; font-size:12px; border-radius:6px; background:#eef2ff; color:#0b3a8a;">[${safeLang}]</span>` : "";

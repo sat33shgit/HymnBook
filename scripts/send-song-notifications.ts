@@ -1,8 +1,9 @@
 import "dotenv/config";
 import { DateTime } from "luxon";
 import { db } from "../lib/db/index";
-import { songs as songsTable, songTranslations as songTranslationsTable, subscribers as subscribersTable, appSettings as appSettingsTable } from "../lib/db/schema";
+import { songs as songsTable, songTranslations as songTranslationsTable, subscribers as subscribersTable, appSettings as appSettingsTable, languages as languagesTable } from "../lib/db/schema";
 import { eq, and, gt, asc, desc, inArray } from "drizzle-orm";
+import { deriveSongDisplayTitle } from "../lib/song-utils";
 import { buildNewSongsDigestEmail } from "../lib/email-templates/new-songs-digest";
 import { sendEmail } from "../lib/email";
 import { siteUrl } from "../lib/site";
@@ -70,7 +71,7 @@ async function run() {
     const translationsBySongId = new Map<number, any[]>();
     for (const t of translations) {
       const arr = translationsBySongId.get(t.songId) ?? [];
-      arr.push({ languageCode: t.languageCode, title: t.title, audioUrl: t.audioUrl, youtubeUrl: t.youtubeUrl });
+      arr.push({ languageCode: t.languageCode, title: t.title, lyrics: t.lyrics ?? null, audioUrl: t.audioUrl, youtubeUrl: t.youtubeUrl });
       translationsBySongId.set(t.songId, arr);
     }
 
@@ -151,15 +152,40 @@ async function run() {
     return;
   }
 
+  // Build a language lookup to map codes to full names
+  const languageRows = await db.select({ code: languagesTable.code, name: languagesTable.name }).from(languagesTable);
+  const langMap = new Map<string, string>();
+  for (const lr of languageRows) {
+    if (lr.code && lr.name) langMap.set(String(lr.code), String(lr.name));
+  }
+
   // Build a simple array of songs for the digest
-  const digestSongs = songList.map((s) => ({
-    title: s.title,
-    slug: s.slug,
-    language: s.translations?.[0]?.languageCode ?? null,
-    category: s.category ?? null,
-    album: null,
-    snippet: s.translations?.[0]?.lyrics ? String(s.translations[0].lyrics).slice(0, 250) : null,
-  }));
+  const digestSongs = songList.map((s) => {
+    const translations = s.translations ?? [];
+    const displayTitle = deriveSongDisplayTitle(translations, { defaultLanguageCode: s.defaultLang ?? null }) || s.slug;
+
+    // pick the first translation as the representative translation
+    const rep = translations[0] ?? null;
+
+    // build a 3-line snippet from the lyrics (first 3 non-empty lines)
+    let snippet: string | null = null;
+    if (rep && rep.lyrics) {
+      const lines = String(rep.lyrics).split(/\r?\n/).map((l: string) => l.trim()).filter(Boolean);
+      snippet = lines.slice(0, 3).join("\n");
+    }
+
+    const langCode = rep?.languageCode ?? s.defaultLang ?? null;
+    const langFull = langCode ? (langMap.get(String(langCode)) ?? String(langCode)) : null;
+
+    return {
+      title: displayTitle,
+      slug: s.slug,
+      language: langFull,
+      category: s.category ?? null,
+      album: null,
+      snippet,
+    };
+  });
 
   // Send in batches to avoid overwhelming SMTP
   const BATCH_SIZE = Number(process.env.SEND_BATCH_SIZE ?? "50");
