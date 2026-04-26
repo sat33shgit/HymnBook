@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { DateTime } from "luxon";
 import { db } from "../lib/db/index";
-import { songs, songTranslations, subscribers, appSettings } from "../lib/db/schema";
+import { songs as songsTable, songTranslations as songTranslationsTable, subscribers as subscribersTable, appSettings as appSettingsTable } from "../lib/db/schema";
 import { eq, and, gt, asc, desc, inArray } from "drizzle-orm";
 import { buildNewSongsDigestEmail } from "../lib/email-templates/new-songs-digest";
 import { sendEmail } from "../lib/email";
@@ -11,12 +11,12 @@ async function run() {
   console.log("Starting send-song-notifications script...");
 
   // Direct DB queries (avoid server-only unstable_cache wrappers)
-  async function isSongNotificationsEnabledDirect() {
+  async function isSongNotificationsEnabledDirect(): Promise<boolean> {
     try {
       const rows = await db
-        .select({ boolValue: appSettings.boolValue })
-        .from(appSettings)
-        .where(eq(appSettings.key, "song_notifications_enabled"))
+        .select({ boolValue: appSettingsTable.boolValue })
+        .from(appSettingsTable)
+        .where(eq(appSettingsTable.key, "song_notifications_enabled"))
         .limit(1);
 
       return rows[0]?.boolValue ?? false;
@@ -29,43 +29,43 @@ async function run() {
     }
   }
 
-  async function getLastSongNotificationTimeDirect() {
+  async function getLastSongNotificationTimeDirect(): Promise<Date | null> {
     const rows = await db
-      .select({ updatedAt: appSettings.updatedAt })
-      .from(appSettings)
-      .where(eq(appSettings.key, "last_song_notifications"))
+      .select({ updatedAt: appSettingsTable.updatedAt })
+      .from(appSettingsTable)
+      .where(eq(appSettingsTable.key, "last_song_notifications"))
       .limit(1);
 
     return rows[0]?.updatedAt ?? null;
   }
 
-  async function touchLastSongNotificationTimeDirect() {
+  async function touchLastSongNotificationTimeDirect(): Promise<void> {
     await db
-      .insert(appSettings)
+      .insert(appSettingsTable)
       .values({ key: "last_song_notifications", boolValue: true, updatedAt: new Date() })
-      .onConflictDoUpdate({ target: appSettings.key, set: { updatedAt: new Date(), boolValue: true } });
+      .onConflictDoUpdate({ target: appSettingsTable.key, set: { updatedAt: new Date(), boolValue: true } });
   }
 
-  async function getSubscribersDirect() {
-    return db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
+  async function getSubscribersDirect(): Promise<any[]> {
+    return db.select().from(subscribersTable).orderBy(desc(subscribersTable.createdAt));
   }
 
-  async function getSongsAddedSinceDirect(since: Date) {
+  async function getSongsAddedSinceDirect(since: Date): Promise<any[]> {
     const songRows = await db
       .select()
-      .from(songs)
-      .where(and(eq(songs.isPublished, true), gt(songs.createdAt, since)))
-      .orderBy(asc(songs.createdAt));
+      .from(songsTable)
+      .where(and(eq(songsTable.isPublished, true), gt(songsTable.createdAt, since)))
+      .orderBy(asc(songsTable.createdAt));
 
     if (songRows.length === 0) return [];
 
     const songIds = songRows.map((s) => s.id);
 
     const translations = await db
-      .select({ songId: songTranslations.songId, languageCode: songTranslations.languageCode, title: songTranslations.title, audioUrl: songTranslations.audioUrl, youtubeUrl: songTranslations.youtubeUrl })
-      .from(songTranslations)
-      .where(inArray(songTranslations.songId, songIds))
-      .orderBy(asc(songTranslations.languageCode));
+      .select({ songId: songTranslationsTable.songId, languageCode: songTranslationsTable.languageCode, title: songTranslationsTable.title, audioUrl: songTranslationsTable.audioUrl, youtubeUrl: songTranslationsTable.youtubeUrl })
+      .from(songTranslationsTable)
+      .where(inArray(songTranslationsTable.songId, songIds))
+      .orderBy(asc(songTranslationsTable.languageCode));
 
     const translationsBySongId = new Map<number, any[]>();
     for (const t of translations) {
@@ -126,19 +126,19 @@ async function run() {
   }
 
   console.log("Fetching songs added since:", since.toISOString());
-  const songs = await getSongsAddedSinceDirect(since);
+  const songList = await getSongsAddedSinceDirect(since);
 
-  if (!songs || songs.length === 0) {
+  if (!songList || songList.length === 0) {
     console.log("No new songs to notify.");
     // update last-sent marker so we don't re-run for the same window
-    await touchLastSongNotificationTime();
+    await touchLastSongNotificationTimeDirect();
     return;
   }
 
-  console.log(`Found ${songs.length} new song(s). Preparing digest...`);
+  console.log(`Found ${songList.length} new song(s). Preparing digest...`);
 
-  const subscribers = await getSubscribersDirect();
-  if (!subscribers || subscribers.length === 0) {
+  const subscriberRows = await getSubscribersDirect();
+  if (!subscriberRows || subscriberRows.length === 0) {
     console.log("No subscribers registered. Aborting.");
     // still touch marker to avoid repeating
     await touchLastSongNotificationTimeDirect();
@@ -146,13 +146,13 @@ async function run() {
   }
 
   // Build a simple array of songs for the digest
-  const digestSongs = songs.map((s) => ({ title: s.title, slug: s.slug, language: s.translations?.[0]?.languageCode ?? null, category: s.category ?? null, album: null }));
+  const digestSongs = songList.map((s) => ({ title: s.title, slug: s.slug, language: s.translations?.[0]?.languageCode ?? null, category: s.category ?? null, album: null }));
 
   // Send in batches to avoid overwhelming SMTP
   const BATCH_SIZE = Number(process.env.SEND_BATCH_SIZE ?? "50");
   let sent = 0;
-  for (let i = 0; i < subscribers.length; i += BATCH_SIZE) {
-    const batch = subscribers.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < subscriberRows.length; i += BATCH_SIZE) {
+    const batch = subscriberRows.slice(i, i + BATCH_SIZE);
     await Promise.allSettled(batch.map(async (sub) => {
       try {
         const unsubscribeUrl = `${siteUrl.replace(/\/$/, "")}/api/subscribers/unsubscribe?token=${encodeURIComponent(sub.token)}`;
@@ -167,7 +167,7 @@ async function run() {
     await new Promise((r) => setTimeout(r, 500));
   }
 
-  console.log(`Sent digest to ${sent} subscribers (attempted ${subscribers.length}).`);
+  console.log(`Sent digest to ${sent} subscribers (attempted ${subscriberRows.length}).`);
 
   // update last-sent marker
   await touchLastSongNotificationTimeDirect();
