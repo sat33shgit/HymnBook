@@ -42,10 +42,12 @@ jobs:
           [ -n "${GMAIL_SMTP_USER:-}" ] && echo "  GMAIL_SMTP_USER: yes" || echo "  GMAIL_SMTP_USER: no"
           [ -n "${GMAIL_SMTP_APP_PASSWORD:-}" ] && echo "  GMAIL_SMTP_APP_PASSWORD: yes" || echo "  GMAIL_SMTP_APP_PASSWORD: no"
           [ -n "${NEXT_PUBLIC_BASE_URL:-}" ] && echo "  NEXT_PUBLIC_BASE_URL: yes" || echo "  NEXT_PUBLIC_BASE_URL: no"
+          [ -n "${POSTGRES_URL:-}" ] && echo "  POSTGRES_URL: yes" || echo "  POSTGRES_URL: no"
         env:
           SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
           SONG_NOTIFICATIONS_HOUR: '18'
           SONG_NOTIFICATIONS_MINUTE: '45'
+          POSTGRES_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run send notifications script
         env:
@@ -53,6 +55,7 @@ jobs:
           GMAIL_SMTP_USER: ${{ secrets.GMAIL_SMTP_USER }}
           GMAIL_SMTP_APP_PASSWORD: ${{ secrets.GMAIL_SMTP_APP_PASSWORD }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
           # Scheduling (defaults used if not provided)
           SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
