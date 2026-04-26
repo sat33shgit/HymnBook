@@ -4,7 +4,6 @@ import { createSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
 import { deriveSongDefaultLanguage, deriveSongSlug } from "@/lib/song-utils";
 import { revalidateSongMutationCaches } from "@/lib/song-cache-revalidation";
-import { deriveSongPrimaryTitle } from "@/lib/song-utils";
 // Individual new-song email notifications removed — batch digest handles notifications now.
 
 const headers = { "X-API-Version": "1" };

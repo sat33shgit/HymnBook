@@ -12,7 +12,7 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [form, setForm] = useState({ name: "", email: "", message: "", type: "Song request", consent: true });
+  const [form, setForm] = useState({ name: "", email: "", message: "", type: "Song request", consent: true, subscribe: false });
   const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
 
   // Left-side subscribe controls
@@ -98,6 +98,10 @@ export default function ContactPage() {
     setSubmitting(true);
     setSubmitError("");
 
+    // capture subscribe choice and email before we clear form
+    const shouldSubscribe = Boolean(form.subscribe);
+    const emailToSubscribe = (form.email || "").trim();
+
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -110,8 +114,24 @@ export default function ContactPage() {
         throw new Error(data.error || "Failed to send message");
       }
 
+      // If user opted to subscribe via the contact form, add them to subscribers.
+      if (shouldSubscribe && emailToSubscribe && /^\S+@\S+\.\S+$/.test(emailToSubscribe)) {
+        try {
+          const subRes = await fetch("/api/subscribers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: emailToSubscribe }),
+          });
+          // ignore response details; subscription endpoint returns exists flag on duplicates
+          await subRes.json().catch(() => ({}));
+        } catch (subErr) {
+          // log but don't fail the main flow
+          console.error("Failed to subscribe contact email:", subErr);
+        }
+      }
+
       setSubmitted(true);
-      setForm({ name: "", email: "", message: "", type: "Song request", consent: true });
+      setForm({ name: "", email: "", message: "", type: "Song request", consent: true, subscribe: false });
       setErrors({});
     } catch (error) {
       setSubmitError(
@@ -381,16 +401,29 @@ export default function ContactPage() {
                         </span>
                       </label>
 
-                      {/* Subscribe moved to left column */}
+                      {/* Inline subscribe checkbox (added to contact form) */}
+                      <label className="flex items-start gap-3 rounded-2xl bg-slate-50 dark:bg-[#0f1720] px-4 py-4 text-sm text-slate-800 dark:text-slate-200 ring-1 ring-slate-200 dark:ring-slate-700 cursor-pointer">
+                        <input type="checkbox" name="subscribe" checked={Boolean(form.subscribe)} onChange={handleChange} className="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 dark:bg-[#232b3d] cursor-pointer" />
+                        <span>
+                          Subscribe to receive updates on new songs
+                        </span>
+                      </label>
 
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
                         <p className="text-sm text-slate-500 dark:text-slate-400">Response time: usually within a few days</p>
                         <button
                           type="submit"
                           disabled={submitting}
-                          className="inline-flex items-center justify-center rounded-2xl bg-slate-950 dark:bg-[#0e2a43] px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:translate-y-[-1px] hover:shadow-xl hover:bg-blue-700 dark:hover:bg-[#0b2336] cursor-pointer"
+                          className="inline-flex items-center justify-center rounded-2xl bg-slate-950 dark:bg-[#0e2a43] px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:translate-y-[-1px] hover:shadow-xl hover:bg-blue-700 dark:hover:bg-[#0b2336] cursor-pointer whitespace-nowrap"
                         >
-                          {submitting ? "Sending..." : "Send message"}
+                          {submitting ? (
+                            <span className="whitespace-nowrap">Sending...</span>
+                          ) : (
+                            <>
+                              <span className="hidden md:inline whitespace-nowrap">Send message</span>
+                              <span className="md:hidden whitespace-nowrap">Send</span>
+                            </>
+                          )}
                         </button>
                       </div>
                     </form>
