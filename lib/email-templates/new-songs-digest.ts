@@ -23,15 +23,15 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
       const safeSnippet = s.snippet ? escapeHtml(String(s.snippet)).replace(/\r?\n/g, '<br/>') : null;
       const songUrl = `${siteUrl.replace(/\/$/, "")}/songs/${encodeURIComponent(s.slug)}`;
 
-      const langPill = safeLang ? `<span style="display:inline-block; margin-right:8px; padding:2px 8px; font-size:12px; border-radius:6px; background:#eef2ff; color:#0b3a8a;">[${safeLang}]</span>` : "";
-      const categoryPill = safeCategory ? `<span style="display:inline-block; margin-right:8px; padding:2px 8px; font-size:12px; border-radius:6px; background:#f0fdf4; color:#065f46;">[${safeCategory}]</span>` : "";
+      const langPill = safeLang ? `<span style="display:inline-block; margin-right:8px; padding:2px 8px; font-size:13px; border-radius:6px; background:#eef2ff; color:#6b7280;">[${safeLang}]</span>` : "";
+      const categoryPill = safeCategory ? `<span style="display:inline-block; margin-right:8px; padding:2px 8px; font-size:13px; border-radius:6px; background:#f0fdf4; color:#6b7280;">[${safeCategory}]</span>` : "";
 
       return `
         <div style="padding:18px 0; border-bottom:1px solid #eef2f6;">
-          <h2 style="margin:0 0 8px; font-size:18px; color:#071033;">🎵 ${safeTitle}</h2>
+          <h2 style="margin:0 0 8px; font-size:20px; font-weight:600; color:#071033;">🎵 ${safeTitle}</h2>
           <div style="margin:0 0 10px;">${langPill}${categoryPill}</div>
-          ${safeSnippet ? `<p style="margin:0 0 12px; font-style:italic; color:#0b1220;">${safeSnippet}</p>` : ""}
-          <p style="margin:0;"><a href="${escapeHtml(songUrl)}" style="text-decoration:underline; color:#0ea5e9; font-weight:600;">👉 View Song</a></p>
+          ${safeSnippet ? `<p style="margin:0 0 12px; font-style:italic; color:#0b1220; font-size:15px; line-height:1.55;">${safeSnippet}</p>` : ""}
+          <p style="margin:0;"><a href="${escapeHtml(songUrl)}" style="text-decoration:none; color:#0ea5e9; font-weight:600;">👉 View Song</a></p>
         </div>
       `;
     })
@@ -44,12 +44,12 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#f7fafc; margin:0; padding:12px 8px; color:#0f172a;">
+      <body style="font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Arial, sans-serif; font-size:15px; line-height:1.55; background:#f7fafc; margin:0; padding:12px 8px; color:#0f172a;">
         <div style="max-width:720px; width:100%; margin:0 auto; padding:0 4px;">
           <div style="background:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e6edf3;">
             <div style="padding:18px 14px;">
-              <p style="margin:0 0 12px;">Hi there,</p>
-              <p style="margin:0 0 12px; color:#0b1220; font-size:20px;">🎶 ${songs.length} new ${songs.length === 1 ? "song has" : "songs have"} been added to your library</p>
+              <p style="margin:0 0 12px;">Dear Friend,</p>
+              <p style="margin:0 0 12px; color:#0b1220; font-size:20px;">🎶 ${songs.length} new ${songs.length === 1 ? "song has" : "songs have"} been added to the library</p>
               <p style="margin:8px 0 12px; color:#475569;">Explore the latest additions below:</p>
               <hr style="border:none; border-top:1px solid #eef2f6; margin:8px 0 18px;" />
 
