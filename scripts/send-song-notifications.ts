@@ -62,7 +62,7 @@ async function run() {
     const songIds = songRows.map((s) => s.id);
 
     const translations = await db
-      .select({ songId: songTranslationsTable.songId, languageCode: songTranslationsTable.languageCode, title: songTranslationsTable.title, audioUrl: songTranslationsTable.audioUrl, youtubeUrl: songTranslationsTable.youtubeUrl })
+      .select({ songId: songTranslationsTable.songId, languageCode: songTranslationsTable.languageCode, title: songTranslationsTable.title, lyrics: songTranslationsTable.lyrics, audioUrl: songTranslationsTable.audioUrl, youtubeUrl: songTranslationsTable.youtubeUrl })
       .from(songTranslationsTable)
       .where(inArray(songTranslationsTable.songId, songIds))
       .orderBy(asc(songTranslationsTable.languageCode));
@@ -152,7 +152,14 @@ async function run() {
   }
 
   // Build a simple array of songs for the digest
-  const digestSongs = songList.map((s) => ({ title: s.title, slug: s.slug, language: s.translations?.[0]?.languageCode ?? null, category: s.category ?? null, album: null }));
+  const digestSongs = songList.map((s) => ({
+    title: s.title,
+    slug: s.slug,
+    language: s.translations?.[0]?.languageCode ?? null,
+    category: s.category ?? null,
+    album: null,
+    snippet: s.translations?.[0]?.lyrics ? String(s.translations[0].lyrics).slice(0, 250) : null,
+  }));
 
   // Send in batches to avoid overwhelming SMTP
   const BATCH_SIZE = Number(process.env.SEND_BATCH_SIZE ?? "50");
