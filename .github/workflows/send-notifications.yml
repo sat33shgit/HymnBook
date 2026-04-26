@@ -2,9 +2,14 @@ name: Send daily song notifications
 
 on:
   schedule:
-    # run hourly at minute 00; script only sends when local time matches configured schedule
-    - cron: '00 * * * *'
+    # run hourly at minute 45; script only sends when local time matches configured schedule
+    - cron: '45 * * * *'
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Set to 1 to force send (bypass schedule check)'
+        required: false
+        default: '0'
 
 jobs:
   send-notifications:
@@ -23,6 +28,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Debug environment and scheduling
+        run: |
+          echo "UTC now: $(date -u +"%Y-%m-%d %H:%M:%S %Z")"
+          echo "Runner local now: $(date +"%Y-%m-%d %H:%M:%S %Z")"
+          echo "America/Los_Angeles now: $(TZ='America/Los_Angeles' date +"%Y-%m-%d %H:%M:%S %Z")"
+          echo "Configured schedule:" 
+          echo "  SONG_NOTIFICATIONS_TIMEZONE=${SONG_NOTIFICATIONS_TIMEZONE:-America/Los_Angeles}"
+          echo "  SONG_NOTIFICATIONS_HOUR=${SONG_NOTIFICATIONS_HOUR:-18}"
+          echo "  SONG_NOTIFICATIONS_MINUTE=${SONG_NOTIFICATIONS_MINUTE:-45}"
+          echo "Secrets present:" 
+          [ -n "${DATABASE_URL:-}" ] && echo "  DATABASE_URL: yes" || echo "  DATABASE_URL: no"
+          [ -n "${GMAIL_SMTP_USER:-}" ] && echo "  GMAIL_SMTP_USER: yes" || echo "  GMAIL_SMTP_USER: no"
+          [ -n "${GMAIL_SMTP_APP_PASSWORD:-}" ] && echo "  GMAIL_SMTP_APP_PASSWORD: yes" || echo "  GMAIL_SMTP_APP_PASSWORD: no"
+          [ -n "${NEXT_PUBLIC_BASE_URL:-}" ] && echo "  NEXT_PUBLIC_BASE_URL: yes" || echo "  NEXT_PUBLIC_BASE_URL: no"
+        env:
+          SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
+          SONG_NOTIFICATIONS_HOUR: '18'
+          SONG_NOTIFICATIONS_MINUTE: '45'
+
       - name: Run send notifications script
         env:
           NODE_ENV: production
@@ -32,8 +56,8 @@ jobs:
           NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
           # Scheduling (defaults used if not provided)
           SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
-          SONG_NOTIFICATIONS_HOUR: '21'
-          SONG_NOTIFICATIONS_MINUTE: '00'
+          SONG_NOTIFICATIONS_HOUR: '18'
+          SONG_NOTIFICATIONS_MINUTE: '45'
           SEND_BATCH_SIZE: '50'
-          FORCE_SEND: '0'
+          FORCE_SEND: ${{ github.event.inputs.force || '0' }}
         run: npm run send:notifications
