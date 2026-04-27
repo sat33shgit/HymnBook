@@ -181,7 +181,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="space-y-5 px-4 py-5 md:space-y-8 md:px-0 md:py-0">
+    <div className="space-y-5 px-4 py-5 pb-28 md:pb-0 md:space-y-8 md:px-0 md:py-0">
       <section className="mx-auto w-full max-w-md sm:max-w-6xl overflow-hidden box-border rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:rounded-[2rem] md:p-6">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-6">
           {/* Left content */}
@@ -191,9 +191,9 @@ export default function ContactPage() {
                     We would love to hear from you
                   </div>
     
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold tracking-tight text-slate-950 dark:text-white leading-tight text-center sm:text-left break-words">
+                  <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-950 dark:text-white leading-tight text-center sm:text-left break-words whitespace-normal">
                     Thank you for visiting
-                    <span className="block text-blue-600 dark:text-blue-400 text-2xl sm:text-3xl md:text-4xl lg:text-5xl break-words">our song library</span>
+                    <span className="block text-blue-600 dark:text-blue-400 text-lg sm:text-2xl md:text-3xl lg:text-4xl break-words whitespace-normal">our song library</span>
                   </h1>
 
                   <p className="mt-6 text-base sm:text-lg leading-8 text-slate-600 dark:text-slate-300 max-w-full sm:max-w-2xl text-center sm:text-left px-2 sm:px-0">
@@ -201,7 +201,7 @@ export default function ContactPage() {
                   </p>
 
                   <div className="mt-8 flex justify-center gap-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0">
+                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0 w-28 sm:w-auto">
                   <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 mx-auto">
                     <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
                       <path d="M8 10h8M8 14h5" />
@@ -211,7 +211,7 @@ export default function ContactPage() {
                   <div className="font-semibold text-slate-900 dark:text-white text-[1rem] sm:text-lg">Feedback</div>
                 </div>
 
-                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0">
+                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0 w-28 sm:w-auto">
                   <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700 mx-auto">
                     <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
                       <path d="M12 6v12M6 12h12" />
@@ -220,13 +220,13 @@ export default function ContactPage() {
                   <div className="font-semibold text-slate-900 dark:text-white text-[1rem] sm:text-lg">Songs</div>
                 </div>
 
-                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0">
+                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0 w-28 sm:w-auto">
                   <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700 mx-auto">
                     <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
                       <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <div className="font-semibold text-slate-900 dark:text-white text-[1rem] sm:text-lg truncate whitespace-nowrap">Corrections</div>
+                  <div className="font-semibold text-slate-900 dark:text-white text-[1rem] sm:text-lg break-words">Corrections</div>
                 </div>
               </div>
        
