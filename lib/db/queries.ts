@@ -851,14 +851,11 @@ export async function isPublicContactVisible() {
           .limit(1);
 
         return rows[0]?.boolValue ?? true;
-      } catch (error) {
-        if (
-          error instanceof Error &&
-          error.message.includes('relation "app_settings" does not exist')
-        ) {
-          return true;
-        }
-        throw error;
+      } catch {
+        // If any DB error occurs (missing table, connection issue, malformed
+        // data), default to showing the public contact page rather than
+        // crashing the request.
+        return true;
       }
     },
     ["isPublicContactVisible"],
