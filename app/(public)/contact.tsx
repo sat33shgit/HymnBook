@@ -181,7 +181,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-0 box-border overflow-x-hidden overflow-hidden rounded-[32px] bg-white dark:bg-[#101624] shadow-[0_20px_60px_rgba(15,23,42,0.12)] dark:shadow-[0_20px_60px_rgba(15,23,42,0.32)] transition-colors mt-4 sm:mt-0">
+    <div className="w-full max-w-6xl overflow-hidden rounded-[32px] bg-white dark:bg-[#101624] shadow-[0_20px_60px_rgba(15,23,42,0.12)] dark:shadow-[0_20px_60px_rgba(15,23,42,0.32)] transition-colors mt-4 sm:mt-0">
       <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
         {/* Left content */}
         <section className="relative px-5 py-5 sm:px-8 sm:py-8 lg:px-12 lg:py-12 bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] transition-colors">
