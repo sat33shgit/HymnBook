@@ -186,22 +186,22 @@ export default function ContactPage() {
         <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-6">
           {/* Left content */}
               <div className="relative p-0 sm:p-8 lg:p-12 bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] transition-colors rounded-[1.25rem] flex flex-col items-center sm:items-start">
-                <div className="w-full max-w-md sm:max-w-xl text-center mx-auto">
+                <div className="w-full max-w-md sm:max-w-xl text-center mx-auto px-4 sm:px-0">
                   <div className="inline-flex items-center gap-2 rounded-full bg-blue-600/10 dark:bg-blue-400/10 px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-400 mb-5">
                     We would love to hear from you
                   </div>
     
-                  <h1 className="text-4xl sm:text-5xl lg:text-5xl font-extrabold tracking-tight text-slate-950 dark:text-white leading-tight text-center sm:text-left">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold tracking-tight text-slate-950 dark:text-white leading-tight text-center sm:text-left break-words">
                     Thank you for visiting
-                    <span className="block text-blue-600 dark:text-blue-400">our song library</span>
+                    <span className="block text-blue-600 dark:text-blue-400 text-2xl sm:text-3xl md:text-4xl lg:text-5xl break-words">our song library</span>
                   </h1>
 
-                  <p className="mt-6 text-base sm:text-lg leading-8 text-slate-600 dark:text-slate-300 max-w-full sm:max-w-2xl text-center sm:text-left">
+                  <p className="mt-6 text-base sm:text-lg leading-8 text-slate-600 dark:text-slate-300 max-w-full sm:max-w-2xl text-center sm:text-left px-2 sm:px-0">
                     Share your feedback, suggest corrections, or request new songs. Every message helps us improve the collection and make it more useful for everyone.
                   </p>
 
                   <div className="mt-8 flex justify-center gap-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center">
+                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0">
                   <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 mx-auto">
                     <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
                       <path d="M8 10h8M8 14h5" />
@@ -211,7 +211,7 @@ export default function ContactPage() {
                   <div className="font-semibold text-slate-900 dark:text-white text-[1rem] sm:text-lg">Feedback</div>
                 </div>
 
-                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center">
+                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0">
                   <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700 mx-auto">
                     <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
                       <path d="M12 6v12M6 12h12" />
@@ -220,7 +220,7 @@ export default function ContactPage() {
                   <div className="font-semibold text-slate-900 dark:text-white text-[1rem] sm:text-lg">Songs</div>
                 </div>
 
-                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center">
+                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0">
                   <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700 mx-auto">
                     <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
                       <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -230,7 +230,7 @@ export default function ContactPage() {
                 </div>
               </div>
        
-                  <div className="mt-8 rounded-3xl bg-slate-900 dark:bg-[#232b3d] px-5 py-5 sm:px-6 sm:py-6 text-white shadow-xl">
+                  <div className="mt-8 rounded-3xl bg-slate-900 dark:bg-[#232b3d] px-5 py-5 sm:px-6 sm:py-6 text-white shadow-xl w-full">
                     <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <div className="text-sm uppercase tracking-[0.2em] text-slate-400 dark:text-slate-300">Email us directly</div>
