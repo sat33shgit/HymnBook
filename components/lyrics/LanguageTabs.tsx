@@ -43,6 +43,9 @@ export function LanguageTabs({
     };
   }, [activeLanguage, languages]);
 
+  // If only one language is available, don't render the selector at all.
+  if (!languages || languages.length <= 1) return null;
+
   return (
     <>
       {/* Desktop / tablet: scrollable tabs (md+) */}

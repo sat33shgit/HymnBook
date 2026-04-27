@@ -94,7 +94,7 @@ export function LanguagesClient({
         selectedCode={selectedLanguage}
         onSelect={handleLanguageChange}
         title="Browse by language"
-        description="English is selected by default. Switch to another language to view songs available in that language."
+        description="Switch to another language to view songs available in that language."
       />
 
       <section className="rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:rounded-[2rem] md:p-6">

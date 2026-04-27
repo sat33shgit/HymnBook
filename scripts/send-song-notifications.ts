@@ -47,11 +47,38 @@ async function run() {
       .onConflictDoUpdate({ target: appSettingsTable.key, set: { updatedAt: new Date(), boolValue: true } });
   }
 
-  async function getSubscribersDirect(): Promise<any[]> {
+  interface SubscriberRow {
+    id: number;
+    email: string;
+    token: string;
+    location?: string | null;
+    createdAt: Date | null;
+  }
+
+  interface TranslationRow {
+    songId: number;
+    languageCode: string;
+    title: string; // ensure non-null for display title derivation
+    lyrics: string | null;
+    audioUrl: string | null;
+    youtubeUrl: string | null;
+  }
+
+  interface SongRow {
+    id: number;
+    slug: string;
+    defaultLang?: string | null;
+    createdAt: Date;
+    isPublished: boolean;
+    category?: string | null;
+    // other fields may exist but are not required here
+  }
+
+  async function getSubscribersDirect(): Promise<SubscriberRow[]> {
     return db.select().from(subscribersTable).orderBy(desc(subscribersTable.createdAt));
   }
 
-  async function getSongsAddedSinceDirect(since: Date): Promise<any[]> {
+  async function getSongsAddedSinceDirect(since: Date): Promise<Array<SongRow & { translations: TranslationRow[] }>> {
     const songRows = await db
       .select()
       .from(songsTable)
@@ -68,14 +95,21 @@ async function run() {
       .where(inArray(songTranslationsTable.songId, songIds))
       .orderBy(asc(songTranslationsTable.languageCode));
 
-    const translationsBySongId = new Map<number, any[]>();
+    const translationsBySongId = new Map<number, TranslationRow[]>();
     for (const t of translations) {
       const arr = translationsBySongId.get(t.songId) ?? [];
-      arr.push({ languageCode: t.languageCode, title: t.title, lyrics: t.lyrics ?? null, audioUrl: t.audioUrl, youtubeUrl: t.youtubeUrl });
-      translationsBySongId.set(t.songId, arr);
+      arr.push({
+        songId: Number(t.songId),
+        languageCode: String(t.languageCode),
+        title: String(t.title ?? ""),
+        lyrics: t.lyrics ?? null,
+        audioUrl: t.audioUrl ?? null,
+        youtubeUrl: t.youtubeUrl ?? null,
+      });
+      translationsBySongId.set(Number(t.songId), arr);
     }
 
-    return songRows.map((song) => ({ ...song, translations: translationsBySongId.get(song.id) ?? [] }));
+    return songRows.map((song) => ({ ...(song as SongRow), translations: translationsBySongId.get((song as SongRow).id) ?? [] }));
   }
 
   const lastSentRaw = await getLastSongNotificationTimeDirect();

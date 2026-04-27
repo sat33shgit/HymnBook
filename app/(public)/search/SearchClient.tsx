@@ -226,20 +226,21 @@ function SearchContent({
   return (
     <div className="space-y-5 pt-2 md:space-y-8 md:pt-0">
       <section
-        className="mx-4 rounded-[1.8rem] px-4 py-5 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] md:mx-0 md:rounded-[2.35rem] md:px-8 md:py-9"
+        className="relative mx-4 rounded-[1.8rem] px-4 py-5 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] md:mx-0 md:rounded-[2.35rem] md:px-8 md:py-9"
         style={{ backgroundColor: "var(--desktop-hero-start)" }}
       >
         <div className="flex items-start justify-between gap-4 md:gap-8">
           <div className="max-w-4xl">
             <h1 className="mt-1.5 font-heading text-[clamp(1.95rem,8vw,3.3rem)] font-semibold leading-[0.97] tracking-[-0.06em]">
-              Search songs, lyric lines, and language groups
+              <span className="md:hidden">Search songs</span>
+              <span className="hidden md:inline">Search songs, lyric lines, and language groups</span>
             </h1>
             <p className="mt-3 max-w-3xl text-[0.84rem] leading-6 text-[var(--desktop-hero-muted)] md:mt-5 md:text-[1.02rem] md:leading-8">
               Start typing a title, chorus line, or language name. Use voice
               search to find songs even faster.
             </p>
           </div>
-          <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-[1rem] bg-white/10 text-[var(--desktop-hero-foreground)] md:mt-3 md:size-16 md:rounded-[1.75rem]">
+          <div className="pointer-events-none absolute right-4 top-4 flex size-10 shrink-0 items-center justify-center rounded-[1rem] bg-white/10 text-[var(--desktop-hero-foreground)] md:mt-3 md:size-16 md:rounded-[1.75rem]">
             <Search className="h-5 w-5 md:h-7 md:w-7" />
           </div>
         </div>

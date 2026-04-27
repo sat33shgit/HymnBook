@@ -54,7 +54,7 @@ export function SongCard({
       transition={{ delay: index * 0.05, duration: 0.3 }}
     >
       <Card
-        className="group h-full cursor-pointer rounded-[1.45rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] py-3 ring-0 shadow-[0_18px_36px_rgba(15,23,42,0.07)] transition-all hover:-translate-y-px hover:shadow-[0_20px_42px_rgba(15,23,42,0.1)] md:rounded-[2rem] md:py-5 dark:shadow-[0_20px_42px_rgba(2,6,23,0.3)] dark:hover:shadow-[0_22px_46px_rgba(2,6,23,0.34)]"
+        className="relative group h-full cursor-pointer rounded-[1.45rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] py-3 ring-0 shadow-[0_18px_36px_rgba(15,23,42,0.07)] transition-all hover:-translate-y-px hover:shadow-[0_20px_42px_rgba(15,23,42,0.1)] md:rounded-[2rem] md:py-5 dark:shadow-[0_20px_42px_rgba(2,6,23,0.3)] dark:hover:shadow-[0_22px_46px_rgba(2,6,23,0.34)]"
         onClick={() => router.push(songHref)}
         role="link"
         tabIndex={0}
@@ -75,7 +75,7 @@ export function SongCard({
                   </span>
                   <div className="mt-2 flex flex-wrap items-center gap-1.5 md:mt-3 md:gap-2">
                     {song.category && (
-                      <span className="inline-flex items-center rounded-md bg-[var(--desktop-panel-soft)] px-2 py-0.5 text-[0.68rem] font-semibold text-[var(--desktop-nav-muted)] md:px-3 md:py-1 md:text-[0.78rem]">
+                      <span className="inline-flex items-center rounded-md bg-[var(--desktop-chip)] px-2 py-0.5 text-[0.68rem] font-semibold text-[var(--desktop-chip-foreground)] md:px-3 md:py-1 md:text-[0.78rem]">
                         {song.category}
                       </span>
                     )}
@@ -117,7 +117,7 @@ export function SongCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="-mr-1 -mt-1 h-9 w-9 shrink-0 rounded-[1rem] bg-[var(--desktop-panel-soft)] hover:bg-[var(--desktop-chip)] md:h-11 md:w-11 md:rounded-[1.15rem]"
+                  className="absolute right-3 bottom-3 z-10 flex shrink-0 h-9 w-9 items-center justify-center rounded-[1rem] bg-[var(--desktop-panel-soft)] hover:bg-[var(--desktop-chip)] md:static md:-mr-1 md:-mt-1 md:h-11 md:w-11 md:rounded-[1.15rem]"
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFavorite(song.id);
