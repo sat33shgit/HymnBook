@@ -19,6 +19,8 @@ export default function ContactPage() {
   const [subscribeEmail, setSubscribeEmail] = useState("");
   const [subscribeLoading, setSubscribeLoading] = useState(false);
   const [subscribeSuccess, setSubscribeSuccess] = useState("");
+  // `subscribeError` is intentionally kept for API error messages but
+  // not surfaced elsewhere — keep state for future UX improvements.
   const [subscribeError, setSubscribeError] = useState("");
   const [subscribeValid, setSubscribeValid] = useState(false);
 
@@ -181,95 +183,85 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="space-y-5 px-4 py-5 pb-28 md:pb-0 md:space-y-8 md:px-0 md:py-0">
-      <section className="mx-auto w-full max-w-md sm:max-w-6xl overflow-hidden box-border rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:rounded-[2rem] md:p-6">
-        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-6">
-          {/* Left content */}
-              <div className="relative p-0 sm:p-8 lg:p-12 bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] transition-colors rounded-[1.25rem] flex flex-col items-center sm:items-start">
-                <div className="w-full max-w-md sm:max-w-xl text-center mx-auto px-4 sm:px-0">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-blue-600/10 dark:bg-blue-400/10 px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-400 mb-5">
+    <div className="space-y-5 px-4 py-6 md:space-y-8 md:px-0 md:py-0">
+      <section className="mx-auto w-full max-w-6xl">
+        <div className="rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] overflow-hidden box-border">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            {/* Left / hero column */}
+            <aside className="md:col-span-5 p-4">
+              <div className="bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] rounded-[1.25rem] p-4 sm:p-6 h-full flex flex-col gap-6 box-border">
+                <div className="text-center md:text-left">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-blue-600/10 dark:bg-blue-400/10 px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-400">
                     We would love to hear from you
                   </div>
-    
-                  <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-950 dark:text-white leading-tight text-center sm:text-left break-words whitespace-normal">
+
+                  <h1 className="mt-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-950 dark:text-white leading-tight">
                     Thank you for visiting
-                    <span className="block text-blue-600 dark:text-blue-400 text-lg sm:text-2xl md:text-3xl lg:text-4xl break-words whitespace-normal">our song library</span>
+                    <span className="block text-blue-600 dark:text-blue-400 text-lg sm:text-2xl md:text-3xl">our song library</span>
                   </h1>
 
-                  <p className="mt-6 text-base sm:text-lg leading-8 text-slate-600 dark:text-slate-300 max-w-full sm:max-w-2xl text-center sm:text-left px-2 sm:px-0">
+                  <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-lg">
                     Share your feedback, suggest corrections, or request new songs. Every message helps us improve the collection and make it more useful for everyone.
                   </p>
-
-                  <div className="mt-8 flex justify-center gap-4 sm:grid sm:grid-cols-3 sm:gap-4">
-                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0 w-28 sm:w-auto">
-                  <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 mx-auto">
-                    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
-                      <path d="M8 10h8M8 14h5" />
-                      <path d="M6 5h12a2 2 0 0 1 2 2v11l-4-3H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
-                    </svg>
-                  </div>
-                  <div className="font-semibold text-slate-900 dark:text-white text-[1rem] sm:text-lg">Feedback</div>
                 </div>
 
-                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0 w-28 sm:w-auto">
-                  <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700 mx-auto">
-                    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
-                      <path d="M12 6v12M6 12h12" />
-                    </svg>
-                  </div>
-                  <div className="font-semibold text-slate-900 dark:text-white text-[1rem] sm:text-lg">Songs</div>
-                </div>
-
-                <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center min-w-0 w-28 sm:w-auto">
-                  <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700 mx-auto">
-                    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
-                      <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <div className="font-semibold text-slate-900 dark:text-white text-[1rem] sm:text-lg break-words">Corrections</div>
-                </div>
-              </div>
-       
-                  <div className="mt-8 rounded-3xl bg-slate-900 dark:bg-[#232b3d] px-5 py-5 sm:px-6 sm:py-6 text-white shadow-xl w-full">
-                    <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <div className="text-sm uppercase tracking-[0.2em] text-slate-400 dark:text-slate-300">Email us directly</div>
-                        <a href="mailto:singuntothelord@gmail.com" className="mt-1 inline-block text-base sm:text-md font-semibold text-white dark:text-blue-200 break-all hover:text-emerald-300 dark:hover:text-emerald-300">
-                          singuntothelord@gmail.com
-                        </a>
-                      </div>
-                      <a
-                        href="mailto:singuntothelord.contact@gmail.com"
-                        className="hidden sm:inline-flex items-center justify-center rounded-2xl bg-white dark:bg-[#181f2e] px-5 py-3 text-sm font-semibold text-slate-900 dark:text-white shadow-lg transform hover:translate-y-[-1px] hover:scale-105 hover:shadow-xl transition dark:hover:bg-[#0b2336] cursor-pointer"
-                        tabIndex={0}
-                      >
-                        Contact us
-                      </a>
+                <div className="grid grid-cols-3 gap-3 mt-2">
+                  <div className="w-full max-w-[140px] mx-auto rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center box-border">
+                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M8 10h8M8 14h5" />
+                        <path d="M6 5h12a2 2 0 0 1 2 2v11l-4-3H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
+                      </svg>
                     </div>
+                    <div className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">Feedback</div>
                   </div>
-                  {/* Subscribe card (left side) */}
-                  <div className="mt-6 rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
+
+                  <div className="w-full max-w-[140px] mx-auto rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center box-border">
+                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
+                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M12 6v12M6 12h12" />
+                      </svg>
+                    </div>
+                    <div className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">Songs</div>
+                  </div>
+
+                  <div className="w-full max-w-[140px] mx-auto rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center box-border">
+                    <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
+                        <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">Corrections</div>
+                  </div>
+                </div>
+
+                <div className="mt-auto md:mt-4 flex flex-col gap-4 w-full">
+                  <div className="rounded-3xl bg-slate-900 dark:bg-[#232b3d] px-5 py-5 text-white shadow-xl w-full text-center">
+                    <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Email us directly</div>
+                    <a href="mailto:singuntothelord@gmail.com" className="mt-2 inline-block text-base font-semibold text-white break-words">singuntothelord@gmail.com</a>
+                  </div>
+
+                  <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 w-full">
                     <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">Subscribe to updates</h3>
                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Get an email when new songs are added.</p>
                     <form onSubmit={handleSubscribe} className="mt-3">
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2 items-center">
                         <input
                           type="email"
                           placeholder="you@example.com"
                           value={subscribeEmail}
                           onChange={(e) => setSubscribeEmail(e.target.value)}
                           aria-invalid={!subscribeValid && subscribeEmail.length > 0}
-                          className="flex-1 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#232b3d] px-4 py-2 text-sm outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                          className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#232b3d] px-4 py-2 text-sm outline-none transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         />
                         <button
                           type="submit"
                           disabled={subscribeLoading || !subscribeValid}
-                          className="rounded-2xl bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-700 disabled:opacity-60"
+                          className="w-full sm:w-auto rounded-2xl bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-700 disabled:opacity-60"
                         >
                           {subscribeLoading ? "Subscribing..." : "Subscribe"}
                         </button>
                       </div>
-
                       {subscribeEmail.length > 0 && !subscribeValid ? (
                         <p className="mt-2 text-sm text-rose-600">Enter a valid email address.</p>
                       ) : subscribeError ? (
@@ -280,20 +272,18 @@ export default function ContactPage() {
                     </form>
                   </div>
                 </div>
-          </div>
+              </div>
+            </aside>
 
-          {/* Right form */}
-          <div className="p-6 sm:p-8 lg:p-10 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 transition-colors bg-[var(--desktop-panel)] dark:bg-[#181f2e] rounded-[1.25rem]">
+            {/* Right / form column */}
+            <main className="md:col-span-7 p-2 md:p-4">
+              <div className="bg-[var(--desktop-panel)] rounded-[1.25rem] p-4 md:p-6">
                 <div className="mx-auto w-full max-w-xl">
-                  <div className="mb-6">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-950 dark:text-white">Contact Form</h2>
-                    <p className="mt-2 text-slate-600 dark:text-slate-300 leading-7">
-                      Let us know your request or feedback below.
-                    </p>
-                  </div>
-    
+                  <h2 className="text-2xl sm:text-3xl font-bold text-slate-950 dark:text-white">Contact Form</h2>
+                  <p className="mt-2 text-slate-600 dark:text-slate-300 leading-7">Let us know your request or feedback below.</p>
+
                   {submitted ? (
-                    <div className="rounded-xl border border-green-200 bg-green-50 px-6 py-5 text-center font-semibold text-green-800 shadow-sm dark:border-emerald-800/70 dark:bg-emerald-950/55 dark:text-emerald-200">
+                    <div className="rounded-xl border border-green-200 bg-green-50 px-6 py-5 text-center font-semibold text-green-800 shadow-sm dark:border-emerald-800/70 dark:bg-emerald-950/55 dark:text-emerald-200 mt-4">
                       <p>Thank you — we received your message and will reply soon.</p>
                       <div className="mt-4 flex justify-center">
                         <button
@@ -303,14 +293,14 @@ export default function ContactPage() {
                             setSubmitError("");
                             setErrors({});
                           }}
-                          className="transform cursor-pointer rounded-2xl bg-white px-5 py-2 text-sm font-semibold text-green-800 shadow transition hover:scale-105 dark:bg-emerald-100 dark:text-emerald-950 dark:hover:bg-emerald-200"
+                          className="transform cursor-pointer rounded-2xl bg-white px-5 py-2 text-sm font-semibold text-green-800 shadow transition hover:scale-105 dark:bg-emerald-100 dark:text-emerald-950"
                         >
                           Send another request
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-5 mt-6">
                       <div className="grid gap-5 sm:grid-cols-2">
                         <div className="sm:col-span-2">
                           <label className="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200">Name <span className="text-rose-500">*</span></label>
@@ -358,8 +348,7 @@ export default function ContactPage() {
                               className={`rounded-2xl border px-4 py-3 text-sm font-semibold text-left transition-all cursor-pointer
                                 ${form.type === type
                                   ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-400 dark:text-blue-300'
-                                  : 'bg-white border-slate-200 text-slate-700 dark:bg-[#232b3d] dark:border-slate-700 dark:text-slate-200'}
-                            `}
+                                  : 'bg-white border-slate-200 text-slate-700 dark:bg-[#232b3d] dark:border-slate-700 dark:text-slate-200'}`}
                               onClick={() => setForm((prev) => ({ ...prev, type }))}
                             >
                               {type}
@@ -397,17 +386,12 @@ export default function ContactPage() {
 
                       <label className="flex items-start gap-3 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 px-4 py-4 text-sm text-emerald-900 dark:text-emerald-200 ring-1 ring-emerald-200 dark:ring-emerald-700 cursor-pointer">
                         <input type="checkbox" name="consent" checked={form.consent} onChange={handleChange} className="mt-1 h-4 w-4 rounded border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:bg-[#232b3d] cursor-pointer" />
-                        <span>
-                          I agree to be contacted about this request if more details are needed.
-                        </span>
+                        <span>I agree to be contacted about this request if more details are needed.</span>
                       </label>
 
-                      {/* Inline subscribe checkbox (added to contact form) */}
                       <label className="flex items-start gap-3 rounded-2xl bg-slate-50 dark:bg-[#0f1720] px-4 py-4 text-sm text-slate-800 dark:text-slate-200 ring-1 ring-slate-200 dark:ring-slate-700 cursor-pointer">
                         <input type="checkbox" name="subscribe" checked={Boolean(form.subscribe)} onChange={handleChange} className="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 dark:bg-[#232b3d] cursor-pointer" />
-                        <span>
-                          Subscribe to receive updates on new songs
-                        </span>
+                        <span>Subscribe to receive updates on new songs</span>
                       </label>
 
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
@@ -417,19 +401,14 @@ export default function ContactPage() {
                           disabled={submitting}
                           className="inline-flex items-center justify-center rounded-2xl bg-slate-950 dark:bg-[#0e2a43] px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:translate-y-[-1px] hover:shadow-xl hover:bg-blue-700 dark:hover:bg-[#0b2336] cursor-pointer whitespace-nowrap"
                         >
-                          {submitting ? (
-                            <span className="whitespace-nowrap">Sending...</span>
-                          ) : (
-                            <>
-                              <span className="hidden md:inline whitespace-nowrap">Send message</span>
-                              <span className="md:hidden whitespace-nowrap">Send</span>
-                            </>
-                          )}
+                          {submitting ? <span className="whitespace-nowrap">Sending...</span> : <><span className="hidden md:inline whitespace-nowrap">Send message</span><span className="md:hidden whitespace-nowrap">Send</span></>}
                         </button>
                       </div>
                     </form>
                   )}
                 </div>
+              </div>
+            </main>
           </div>
         </div>
       </section>
