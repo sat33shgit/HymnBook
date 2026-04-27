@@ -182,7 +182,7 @@ export default function ContactPage() {
 
   return (
     <div className="space-y-5 px-4 py-5 md:space-y-8 md:px-0 md:py-0">
-      <section className="mx-auto max-w-md sm:max-w-6xl rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:rounded-[2rem] md:p-6">
+      <section className="mx-auto w-full max-w-md sm:max-w-6xl overflow-hidden box-border rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:rounded-[2rem] md:p-6">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-6">
           {/* Left content */}
               <div className="relative p-0 sm:p-8 lg:p-12 bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] transition-colors rounded-[1.25rem] flex flex-col items-center sm:items-start">
@@ -284,7 +284,7 @@ export default function ContactPage() {
 
           {/* Right form */}
           <div className="p-6 sm:p-8 lg:p-10 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 transition-colors bg-[var(--desktop-panel)] dark:bg-[#181f2e] rounded-[1.25rem]">
-                <div className="mx-auto max-w-xl">
+                <div className="mx-auto w-full max-w-xl">
                   <div className="mb-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-slate-950 dark:text-white">Contact Form</h2>
                     <p className="mt-2 text-slate-600 dark:text-slate-300 leading-7">
