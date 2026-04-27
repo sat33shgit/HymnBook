@@ -181,11 +181,12 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="w-full max-w-6xl overflow-hidden rounded-[32px] bg-white dark:bg-[#101624] shadow-[0_20px_60px_rgba(15,23,42,0.12)] dark:shadow-[0_20px_60px_rgba(15,23,42,0.32)] transition-colors mt-4 sm:mt-0">
-      <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
-        {/* Left content */}
-        <section className="relative px-5 py-5 sm:px-8 sm:py-8 lg:px-12 lg:py-12 bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] transition-colors">
-                <div className="max-w-xl text-center ">
+    <div className="space-y-5 px-4 py-5 md:space-y-8 md:px-0 md:py-0">
+      <section className="mx-auto max-w-md sm:max-w-6xl rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:rounded-[2rem] md:p-6">
+        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-6">
+          {/* Left content */}
+              <div className="relative p-0 sm:p-8 lg:p-12 bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] transition-colors rounded-[1.25rem] flex flex-col items-center sm:items-start">
+                <div className="w-full max-w-md sm:max-w-xl text-center mx-auto">
                   <div className="inline-flex items-center gap-2 rounded-full bg-blue-600/10 dark:bg-blue-400/10 px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-400 mb-5">
                     We would love to hear from you
                   </div>
@@ -195,11 +196,11 @@ export default function ContactPage() {
                     <span className="block text-blue-600 dark:text-blue-400">our song library</span>
                   </h1>
 
-                  <p className="mt-6 text-base sm:text-lg leading-8 text-slate-600 dark:text-slate-300 max-w-2xl text-center sm:text-left">
+                  <p className="mt-6 text-base sm:text-lg leading-8 text-slate-600 dark:text-slate-300 max-w-full sm:max-w-2xl text-center sm:text-left">
                     Share your feedback, suggest corrections, or request new songs. Every message helps us improve the collection and make it more useful for everyone.
                   </p>
 
-                  <div className="mt-8 grid gap-4 grid-cols-3 sm:grid-cols-3">
+                  <div className="mt-8 flex justify-center gap-4 sm:grid sm:grid-cols-3 sm:gap-4">
                 <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center">
                   <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 mx-auto">
                     <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
@@ -230,7 +231,7 @@ export default function ContactPage() {
               </div>
        
                   <div className="mt-8 rounded-3xl bg-slate-900 dark:bg-[#232b3d] px-5 py-5 sm:px-6 sm:py-6 text-white shadow-xl">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <div className="text-sm uppercase tracking-[0.2em] text-slate-400 dark:text-slate-300">Email us directly</div>
                         <a href="mailto:singuntothelord@gmail.com" className="mt-1 inline-block text-base sm:text-md font-semibold text-white dark:text-blue-200 break-all hover:text-emerald-300 dark:hover:text-emerald-300">
@@ -279,10 +280,10 @@ export default function ContactPage() {
                     </form>
                   </div>
                 </div>
-              </section>
-    
-              {/* Right form */}
-              <section className="bg-white dark:bg-[#181f2e] px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-12 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 transition-colors">
+          </div>
+
+          {/* Right form */}
+          <div className="p-6 sm:p-8 lg:p-10 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 transition-colors bg-[var(--desktop-panel)] dark:bg-[#181f2e] rounded-[1.25rem]">
                 <div className="mx-auto max-w-xl">
                   <div className="mb-6">
                     <h2 className="text-2xl sm:text-3xl font-bold text-slate-950 dark:text-white">Contact Form</h2>
@@ -429,9 +430,9 @@ export default function ContactPage() {
                     </form>
                   )}
                 </div>
-              </section>
-            </div>
-    
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

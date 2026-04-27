@@ -766,15 +766,9 @@ export async function isPublicSongAudioVisible() {
           .limit(1);
 
         return rows[0]?.boolValue ?? true;
-      } catch (error) {
-        // During rollout, table may not exist before migration runs.
-        if (
-          error instanceof Error &&
-          error.message.includes('relation "app_settings" does not exist')
-        ) {
-          return true;
-        }
-        throw error;
+      } catch {
+        // On any DB error, default to showing the feature.
+        return true;
       }
     },
     ["isPublicSongAudioVisible"],
@@ -816,14 +810,9 @@ export async function isPublicSongYoutubeVisible() {
           .limit(1);
 
         return rows[0]?.boolValue ?? true;
-      } catch (error) {
-        if (
-          error instanceof Error &&
-          error.message.includes('relation "app_settings" does not exist')
-        ) {
-          return true;
-        }
-        throw error;
+      } catch {
+        // On any DB error, default to showing the feature.
+        return true;
       }
     },
     ["isPublicSongYoutubeVisible"],
@@ -914,14 +903,9 @@ export async function isSongNotificationsEnabled() {
           .limit(1);
 
         return rows[0]?.boolValue ?? false;
-      } catch (error) {
-        if (
-          error instanceof Error &&
-          error.message.includes('relation "app_settings" does not exist')
-        ) {
-          return false;
-        }
-        throw error;
+      } catch {
+        // On any DB error, default to disabled for notifications.
+        return false;
       }
     },
     ["isSongNotificationsEnabled"],
