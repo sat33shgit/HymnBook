@@ -1,6 +1,7 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Search as SearchIcon } from "lucide-react";
+import { Search as SearchIcon, Mic as MicIcon } from "lucide-react";
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -30,11 +31,11 @@ export function SearchBar({
   autoFocus = false,
   voiceLang,
 }: SearchBarProps) {
-  // Voice/microphone support removed from SearchBar to avoid platform-specific
-  // issues. The input remains text-only and suggested-query selection is kept.
-  // Keep unused props referenced to avoid linter warnings and preserve
-  // public component API.
-  void onVoiceResult;
+  const [isListening, setIsListening] = React.useState(false);
+  const recognitionRef = React.useRef<SpeechRecognition | null>(null);
+
+  // Keep unused prop referenced to avoid linter warnings for props we may not
+  // always use in some environments.
   void voiceLang;
 
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -50,6 +51,22 @@ export function SearchBar({
       // matchMedia may not be available in some environments; if so, don't focus
     }
   }, [autoFocus]);
+
+  React.useEffect(() => {
+    return () => {
+      try {
+        if (recognitionRef.current) {
+          recognitionRef.current.onresult = null;
+          recognitionRef.current.onend = null;
+          recognitionRef.current.onerror = null;
+          recognitionRef.current.stop();
+          recognitionRef.current = null;
+        }
+      } catch (e) {
+        // ignore cleanup errors
+      }
+    };
+  }, []);
 
   const handleSubmit = () => {
     const trimmedValue = value.trim();
@@ -75,10 +92,98 @@ export function SearchBar({
           ref={inputRef}
           className={cn(
             "h-11 rounded-[1.2rem] border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] pl-10 text-[0.95rem] text-foreground shadow-[0_14px_30px_rgba(15,23,42,0.08)] placeholder:text-[0.84rem] placeholder:text-[var(--desktop-nav-muted)] md:h-14 md:rounded-[1.45rem] md:pl-11 md:text-base md:placeholder:text-[0.95rem] dark:shadow-[0_14px_30px_rgba(2,6,23,0.24)]",
-            "pr-3.5 md:pr-4"
+            // add right padding so the microphone button doesn't overlap text
+            "pr-12 md:pr-14"
           )}
           aria-label="Search songs"
         />
+        {/* Microphone button: toggles SpeechRecognition and reports candidates */}
+        <button
+          type="button"
+          data-slot="tooltip-trigger"
+          aria-pressed={isListening}
+          aria-label={isListening ? "Stop voice search" : "Start voice search"}
+            onClick={() => {
+            if (isListening) {
+              try {
+                recognitionRef.current?.stop();
+              } catch (e) {
+                // ignore
+              }
+              setIsListening(false);
+              return;
+            }
+            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+              // Not supported in this browser
+              return;
+            }
+
+            try {
+              const rec = new SpeechRecognition();
+              rec.lang = voiceLang ?? (navigator.language || "en-US");
+              rec.interimResults = false;
+              rec.continuous = false;
+              // request some alternatives where supported
+              try {
+                rec.maxAlternatives = 5;
+              } catch {
+                // some implementations may not allow setting this
+              }
+
+              rec.onstart = () => {
+                setIsListening(true);
+              };
+
+              rec.onend = () => {
+                setIsListening(false);
+              };
+
+              rec.onerror = (ev: any) => {
+                setIsListening(false);
+              };
+
+              rec.onresult = (ev: any) => {
+                const candidates: string[] = [];
+                try {
+                  for (let i = 0; i < ev.results.length; i++) {
+                    const result = ev.results[i];
+                    for (let j = 0; j < result.length; j++) {
+                      const t = (result[j]?.transcript || "").trim();
+                      if (t) candidates.push(t);
+                    }
+                  }
+                } catch {
+                  // fallback to first transcript
+                  const first = ev.results?.[0]?.[0]?.transcript;
+                  if (first) candidates.push(first.trim());
+                }
+
+                const unique = Array.from(new Set(candidates)).filter(Boolean);
+                if (unique.length === 0) {
+                  const first = ev.results?.[0]?.[0]?.transcript;
+                  if (first) unique.push(first.trim());
+                }
+
+                if (unique.length > 0) {
+                  onVoiceResult?.(unique);
+                }
+              };
+
+              recognitionRef.current = rec;
+              rec.start();
+            } catch (err) {
+              // Failed to start speech recognition
+              setIsListening(false);
+            }
+            }}
+          className={"absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full text-[var(--desktop-nav-muted)] hover:text-foreground"}
+        >
+          <span className={cn(isListening ? "text-rose-600" : "text-[var(--desktop-nav-muted)]")}>
+            <MicIcon className="h-4 w-4 md:h-5 md:w-5" />
+          </span>
+          {isListening ? <span className="sr-only">Listening</span> : null}
+        </button>
         {/* Microphone UI removed */}
       </div>
       {suggestedQuery && (
