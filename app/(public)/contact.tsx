@@ -183,13 +183,13 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="space-y-5 px-4 py-6 md:space-y-8 md:px-0 md:py-0">
+    <div className="space-y-2 px-4 py-6 md:space-y-8 md:px-0 md:py-0">
       <section className="mx-auto w-full max-w-6xl">
-        <div className="rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] overflow-hidden box-border">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-3 md:p-4 shadow-[0_18px_38px_rgba(15,23,42,0.07)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] overflow-hidden box-border">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-6 items-stretch">
             {/* Left / hero column */}
-            <aside className="md:col-span-5 p-4">
-              <div className="bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] rounded-[1.25rem] p-4 sm:p-6 h-full flex flex-col gap-6 box-border">
+            <aside className="md:col-span-5 p-2 md:p-4">
+              <div className="bg-gradient-to-br from-white via-emerald-50/40 to-blue-50/60 dark:from-[#101624] dark:via-[#18213a] dark:to-[#1a2236] rounded-[1.25rem] p-3 sm:p-6 h-full flex flex-col gap-3 sm:gap-6 box-border">
                 <div className="text-center md:text-left">
                   <div className="inline-flex items-center gap-2 rounded-full bg-blue-600/10 dark:bg-blue-400/10 px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-400">
                     We would love to hear from you
@@ -205,8 +205,8 @@ export default function ContactPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 mt-2">
-                  <div className="w-full max-w-[140px] mx-auto rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center box-border">
+                <div className="grid grid-cols-3 gap-4 sm:gap-3 md:gap-3 mt-2">
+                  <div className="w-full max-w-[100px] sm:max-w-[140px] mx-auto rounded-2xl bg-white dark:bg-[#0b1220] p-2 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center box-border">
                     <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
                       <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
                         <path d="M8 10h8M8 14h5" />
@@ -216,7 +216,7 @@ export default function ContactPage() {
                     <div className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">Feedback</div>
                   </div>
 
-                  <div className="w-full max-w-[140px] mx-auto rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center box-border">
+                  <div className="w-full max-w-[100px] sm:max-w-[140px] mx-auto rounded-2xl bg-white dark:bg-[#0b1220] p-2 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center box-border">
                     <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
                       <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.8">
                         <path d="M12 6v12M6 12h12" />
@@ -225,7 +225,7 @@ export default function ContactPage() {
                     <div className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">Songs</div>
                   </div>
 
-                  <div className="w-full max-w-[140px] mx-auto rounded-2xl bg-white dark:bg-[#0b1220] p-3 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center box-border">
+                  <div className="w-full max-w-[100px] sm:max-w-[140px] mx-auto rounded-2xl bg-white dark:bg-[#0b1220] p-2 sm:p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col items-center text-center box-border">
                     <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
                       <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
                         <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -235,7 +235,7 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                <div className="mt-auto md:mt-4 flex flex-col gap-4 w-full">
+                <div className="mt-auto md:mt-4 flex flex-col gap-2 md:gap-4 w-full">
                   <div className="rounded-3xl bg-slate-900 dark:bg-[#232b3d] px-5 py-5 text-white shadow-xl w-full text-center">
                     <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Email us directly</div>
                     <a href="mailto:singuntothelord@gmail.com" className="mt-2 inline-block text-base font-semibold text-white break-words">singuntothelord@gmail.com</a>
@@ -275,10 +275,16 @@ export default function ContactPage() {
               </div>
             </aside>
 
+            {/* Vertical divider (desktop only) */}
+            <div className="hidden md:flex md:col-span-1 items-center justify-center">
+              <div className="h-full w-px bg-slate-200 dark:bg-slate-700 rounded" />
+            </div>
+
             {/* Right / form column */}
-            <main className="md:col-span-7 p-2 md:p-4">
-              <div className="bg-[var(--desktop-panel)] rounded-[1.25rem] p-4 md:p-6">
+            <main className="md:col-span-6 p-2 md:p-4">
+              <div className="bg-[var(--desktop-panel)] rounded-[1.25rem] p-3 md:p-6">
                 <div className="mx-auto w-full max-w-xl">
+                  <hr className="block md:hidden border-t border-slate-200 dark:border-slate-700 my-2 md:my-4" />
                   <h2 className="text-2xl sm:text-3xl font-bold text-slate-950 dark:text-white">Contact Form</h2>
                   <p className="mt-2 text-slate-600 dark:text-slate-300 leading-7">Let us know your request or feedback below.</p>
 
@@ -300,8 +306,8 @@ export default function ContactPage() {
                       </div>
                     </div>
                   ) : (
-                    <form onSubmit={handleSubmit} className="space-y-5 mt-6">
-                      <div className="grid gap-5 sm:grid-cols-2">
+                    <form onSubmit={handleSubmit} className="space-y-2 md:space-y-5 mt-3 md:mt-6">
+                      <div className="grid gap-2 sm:gap-5 sm:grid-cols-2">
                         <div className="sm:col-span-2">
                           <label className="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200">Name <span className="text-rose-500">*</span></label>
                           <input
@@ -340,7 +346,7 @@ export default function ContactPage() {
 
                       <div>
                         <label className="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200">Type of request</label>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-1 sm:gap-3 sm:grid-cols-3">
                           {CONTACT_REQUEST_TYPES.map((type) => (
                             <button
                               key={type}
@@ -356,7 +362,6 @@ export default function ContactPage() {
                           ))}
                         </div>
                       </div>
-
                       <div>
                         <label className="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200">Message <span className="text-rose-500">*</span></label>
                         <textarea
@@ -394,7 +399,7 @@ export default function ContactPage() {
                         <span>Subscribe to receive updates on new songs</span>
                       </label>
 
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
+                      <div className="flex flex-col gap-1 sm:gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
                         <p className="text-sm text-slate-500 dark:text-slate-400">Response time: usually within a few days</p>
                         <button
                           type="submit"
