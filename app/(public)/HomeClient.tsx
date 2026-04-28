@@ -24,6 +24,8 @@ interface HomeClientProps {
   languageOverview: LanguageOverviewItem[];
   mobileMostViewedSongsSection: ReactNode;
   desktopMostViewedSongsSection: ReactNode;
+  mobileRecentlyAddedSongsSection?: ReactNode;
+  desktopRecentlyAddedSongsSection?: ReactNode;
 }
 
 const HOME_HERO_KICKER = publicSiteTitle;
@@ -61,6 +63,8 @@ export function HomeClient({
   languageOverview,
   mobileMostViewedSongsSection,
   desktopMostViewedSongsSection,
+  mobileRecentlyAddedSongsSection,
+  desktopRecentlyAddedSongsSection,
 }: HomeClientProps) {
   const router = useRouter();
   const { favorites } = useFavorites();
@@ -173,6 +177,7 @@ export function HomeClient({
           />
         </div>
 
+        {mobileRecentlyAddedSongsSection}
         {mobileMostViewedSongsSection}
       </section>
 
@@ -261,6 +266,7 @@ export function HomeClient({
           />
         </div>
 
+        {desktopRecentlyAddedSongsSection}
         {desktopMostViewedSongsSection}
       </div>
     </div>

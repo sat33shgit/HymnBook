@@ -11,6 +11,12 @@ import {
   MobileMostViewedSongsSkeleton,
   MobileMostViewedSongsSection,
 } from "./MostViewedSongsSection";
+import {
+  DesktopRecentlyAddedSongsSkeleton,
+  DesktopRecentlyAddedSongsSection,
+  MobileRecentlyAddedSongsSkeleton,
+  MobileRecentlyAddedSongsSection,
+} from "./RecentlyAddedSongsSection";
 
 export const revalidate = 300;
 
@@ -57,6 +63,16 @@ export default async function HomePage() {
       totalLanguages={totalLanguages}
       totalCategories={totalCategories}
       languageOverview={languageOverview}
+      mobileRecentlyAddedSongsSection={
+        <Suspense fallback={<MobileRecentlyAddedSongsSkeleton />}>
+          <MobileRecentlyAddedSongsSection />
+        </Suspense>
+      }
+      desktopRecentlyAddedSongsSection={
+        <Suspense fallback={<DesktopRecentlyAddedSongsSkeleton />}>
+          <DesktopRecentlyAddedSongsSection />
+        </Suspense>
+      }
       mobileMostViewedSongsSection={
         <Suspense fallback={<MobileMostViewedSongsSkeleton />}>
           <MobileMostViewedSongsSection />

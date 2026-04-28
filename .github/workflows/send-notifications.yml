@@ -30,19 +30,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Debug runner time and schedule
-        # Safe debug step (no secrets printed) — shows runner times and schedule env
-        run: |
-          echo "UTC now: $(date -u +"%Y-%m-%d %H:%M:%S %Z")"
-          echo "Runner local now: $(date +"%Y-%m-%d %H:%M:%S %Z")"
-          echo "Configured schedule:"
-          echo "  SONG_NOTIFICATIONS_TIMEZONE=${SONG_NOTIFICATIONS_TIMEZONE}"
-          echo "  SONG_NOTIFICATIONS_HOUR=${SONG_NOTIFICATIONS_HOUR}"
-          echo "  SONG_NOTIFICATIONS_MINUTE=${SONG_NOTIFICATIONS_MINUTE}"
-        env:
-          SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
-          SONG_NOTIFICATIONS_HOUR: '11'
-          SONG_NOTIFICATIONS_MINUTE: '15'
+      # Debug step removed: avoid printing environment/secrets in CI runs
 
       # Debug step removed: avoid printing environment/secrets in CI runs
 

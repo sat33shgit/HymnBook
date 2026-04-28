@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SongList } from "@/components/songs/SongList";
-import { getMostViewedSongs } from "@/lib/db/queries";
+import { getRecentSongs } from "@/lib/db/queries";
 
-async function MostViewedSongsSection({
+async function RecentlyAddedSongsSection({
   className,
 }: {
   className?: string;
 }) {
-  let songs: Awaited<ReturnType<typeof getMostViewedSongs>>;
+  let songs: Awaited<ReturnType<typeof getRecentSongs>>;
 
-  try {
-    songs = await getMostViewedSongs(6);
+    try {
+    songs = await getRecentSongs(6);
   } catch {
     return null;
   }
@@ -25,7 +25,7 @@ async function MostViewedSongsSection({
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
           <h2 className="font-heading text-[1.45rem] font-semibold leading-[1.06] tracking-[-0.04em] text-foreground md:text-[1.85rem] md:leading-[1.05]">
-            Most viewed songs
+            Newly Added Songs
           </h2>
         </div>
         <Link
@@ -40,7 +40,7 @@ async function MostViewedSongsSection({
   );
 }
 
-function MostViewedSongsSkeleton({
+function RecentlyAddedSongsSkeleton({
   className,
 }: {
   className?: string;
@@ -65,22 +65,22 @@ function MostViewedSongsSkeleton({
   );
 }
 
-export function MobileMostViewedSongsSection() {
+export function MobileRecentlyAddedSongsSection() {
   return (
-    <MostViewedSongsSection className="mt-4 rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:hidden" />
+    <RecentlyAddedSongsSection className="mt-4 rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:hidden" />
   );
 }
 
-export function MobileMostViewedSongsSkeleton() {
+export function MobileRecentlyAddedSongsSkeleton() {
   return (
-    <MostViewedSongsSkeleton className="mt-4 rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:hidden" />
+    <RecentlyAddedSongsSkeleton className="mt-4 rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)] md:hidden" />
   );
 }
 
-export function DesktopMostViewedSongsSection() {
-  return <MostViewedSongsSection className="mt-8 hidden md:block" />;
+export function DesktopRecentlyAddedSongsSection() {
+  return <RecentlyAddedSongsSection className="mt-8 hidden md:block" />;
 }
 
-export function DesktopMostViewedSongsSkeleton() {
-  return <MostViewedSongsSkeleton className="mt-8 hidden md:block" />;
+export function DesktopRecentlyAddedSongsSkeleton() {
+  return <RecentlyAddedSongsSkeleton className="mt-8 hidden md:block" />;
 }
