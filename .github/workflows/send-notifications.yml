@@ -2,9 +2,10 @@ name: Send daily song notifications
 
 on:
   schedule:
-    # run hourly at minute 30; the script itself checks the configured
-    # America/Los_Angeles time (handles DST automatically).
-    - cron: '30 * * * *'
+    # run once daily at 11:15 America/Los_Angeles. GitHub cron uses UTC,
+    # so include both UTC equivalents to cover PDT and PST (DST).
+    - cron: '15 18 * * *'  # 11:15 PDT (UTC-7)
+    - cron: '15 19 * * *'  # 11:15 PST (UTC-8)
   workflow_dispatch:
     inputs:
       force:
@@ -40,8 +41,8 @@ jobs:
           echo "  SONG_NOTIFICATIONS_MINUTE=${SONG_NOTIFICATIONS_MINUTE}"
         env:
           SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
-          SONG_NOTIFICATIONS_HOUR: '10'
-          SONG_NOTIFICATIONS_MINUTE: '30'
+          SONG_NOTIFICATIONS_HOUR: '11'
+          SONG_NOTIFICATIONS_MINUTE: '15'
 
       # Debug step removed: avoid printing environment/secrets in CI runs
 
@@ -53,10 +54,10 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           POSTGRES_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
-          # Scheduling: run at 10:30 in America/Los_Angeles
+          # Scheduling: run at 11:15 in America/Los_Angeles
           SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
-          SONG_NOTIFICATIONS_HOUR: '10'
-          SONG_NOTIFICATIONS_MINUTE: '30'
+          SONG_NOTIFICATIONS_HOUR: '11'
+          SONG_NOTIFICATIONS_MINUTE: '15'
           SEND_BATCH_SIZE: '50'
           FORCE_SEND: ${{ github.event.inputs.force || '0' }}
         run: npm run send:notifications
