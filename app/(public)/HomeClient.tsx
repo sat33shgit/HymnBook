@@ -127,23 +127,7 @@ export function HomeClient({
               {HOME_HERO_SUPPORTING_TEXT}
             </p>
 
-            <div className="mt-4 space-y-2 md:mt-5 md:space-y-3">
-              {HOME_HERO_FEATURES.map(({ title, description, icon: Icon }) => (
-                <div key={title} className="flex items-center gap-3">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/12 text-[var(--desktop-hero-foreground)]">
-                    <Icon className="h-4.5 w-4.5" />
-                  </div>
-                  <div>
-                    <p className="text-[0.92rem] font-semibold leading-none text-[var(--desktop-hero-foreground)]">
-                      {title}
-                    </p>
-                    <p className="mt-1 text-[0.82rem] text-[var(--desktop-hero-muted)]">
-                      {description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {/* Mobile hero features removed — keep desktop features only */}
           </div>
         </div>
 

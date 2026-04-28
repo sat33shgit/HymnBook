@@ -96,7 +96,7 @@ export function FavoritesClient() {
       : songs;
 
   return (
-    <div className="space-y-5 pt-2 md:space-y-8 md:pt-0">
+    <div className="space-y-6 pt-4 md:space-y-8 md:pt-0">
       <section
         className="mx-4 rounded-[1.8rem] px-4 py-5 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] md:mx-0 md:rounded-[2.35rem] md:px-8 md:py-9"
           style={HERO_HEADER_STYLE}
@@ -110,7 +110,7 @@ export function FavoritesClient() {
               <h1 className="mt-1.5 font-heading text-[clamp(1.95rem,7vw,3rem)] font-semibold leading-[0.97] tracking-[-0.06em]">
                 Favorites
               </h1>
-              <p className="mt-3 max-w-2xl text-[0.84rem] leading-6 text-[var(--desktop-hero-muted)] md:mt-5 md:text-[1.02rem] md:leading-8">
+              <p className="hidden md:block mt-3 max-w-2xl text-[0.84rem] leading-6 text-[var(--desktop-hero-muted)] md:mt-5 md:text-[1.02rem] md:leading-8">
                 Keep quick access to the songs you revisit most.
               </p>
             </div>

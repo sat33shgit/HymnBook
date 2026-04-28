@@ -42,10 +42,10 @@ export function BrowseByLanguageSection({
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="font-heading text-[1.45rem] font-semibold leading-[1.05] tracking-[-0.04em] md:text-[1.85rem]">
+          <h2 className="font-heading mt-1.5 text-[1.45rem] font-semibold leading-[1.05] tracking-[-0.04em] md:text-[clamp(1.95rem,8vw,3.3rem)] md:leading-[0.97] md:tracking-[-0.06em]">
             {title}
           </h2>
-          <p className="mt-1.5 max-w-3xl text-[0.84rem] leading-6 text-[var(--desktop-hero-muted)] md:mt-2 md:text-[0.94rem] md:leading-7">
+          <p className="hidden md:block mt-1.5 max-w-3xl text-[0.84rem] leading-6 text-[var(--desktop-hero-muted)] md:mt-2 md:text-[0.94rem] md:leading-7">
             {description}
           </p>
         </div>
