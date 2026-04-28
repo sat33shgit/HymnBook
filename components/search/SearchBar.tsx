@@ -173,7 +173,8 @@ export function SearchBar({
               recognitionRef.current = rec;
               rec.start();
             } catch (err) {
-              setRecError("Failed to start speech recognition.");
+              // Failed to start speech recognition
+              setIsListening(false);
             }
             }}
           className={"absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full text-[var(--desktop-nav-muted)] hover:text-foreground"}
