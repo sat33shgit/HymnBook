@@ -37,6 +37,20 @@ export function SearchBar({
   void onVoiceResult;
   void voiceLang;
 
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+
+  React.useEffect(() => {
+    if (!autoFocus) return;
+    try {
+      const mql = window.matchMedia('(min-width: 768px)');
+      if (mql.matches) {
+        inputRef.current?.focus();
+      }
+    } catch (e) {
+      // matchMedia may not be available in some environments; if so, don't focus
+    }
+  }, [autoFocus]);
+
   const handleSubmit = () => {
     const trimmedValue = value.trim();
     if (!trimmedValue) return;
@@ -58,11 +72,11 @@ export function SearchBar({
               handleSubmit();
             }
           }}
+          ref={inputRef}
           className={cn(
             "h-11 rounded-[1.2rem] border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] pl-10 text-[0.95rem] text-foreground shadow-[0_14px_30px_rgba(15,23,42,0.08)] placeholder:text-[0.84rem] placeholder:text-[var(--desktop-nav-muted)] md:h-14 md:rounded-[1.45rem] md:pl-11 md:text-base md:placeholder:text-[0.95rem] dark:shadow-[0_14px_30px_rgba(2,6,23,0.24)]",
             "pr-3.5 md:pr-4"
           )}
-          autoFocus={autoFocus}
           aria-label="Search songs"
         />
         {/* Microphone UI removed */}
