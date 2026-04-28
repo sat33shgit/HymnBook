@@ -2,10 +2,9 @@ name: Send daily song notifications
 
 on:
   schedule:
-    # run once daily at 21:45 America/Los_Angeles. GitHub cron uses UTC,
-    # so include both UTC equivalents to cover PST and PDT (DST).
-    - cron: '45 4 * * *'  # 21:45 PDT (UTC-7)
-    - cron: '45 5 * * *'  # 21:45 PST (UTC-8)
+    # run hourly at minute 45; the script itself checks the configured
+    # America/Los_Angeles time (handles DST automatically).
+    - cron: '45 * * * *'
   workflow_dispatch:
     inputs:
       force:
