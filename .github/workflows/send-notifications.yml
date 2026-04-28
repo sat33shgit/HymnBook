@@ -2,8 +2,10 @@ name: Send daily song notifications
 
 on:
   schedule:
-    # run hourly at minute 45; script only sends when local time matches configured schedule
-    - cron: '45 * * * *'
+    # run once daily at 21:45 America/Los_Angeles. GitHub cron uses UTC,
+    # so include both UTC equivalents to cover PST and PDT (DST).
+    - cron: '45 4 * * *'  # 21:45 PDT (UTC-7)
+    - cron: '45 5 * * *'  # 21:45 PST (UTC-8)
   workflow_dispatch:
     inputs:
       force:
@@ -38,9 +40,9 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           POSTGRES_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
-          # Scheduling (defaults used if not provided)
+          # Scheduling: run at 21:45 in America/Los_Angeles
           SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
-          SONG_NOTIFICATIONS_HOUR: '18'
+          SONG_NOTIFICATIONS_HOUR: '21'
           SONG_NOTIFICATIONS_MINUTE: '45'
           SEND_BATCH_SIZE: '50'
           FORCE_SEND: ${{ github.event.inputs.force || '0' }}
