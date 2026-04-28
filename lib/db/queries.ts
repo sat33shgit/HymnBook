@@ -519,6 +519,61 @@ export async function getMostViewedSongs(limit = 5) {
   )();
 }
 
+export async function getRecentSongs(limit = 10) {
+  const safeLimit = Math.min(Math.max(limit, 1), 50);
+
+  return unstable_cache(
+    async () => {
+      const songRows = await db
+        .select()
+        .from(songs)
+        .where(eq(songs.isPublished, true))
+        .orderBy(desc(songs.createdAt))
+        .limit(safeLimit);
+
+      if (songRows.length === 0) {
+        return [];
+      }
+
+      const songIds = songRows.map((song) => song.id);
+      const translations = await db
+        .select({ songId: songTranslations.songId, languageCode: songTranslations.languageCode, title: songTranslations.title })
+        .from(songTranslations)
+        .where(inArray(songTranslations.songId, songIds))
+        .orderBy(asc(songTranslations.languageCode));
+
+      const translationsBySongId = new Map<number, { languageCode: string; title: string }[]>();
+      for (const translation of translations) {
+        const existingTranslations = translationsBySongId.get(translation.songId) ?? [];
+        existingTranslations.push({ languageCode: translation.languageCode, title: translation.title });
+        translationsBySongId.set(translation.songId, existingTranslations);
+      }
+
+      return songRows.map((song) => {
+        const songTranslationsForSong = translationsBySongId.get(song.id) ?? [];
+
+        return {
+          id: song.id,
+          slug: song.slug,
+          category: song.category,
+          defaultLang: song.defaultLang,
+          viewCount: song.viewCount,
+          isPublished: song.isPublished,
+          title:
+            deriveSongPrimaryTitle(songTranslationsForSong, song.defaultLang) ||
+            "Untitled",
+          languages: songTranslationsForSong.map((translation) => translation.languageCode),
+        };
+      });
+    },
+    ["getRecentSongs", String(safeLimit)],
+    {
+      revalidate: CACHE_TTL.songs,
+      tags: [CACHE_TAGS.songs],
+    }
+  )();
+}
+
 export async function getPublishedLanguageSongCounts(activeOnly = true) {
   const cacheKey = activeOnly ? "active" : "all";
 
