@@ -123,10 +123,15 @@ async function run() {
   // Allow forced runs (useful for debugging): set FORCE_SEND=1
   const FORCE = process.env.FORCE_SEND === "1" || process.env.FORCE_SEND === "true";
 
-  // If not forced, only run when the current time in TZ matches the configured schedule
+  // If not forced, only run when the current time in TZ is within a small
+  // tolerance window around the configured schedule. This prevents false
+  // negatives when the runner starts slightly early/late.
   const nowTzCheck = DateTime.now().setZone(TZ);
   if (!FORCE) {
-    if (nowTzCheck.hour !== HOUR || nowTzCheck.minute !== MINUTE) {
+    const scheduledToday = nowTzCheck.set({ hour: HOUR, minute: MINUTE, second: 0, millisecond: 0 });
+    const diffMinutes = Math.abs(nowTzCheck.diff(scheduledToday, "minutes").minutes);
+    const ALLOW_WINDOW_MINUTES = Number(process.env.SONG_NOTIFICATIONS_ALLOW_WINDOW_MINUTES ?? "3");
+    if (diffMinutes > ALLOW_WINDOW_MINUTES) {
       console.log(
         `Not scheduled time in ${TZ} (current ${nowTzCheck.toFormat("HH:mm")}). Exiting without sending.`
       );
