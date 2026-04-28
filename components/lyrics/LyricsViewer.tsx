@@ -249,7 +249,14 @@ export function LyricsViewer({
             <Button
               variant="ghost"
               onClick={handleBack}
-              className="h-9 rounded-full border border-[var(--desktop-chip-border)] bg-[var(--desktop-panel-soft)] px-3 text-[0.8rem] font-semibold text-[var(--desktop-chip-foreground)] hover:bg-[var(--desktop-chip)]"
+              className={
+                "h-9 rounded-full border px-3 text-[0.8rem] font-semibold " +
+                "bg-[var(--back-btn-bg)] border-[var(--back-btn-border)] text-[var(--back-btn-foreground)] " +
+                "hover:bg-[color-mix(in%25, var(--back-btn-bg), black)] " +
+                "dark:bg-[var(--back-btn-bg-dark)] dark:border-[var(--back-btn-border-dark)] dark:text-[var(--back-btn-foreground-dark)] " +
+                "md:bg-[var(--back-btn-bg)] md:dark:bg-[var(--back-btn-bg-dark)] " +
+                "bg-[var(--back-btn-bg-mobile)] dark:bg-[var(--back-btn-bg-dark-mobile)]"
+              }
             >
               <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
               Back
@@ -289,21 +296,23 @@ export function LyricsViewer({
             </a>
           )}
 
-          <div className="mt-4">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
-              Select language
-            </p>
-            <div className="mt-2.5">
-              <LanguageTabs
-                languages={languages}
-                activeLanguage={resolvedActiveLanguage}
-                onSelect={handleLanguageChange}
-              />
+          {languages && languages.length > 1 && (
+            <div className="mt-4">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
+                Select language
+              </p>
+              <div className="mt-2.5">
+                <LanguageTabs
+                  languages={languages}
+                  activeLanguage={resolvedActiveLanguage}
+                  onSelect={handleLanguageChange}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-4">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
+            <p className="hidden md:block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
               Reader tools
             </p>
             <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
@@ -331,27 +340,33 @@ export function LyricsViewer({
           </div>
 
           {canShowEnglishTranslation && (
-            <div className="mt-4 flex items-center gap-2.5 rounded-[1rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] px-3 py-2.5">
-              <Switch
-                checked={showEnglishTranslation}
-                onCheckedChange={setShowEnglishTranslation}
-                aria-label="Show English Text"
-              />
-              <span className="text-[0.8rem] font-medium text-foreground">
-                Show English Text
-              </span>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => setShowEnglishTranslation((v) => !v)}
+                  className="mt-4 flex w-full items-center gap-2.5 rounded-[1rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] px-3 py-2.5 text-left"
+                  aria-pressed={showEnglishTranslation}
+                >
+                  <Switch
+                    checked={showEnglishTranslation}
+                    onCheckedChange={setShowEnglishTranslation}
+                    aria-label="Show English Text"
+                  />
+                  <span className="text-[0.8rem] font-medium text-foreground">
+                    Show English Text
+                  </span>
+                </button>
           )}
         </section>
 
         <section className="overflow-x-hidden max-w-full rounded-[1.7rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel-soft)] p-4 shadow-[0_18px_38px_rgba(15,23,42,0.08)] dark:shadow-[0_18px_38px_rgba(2,6,23,0.28)]">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
+              <p className="hidden md:block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[var(--desktop-nav-muted)]">
                 Lyrics
               </p>
-              <h2 className="mt-1.5 font-heading text-[1.3rem] font-semibold leading-[1.04] tracking-[-0.04em] text-foreground">
-                Focused reader
+              <h2 className="mt-1.5 font-heading text-[1.7rem] font-bold leading-[1.04] tracking-[-0.04em] text-foreground">
+                <span className="md:hidden">Lyrics</span>
+                <span className="hidden md:inline">Focused reader</span>
               </h2>
               <p className="mt-2 text-[0.82rem] leading-6 text-[var(--desktop-nav-muted)]">
                 Use the toolbar below to save, share, or go fullscreen.
@@ -432,11 +447,11 @@ export function LyricsViewer({
         </div>
 
         <section className="rounded-[2.25rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-7 shadow-[0_20px_42px_rgba(15,23,42,0.07)] dark:shadow-[0_20px_42px_rgba(2,6,23,0.28)]">
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+          <div className="grid gap-6 items-start xl:grid-cols-1">
             <div>
               <div className="flex flex-wrap gap-2">
                 {songCategory && (
-                  <span className="rounded-full bg-[var(--desktop-nav-active)] px-3 py-1 text-[0.78rem] font-semibold text-[var(--desktop-nav-active-foreground)]">
+                  <span className="rounded-full bg-[var(--desktop-chip)] px-3 py-1 text-[0.78rem] font-semibold text-[var(--desktop-chip-foreground)]">
                     {songCategory}
                   </span>
                 )}
@@ -444,14 +459,14 @@ export function LyricsViewer({
                 {languages.map((language) => (
                   <span
                     key={language.code}
-                    className="rounded-full border border-[var(--desktop-chip-border)] bg-[var(--desktop-chip)] px-3 py-1 text-[0.78rem] font-semibold text-[var(--desktop-chip-foreground)]"
+                    className="rounded-full bg-[var(--desktop-panel-soft)] px-3 py-1 text-[0.78rem] font-semibold text-[var(--desktop-nav-muted)]"
                   >
                     {language.nativeName}
                   </span>
                 ))}
               </div>
 
-              <h2 className="mt-5 max-w-4xl font-heading text-[clamp(2.5rem,5vw,4.3rem)] font-semibold leading-[0.96] tracking-[-0.06em] text-foreground">
+              <h2 className="mt-5 w-full font-heading text-[clamp(2.5rem,5vw,4.3rem)] font-semibold leading-[0.96] tracking-[-0.06em] text-foreground break-words">
                 {currentTitle}
               </h2>
 
@@ -461,64 +476,61 @@ export function LyricsViewer({
               </p>
             </div>
 
-            <div className="rounded-[1.85rem] bg-[var(--desktop-panel-soft)] p-5">
-              <p className="text-[0.98rem] font-semibold text-foreground">
-                Available language codes
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2.5">
-                {languages.map((language) => (
-                  <span
-                    key={language.code}
-                    className={cn(
-                      "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border px-3 text-[0.82rem] font-semibold",
-                      language.code === resolvedActiveLanguage
-                        ? "border-transparent bg-[var(--desktop-nav-active)] text-[var(--desktop-nav-active-foreground)]"
-                        : "border-[var(--desktop-chip-border)] bg-[var(--desktop-panel)] text-[var(--desktop-chip-foreground)]",
-                    )}
-                  >
-                    {getCompactLanguageBadge(language)}
-                  </span>
-                ))}
+            {languages && (
+              <div className="md:hidden rounded-[1.85rem] bg-[var(--desktop-panel-soft)] p-5">
+                <p className="text-[0.98rem] font-semibold text-foreground">
+                  Available language codes
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2.5">
+                  {languages.map((language) => (
+                    <span
+                      key={language.code}
+                      className={cn(
+                        "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border px-3 text-[0.82rem] font-semibold",
+                        language.code === resolvedActiveLanguage
+                          ? "border-transparent bg-[var(--desktop-nav-active)] text-[var(--desktop-nav-active-foreground)]"
+                          : "border-[var(--desktop-chip-border)] bg-[var(--desktop-panel)] text-[var(--desktop-chip-foreground)]",
+                      )}
+                    >
+                      {getCompactLanguageBadge(language)}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
 
         <section className="rounded-[2.25rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-7 shadow-[0_20px_42px_rgba(15,23,42,0.07)] dark:shadow-[0_20px_42px_rgba(2,6,23,0.28)]">
-          <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-            <aside className="space-y-5">
-              <div className="rounded-[1.85rem] bg-[var(--desktop-panel-soft)] p-5">
-                <h3 className="text-[1rem] font-semibold text-foreground">
-                  Select language
-                </h3>
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  {languages.map((language) => {
-                    const isActive = language.code === resolvedActiveLanguage;
+          <div className="grid gap-6 items-start xl:grid-cols-1">
+            {/* desktop aside moved into Reader tools card */}
 
-                    return (
-                      <button
-                        key={language.code}
-                        type="button"
-                        className={cn(
-                          "inline-flex min-h-12 items-center justify-center rounded-[1.2rem] border px-4 py-3 text-[0.95rem] font-semibold transition-all",
-                          isActive
-                            ? "border-transparent bg-[var(--desktop-nav-active)] text-[var(--desktop-nav-active-foreground)] shadow-[0_14px_28px_rgba(15,23,42,0.16)]"
-                            : "border-[var(--desktop-chip-border)] bg-[var(--desktop-panel)] text-[var(--desktop-chip-foreground)] hover:-translate-y-px hover:border-[var(--desktop-chip-hover-border)] hover:bg-[var(--desktop-chip-hover)] hover:text-[var(--desktop-chip-hover-foreground)]",
-                        )}
-                        onClick={() => handleLanguageChange(language.code)}
-                      >
-                        {language.nativeName}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="rounded-[1.85rem] bg-[var(--desktop-panel-soft)] p-5">
+              <div className="rounded-[1.85rem] bg-[var(--desktop-panel-soft)] p-5 order-1 xl:order-1">
                 <h3 className="text-[1rem] font-semibold text-foreground">
                   Reader tools
                 </h3>
 
+                {/* Select language (desktop) - moved inside Reader tools card */}
+                {languages && languages.length > 1 && (
+                  <div className="hidden md:block mb-4">
+                    <label htmlFor="desktop-language-select" className="block text-sm font-semibold text-[var(--desktop-nav-muted)] mb-2">
+                      Select language
+                    </label>
+                    <select
+                      id="desktop-language-select"
+                      value={resolvedActiveLanguage}
+                      onChange={(e) => handleLanguageChange(e.target.value)}
+                      className="w-full rounded-[1.2rem] border border-[var(--desktop-chip-border)] bg-[var(--desktop-panel)] px-4 py-3 text-[0.95rem] font-semibold text-[var(--desktop-chip-foreground)]"
+                      aria-label="Select language"
+                    >
+                      {languages.map((language) => (
+                        <option key={language.code} value={language.code}>
+                          {language.nativeName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Button
                     variant="ghost"
@@ -595,7 +607,12 @@ export function LyricsViewer({
                 </div>
 
                 {canShowEnglishTranslation && (
-                  <div className="mt-5 flex items-center gap-3 rounded-[1.2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowEnglishTranslation((v) => !v)}
+                    className="mt-5 flex w-full items-center gap-3 rounded-[1.2rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] px-4 py-3 text-left"
+                    aria-pressed={showEnglishTranslation}
+                  >
                     <Switch
                       checked={showEnglishTranslation}
                       onCheckedChange={setShowEnglishTranslation}
@@ -604,10 +621,9 @@ export function LyricsViewer({
                     <span className="text-[0.9rem] font-medium text-foreground">
                       Show English Text
                     </span>
-                  </div>
+                  </button>
                 )}
               </div>
-            </aside>
 
             <div className="rounded-[1.85rem] bg-[var(--desktop-panel-soft)] p-6">
               <div className="flex items-start justify-between gap-4">

@@ -37,7 +37,7 @@ export function BrowseByLanguageSection({
   return (
     <section
       id={id}
-      className="rounded-[1.65rem] p-4 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] md:rounded-[2rem] md:p-6"
+      className="relative rounded-[1.65rem] p-4 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] md:rounded-[2rem] md:p-6"
       style={HERO_HEADER_STYLE}
     >
       <div className="flex items-start justify-between gap-4">
@@ -49,7 +49,7 @@ export function BrowseByLanguageSection({
             {description}
           </p>
         </div>
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-[1rem] bg-white/10 md:size-14 md:rounded-[1.5rem]">
+        <div className="absolute right-3 top-3 md:static md:ml-0 flex size-10 shrink-0 items-center justify-center rounded-[1rem] bg-white/10 md:size-14 md:rounded-[1.5rem]">
           <Languages className="h-5 w-5 md:h-6 md:w-6" />
         </div>
       </div>

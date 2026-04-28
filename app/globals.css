@@ -43,6 +43,14 @@
   --sidebar-ring: #4338CA;
   --gold: #B45309;
   --gold-light: #FBBF24;
+  /* Back button colors */
+  --back-btn-bg: #f1f5f9;
+  --back-btn-border: #e2e8f0;
+  --back-btn-foreground: #0f172a;
+  /* Mobile-only slightly darker background for back button */
+  --back-btn-bg-mobile: #e6eef6;
+  /* Dark-mode mobile variant */
+  --back-btn-bg-dark-mobile: #07101a;
 }
 
 .dark {
@@ -80,6 +88,10 @@
   --sidebar-accent-foreground: #C7D2FE;
   --sidebar-border: #2E2E33;
   --sidebar-ring: #818CF8;
+  /* Back button dark mode */
+  --back-btn-bg-dark: #0b1220;
+  --back-btn-border-dark: #172033;
+  --back-btn-foreground-dark: #e6eef8;
 }
 
 .theme-c-public {
