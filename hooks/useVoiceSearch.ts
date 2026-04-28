@@ -83,7 +83,6 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
 
     // If SpeechRecognition API is being used, stop it.
     if (recognitionRef.current) {
-      if (process.env.NODE_ENV === "development") console.debug("[useVoiceSearch] stopping SpeechRecognition");
       recognitionRef.current.stop();
       return;
     }
@@ -110,7 +109,6 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
 
   const start = useCallback(() => {
     if (!isSupported) {
-      if (process.env.NODE_ENV === "development") console.debug("[useVoiceSearch] start failed: not supported (isSpeechAPI, hasNativeBridge)", isSpeechAPI, hasNativeBridge);
       setErrorMessage("Voice search is not supported in this environment.");
       setState("error");
       setTimeout(() => setState("idle"), 3000);
@@ -128,7 +126,6 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
 
     // If browser Speech API is available, use it.
     if (isSpeechAPI) {
-      if (process.env.NODE_ENV === "development") console.debug("[useVoiceSearch] using browser SpeechRecognition API");
       const SpeechAPI = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
       const recognition: SpeechRecognition = new SpeechAPI();
       recognition.continuous = false;
@@ -182,14 +179,22 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
       };
 
       recognitionRef.current = recognition;
-      recognition.start();
+      try {
+        recognition.start();
+        // Ensure UI shows listening state immediately rather than waiting
+        // for the browser's onstart event (some engines delay that event).
+        setState("listening");
+      } catch (err) {
+        setErrorMessage("Voice search failed to start.");
+        setState("error");
+        setTimeout(() => setState("idle"), 3000);
+      }
       return;
     }
 
     // Otherwise, use a native WebView bridge if available.
     try {
-    const w = window as any;
-    if (process.env.NODE_ENV === "development") console.debug("[useVoiceSearch] attempting native bridge start", { hasAndroid: !!w.Android, hasWebkit: !!w.webkit?.messageHandlers });
+      const w = window as any;
       // Tell the native host to start voice capture/recognition.
       if (w.Android) {
         if (typeof w.Android.startVoiceRecognition === "function") {
@@ -204,7 +209,9 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
           // best-effort: call startVoiceRecognition if present
           try {
             w.Android.startVoiceRecognition?.();
-          } catch {}
+          } catch {
+            // ignore errors from best-effort call
+          }
         }
       } else if (w.webkit?.messageHandlers?.voice) {
         w.webkit.messageHandlers.voice.postMessage({ command: "start", lang });
@@ -215,7 +222,6 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
       // Set listening state; native host should call back via global callbacks below.
       setState("listening");
     } catch {
-      if (process.env.NODE_ENV === "development") console.debug("[useVoiceSearch] native start failed");
       setErrorMessage("Voice search failed to start.");
       setState("error");
       setTimeout(() => setState("idle"), 3000);
@@ -229,7 +235,6 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
 
       // Handler for native -> page results. Accepts string or array of strings.
       w.__hymnbookOnVoiceResult = (payload: any) => {
-        if (process.env.NODE_ENV === "development") console.debug("[useVoiceSearch] __hymnbookOnVoiceResult", payload);
         try {
           let candidates: string[] = [];
           if (Array.isArray(payload)) {
@@ -250,7 +255,6 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
       };
 
       w.__hymnbookOnVoiceError = (msg: string) => {
-        if (process.env.NODE_ENV === "development") console.debug("[useVoiceSearch] __hymnbookOnVoiceError", msg);
         setErrorMessage(msg || "Voice search failed.");
         setState("error");
         setTimeout(() => setState("idle"), 3000);

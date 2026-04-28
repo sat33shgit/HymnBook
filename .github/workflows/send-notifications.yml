@@ -28,26 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Debug environment and scheduling
-        run: |
-          echo "UTC now: $(date -u +"%Y-%m-%d %H:%M:%S %Z")"
-          echo "Runner local now: $(date +"%Y-%m-%d %H:%M:%S %Z")"
-          echo "America/Los_Angeles now: $(TZ='America/Los_Angeles' date +"%Y-%m-%d %H:%M:%S %Z")"
-          echo "Configured schedule:" 
-          echo "  SONG_NOTIFICATIONS_TIMEZONE=${SONG_NOTIFICATIONS_TIMEZONE:-America/Los_Angeles}"
-          echo "  SONG_NOTIFICATIONS_HOUR=${SONG_NOTIFICATIONS_HOUR:-18}"
-          echo "  SONG_NOTIFICATIONS_MINUTE=${SONG_NOTIFICATIONS_MINUTE:-45}"
-          echo "Secrets present:" 
-          [ -n "${DATABASE_URL:-}" ] && echo "  DATABASE_URL: yes" || echo "  DATABASE_URL: no"
-          [ -n "${GMAIL_SMTP_USER:-}" ] && echo "  GMAIL_SMTP_USER: yes" || echo "  GMAIL_SMTP_USER: no"
-          [ -n "${GMAIL_SMTP_APP_PASSWORD:-}" ] && echo "  GMAIL_SMTP_APP_PASSWORD: yes" || echo "  GMAIL_SMTP_APP_PASSWORD: no"
-          [ -n "${NEXT_PUBLIC_BASE_URL:-}" ] && echo "  NEXT_PUBLIC_BASE_URL: yes" || echo "  NEXT_PUBLIC_BASE_URL: no"
-          [ -n "${POSTGRES_URL:-}" ] && echo "  POSTGRES_URL: yes" || echo "  POSTGRES_URL: no"
-        env:
-          SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
-          SONG_NOTIFICATIONS_HOUR: '18'
-          SONG_NOTIFICATIONS_MINUTE: '45'
-          POSTGRES_URL: ${{ secrets.DATABASE_URL }}
+      # Debug step removed: avoid printing environment/secrets in CI runs
 
       - name: Run send notifications script
         env:
