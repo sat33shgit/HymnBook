@@ -1,10 +1,25 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Search as SearchIcon, Mic as MicIcon } from "lucide-react";
+import { Search as SearchIcon, Mic as MicIcon, X as XIcon } from "lucide-react";
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+
+// Pulsing animation for microphone indicator
+const micPulseAnimation = `
+  @keyframes mic-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(225, 29, 72, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(225, 29, 72, 0);
+    }
+  }
+`;
 
 interface SearchBarProps {
   value: string;
@@ -47,7 +62,7 @@ export function SearchBar({
       if (mql.matches) {
         inputRef.current?.focus();
       }
-    } catch (e) {
+    } catch (_e) {
       // matchMedia may not be available in some environments; if so, don't focus
     }
   }, [autoFocus]);
@@ -62,9 +77,9 @@ export function SearchBar({
           recognitionRef.current.stop();
           recognitionRef.current = null;
         }
-      } catch (e) {
-        // ignore cleanup errors
-      }
+    } catch (_e) {
+      // ignore cleanup errors
+    }
     };
   }, []);
 
@@ -76,6 +91,7 @@ export function SearchBar({
 
   return (
     <div className={className}>
+      <style>{micPulseAnimation}</style>
       <div className="relative">
         <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--desktop-nav-muted)] md:left-4 md:h-5 md:w-5" />
         <Input
@@ -92,24 +108,40 @@ export function SearchBar({
           ref={inputRef}
           className={cn(
             "h-11 rounded-[1.2rem] border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] pl-10 text-[0.95rem] text-foreground shadow-[0_14px_30px_rgba(15,23,42,0.08)] placeholder:text-[0.84rem] placeholder:text-[var(--desktop-nav-muted)] md:h-14 md:rounded-[1.45rem] md:pl-11 md:text-base md:placeholder:text-[0.95rem] dark:shadow-[0_14px_30px_rgba(2,6,23,0.24)]",
-            // add right padding so the microphone button doesn't overlap text
-            "pr-12 md:pr-14"
+            // Hide the browser-native search clear button so our always-visible
+            // clear button can be shown consistently whenever there is text.
+            "[&::-webkit-search-cancel-button]:appearance-none",
+            // add right padding so the clear and microphone buttons don't overlap text
+            value ? "pr-20 md:pr-24" : "pr-12 md:pr-14"
           )}
           aria-label="Search songs"
         />
+        {value ? (
+          <button
+            type="button"
+            aria-label="Clear search"
+            onClick={() => {
+              onChange("");
+              inputRef.current?.focus();
+            }}
+            className="absolute right-10 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full p-1 text-[var(--desktop-nav-muted)] transition-colors hover:text-foreground focus-visible:text-foreground md:right-11"
+          >
+            <XIcon className="h-4 w-4 md:h-5 md:w-5" />
+          </button>
+        ) : null}
         {/* Microphone button: toggles SpeechRecognition and reports candidates */}
         <button
           type="button"
           data-slot="tooltip-trigger"
           aria-pressed={isListening}
           aria-label={isListening ? "Stop voice search" : "Start voice search"}
-            onClick={() => {
+          onClick={() => {
             if (isListening) {
               try {
                 recognitionRef.current?.stop();
-              } catch (e) {
-                // ignore
-              }
+      } catch (_e) {
+        // ignore
+      }
               setIsListening(false);
               return;
             }
@@ -139,9 +171,9 @@ export function SearchBar({
                 setIsListening(false);
               };
 
-              rec.onerror = (ev: any) => {
-                setIsListening(false);
-              };
+      rec.onerror = (_ev: any) => {
+        setIsListening(false);
+      };
 
               rec.onresult = (ev: any) => {
                 const candidates: string[] = [];
@@ -165,6 +197,9 @@ export function SearchBar({
                   if (first) unique.push(first.trim());
                 }
 
+                // Stop listening immediately after voice is detected
+                setIsListening(false);
+
                 if (unique.length > 0) {
                   onVoiceResult?.(unique);
                 }
@@ -172,14 +207,20 @@ export function SearchBar({
 
               recognitionRef.current = rec;
               rec.start();
-            } catch (err) {
-              // Failed to start speech recognition
-              setIsListening(false);
-            }
+    } catch (_err) {
+      // Failed to start speech recognition
+      setIsListening(false);
+    }
             }}
-          className={"absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full text-[var(--desktop-nav-muted)] hover:text-foreground"}
+          className={cn(
+            "absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full text-[var(--desktop-nav-muted)] hover:text-foreground transition-all duration-200",
+            isListening && "animate-[mic-pulse_1.5s_infinite] bg-rose-50"
+          )}
         >
-          <span className={cn(isListening ? "text-rose-600" : "text-[var(--desktop-nav-muted)]")}>
+          <span className={cn(
+            "inline-flex items-center justify-center rounded-full p-1",
+            isListening ? "text-rose-600 bg-rose-100" : "text-[var(--desktop-nav-muted)]"
+          )}>
             <MicIcon className="h-4 w-4 md:h-5 md:w-5" />
           </span>
           {isListening ? <span className="sr-only">Listening</span> : null}
