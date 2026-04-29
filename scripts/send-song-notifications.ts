@@ -130,7 +130,9 @@ async function run() {
   if (!FORCE) {
     const scheduledToday = nowTzCheck.set({ hour: HOUR, minute: MINUTE, second: 0, millisecond: 0 });
     const diffMinutes = Math.abs(nowTzCheck.diff(scheduledToday, "minutes").minutes);
-    const ALLOW_WINDOW_MINUTES = Number(process.env.SONG_NOTIFICATIONS_ALLOW_WINDOW_MINUTES ?? "3");
+    // Increased window from 3 to 15 minutes to account for GitHub Actions delayed startup times
+    // GitHub Actions runners often take 1-5 minutes to start after cron triggers
+    const ALLOW_WINDOW_MINUTES = Number(process.env.SONG_NOTIFICATIONS_ALLOW_WINDOW_MINUTES ?? "15");
     if (diffMinutes > ALLOW_WINDOW_MINUTES) {
       console.log(
         `Not scheduled time in ${TZ} (current ${nowTzCheck.toFormat("HH:mm")}). Exiting without sending.`
