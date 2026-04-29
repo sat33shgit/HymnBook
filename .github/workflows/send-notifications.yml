@@ -33,9 +33,34 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Debug step removed: avoid printing environment/secrets in CI runs
-
-      # Debug step removed: avoid printing environment/secrets in CI runs
+      - name: Debug Schedule Information
+        run: |
+          echo "=== SCHEDULE DEBUG INFORMATION ==="
+          echo ""
+          echo "✅ CURRENT TIME:"
+          echo "   UTC:  $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+          echo "   PST:  $(TZ=America/Los_Angeles date +"%Y-%m-%d %H:%M:%S %Z")"
+          echo ""
+          echo "✅ SCHEDULED WINDOW: 9:30 PM - 10:30 PM PST DAILY"
+          echo ""
+          echo "✅ UPCOMING SCHEDULED RUNS:"
+          echo "   Next at 9:30PM PST -> $(TZ=America/Los_Angeles date -d 'today 21:30' +"%Y-%m-%d %H:%M:%S %Z")"
+          echo "   Next at 10:00PM PST -> $(TZ=America/Los_Angeles date -d 'today 22:00' +"%Y-%m-%d %H:%M:%S %Z")"
+          echo "   Next at 10:30PM PST -> $(TZ=America/Los_Angeles date -d 'today 22:30' +"%Y-%m-%d %H:%M:%S %Z")"
+          echo ""
+          echo "✅ UTC EQUIVALENTS:"
+          echo "   9:30 PM PST = $(date -u -d "TZ=\"America/Los_Angeles\" 21:30" +"%H:%M UTC")"
+          echo "   10:00 PM PST = $(date -u -d "TZ=\"America/Los_Angeles\" 22:00" +"%H:%M UTC")"
+          echo "   10:30 PM PST = $(date -u -d "TZ=\"America/Los_Angeles\" 22:30" +"%H:%M UTC")"
+          echo ""
+          echo "✅ CRON ENTRIES CONFIGURED:"
+          echo "   - cron: '30 4 * * *'   ->  9:30 PM PDT"
+          echo "   - cron: '0 5 * * *'    -> 10:00 PM PDT / 9:00 PM PST"
+          echo "   - cron: '30 5 * * *'   -> 10:30 PM PDT / 9:30 PM PST"
+          echo "   - cron: '0 6 * * *'    -> 10:00 PM PST"
+          echo "   - cron: '30 6 * * *'   -> 10:30 PM PST"
+          echo ""
+          echo "=================================="
 
       - name: Run send notifications script
         env:
