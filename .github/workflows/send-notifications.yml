@@ -2,13 +2,13 @@ name: Send daily song notifications
 
 on:
   schedule:
-    # Run once daily between 9:30pm - 10:30pm America/Los_Angeles (PST/PDT)
+    # Run once daily between 9:00am - 10:00am America/Los_Angeles (PST/PDT)
     # GitHub cron uses UTC, include both UTC equivalents to cover DST changes:
-    - cron: '30 4 * * *'   # 9:30 PM PDT (UTC-7)
-    - cron: '0 5 * * *'    # 10:00 PM PDT / 9:00 PM PST (UTC-7 / UTC-8)
-    - cron: '30 5 * * *'   # 10:30 PM PDT / 9:30 PM PST (UTC-7 / UTC-8)
-    - cron: '0 6 * * *'    # 10:00 PM PST (UTC-8)
-    - cron: '30 6 * * *'   # 10:30 PM PST (UTC-8)
+    - cron: '0 16 * * *'   # 9:00 AM PDT (UTC-7)
+    - cron: '30 16 * * *'  # 9:30 AM PDT / 8:30 AM PST (UTC-7 / UTC-8)
+    - cron: '0 17 * * *'   # 10:00 AM PDT / 9:00 AM PST (UTC-7 / UTC-8)
+    - cron: '30 17 * * *'  # 9:30 AM PST (UTC-8)
+    - cron: '0 18 * * *'   # 10:00 AM PST (UTC-8)
   workflow_dispatch:
     inputs:
       force:
@@ -41,24 +41,24 @@ jobs:
           echo "   UTC:  $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
           echo "   PST:  $(TZ=America/Los_Angeles date +"%Y-%m-%d %H:%M:%S %Z")"
           echo ""
-          echo "✅ SCHEDULED WINDOW: 9:30 PM - 10:30 PM PST DAILY"
+          echo "✅ SCHEDULED WINDOW: 9:00 AM - 10:00 AM PST DAILY"
           echo ""
           echo "✅ UPCOMING SCHEDULED RUNS:"
-          echo "   Next at 9:30PM PST -> $(TZ=America/Los_Angeles date -d 'today 21:30' +"%Y-%m-%d %H:%M:%S %Z")"
-          echo "   Next at 10:00PM PST -> $(TZ=America/Los_Angeles date -d 'today 22:00' +"%Y-%m-%d %H:%M:%S %Z")"
-          echo "   Next at 10:30PM PST -> $(TZ=America/Los_Angeles date -d 'today 22:30' +"%Y-%m-%d %H:%M:%S %Z")"
+          echo "   Next at 9:00AM PST -> $(TZ=America/Los_Angeles date -d 'today 09:00' +"%Y-%m-%d %H:%M:%S %Z")"
+          echo "   Next at 9:30AM PST -> $(TZ=America/Los_Angeles date -d 'today 09:30' +"%Y-%m-%d %H:%M:%S %Z")"
+          echo "   Next at 10:00AM PST -> $(TZ=America/Los_Angeles date -d 'today 10:00' +"%Y-%m-%d %H:%M:%S %Z")"
           echo ""
           echo "✅ UTC EQUIVALENTS:"
-          echo "   9:30 PM PST = $(date -u -d "TZ=\"America/Los_Angeles\" 21:30" +"%H:%M UTC")"
-          echo "   10:00 PM PST = $(date -u -d "TZ=\"America/Los_Angeles\" 22:00" +"%H:%M UTC")"
-          echo "   10:30 PM PST = $(date -u -d "TZ=\"America/Los_Angeles\" 22:30" +"%H:%M UTC")"
+          echo "   9:00 AM PST = $(date -u -d "TZ=\"America/Los_Angeles\" 09:00" +"%H:%M UTC")"
+          echo "   9:30 AM PST = $(date -u -d "TZ=\"America/Los_Angeles\" 09:30" +"%H:%M UTC")"
+          echo "   10:00 AM PST = $(date -u -d "TZ=\"America/Los_Angeles\" 10:00" +"%H:%M UTC")"
           echo ""
           echo "✅ CRON ENTRIES CONFIGURED:"
-          echo "   - cron: '30 4 * * *'   ->  9:30 PM PDT"
-          echo "   - cron: '0 5 * * *'    -> 10:00 PM PDT / 9:00 PM PST"
-          echo "   - cron: '30 5 * * *'   -> 10:30 PM PDT / 9:30 PM PST"
-          echo "   - cron: '0 6 * * *'    -> 10:00 PM PST"
-          echo "   - cron: '30 6 * * *'   -> 10:30 PM PST"
+          echo "   - cron: '0 16 * * *'   ->  9:00 AM PDT"
+          echo "   - cron: '30 16 * * *'  ->  9:30 AM PDT / 8:30 AM PST"
+          echo "   - cron: '0 17 * * *'   -> 10:00 AM PDT / 9:00 AM PST"
+          echo "   - cron: '30 17 * * *'  ->  9:30 AM PST"
+          echo "   - cron: '0 18 * * *'   -> 10:00 AM PST"
           echo ""
           echo "=================================="
 
@@ -70,10 +70,10 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           POSTGRES_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
-          # Scheduling: run between 9:30pm - 10:30pm in America/Los_Angeles
+          # Scheduling: run between 9:00am - 10:00am in America/Los_Angeles
           SONG_NOTIFICATIONS_TIMEZONE: 'America/Los_Angeles'
-          SONG_NOTIFICATIONS_HOUR: '22'
-          SONG_NOTIFICATIONS_MINUTE: '0'
+          SONG_NOTIFICATIONS_HOUR: '9'
+          SONG_NOTIFICATIONS_MINUTE: '30'
           SEND_BATCH_SIZE: '50'
           FORCE_SEND: ${{ github.event.inputs.force || '0' }}
         run: npm run send:notifications
