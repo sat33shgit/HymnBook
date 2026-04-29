@@ -112,8 +112,15 @@ async function run() {
     return songRows.map((song) => ({ ...(song as SongRow), translations: translationsBySongId.get((song as SongRow).id) ?? [] }));
   }
 
-  const lastSentRaw = await getLastSongNotificationTimeDirect();
-  const lastSent = lastSentRaw ? new Date(lastSentRaw) : null;
+  let lastSent: Date | null = null;
+  try {
+    const lastSentRaw = await getLastSongNotificationTimeDirect();
+    lastSent = lastSentRaw ? new Date(lastSentRaw) : null;
+  } catch (dbError) {
+    // On database connection failures fall back to 24h window
+    console.warn("⚠️ Could not read last notification time from database, using 24 hour fallback window", dbError instanceof Error ? dbError.message : dbError);
+    lastSent = null;
+  }
 
   // Configuration: timezone and scheduled time (defaults to 17:00 America/Los_Angeles)
   const TZ = process.env.SONG_NOTIFICATIONS_TIMEZONE ?? process.env.NOTIFICATION_TIMEZONE ?? "America/Los_Angeles";
