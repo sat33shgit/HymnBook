@@ -62,7 +62,7 @@ export function SearchBar({
       if (mql.matches) {
         inputRef.current?.focus();
       }
-    } catch (_e) {
+    } catch {
       // matchMedia may not be available in some environments; if so, don't focus
     }
   }, [autoFocus]);
@@ -77,7 +77,7 @@ export function SearchBar({
           recognitionRef.current.stop();
           recognitionRef.current = null;
         }
-    } catch (_e) {
+    } catch {
       // ignore cleanup errors
     }
     };
@@ -139,9 +139,9 @@ export function SearchBar({
             if (isListening) {
               try {
                 recognitionRef.current?.stop();
-      } catch (_e) {
-        // ignore
-      }
+              } catch {
+                // ignore
+              }
               setIsListening(false);
               return;
             }
@@ -171,9 +171,9 @@ export function SearchBar({
                 setIsListening(false);
               };
 
-      rec.onerror = (_ev: any) => {
-        setIsListening(false);
-      };
+              rec.onerror = () => {
+                setIsListening(false);
+              };
 
               rec.onresult = (ev: any) => {
                 const candidates: string[] = [];
@@ -207,7 +207,7 @@ export function SearchBar({
 
               recognitionRef.current = rec;
               rec.start();
-    } catch (_err) {
+    } catch {
       // Failed to start speech recognition
       setIsListening(false);
     }

@@ -44,6 +44,7 @@ export interface SongListItem {
   defaultLang: string | null;
   viewCount: number | null;
   isPublished: boolean | null;
+  createdAt?: string | null;
   title: string;
   localizedTitle?: string | null;
   titlesByLanguage?: Record<string, string>;

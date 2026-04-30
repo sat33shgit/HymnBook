@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { DateTime } from "luxon";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +45,7 @@ interface AdminSongsClientProps {
 }
 
 type AvailabilityFilter = "all" | "with" | "without";
-type SortKey = "title" | "languages" | "category";
+type SortKey = "title" | "languages" | "category" | "createdAt";
 type SortDirection = "asc" | "desc";
 
 function getSongApiPath(songId: number) {
@@ -95,6 +96,17 @@ export function AdminSongsClient({
         song.title
       : song.title;
 
+  const formatCreatedAt = (value?: string | Date | null) => {
+    if (!value) return "-";
+    try {
+      return typeof value === "string"
+        ? DateTime.fromISO(value).toFormat("dd-MMM-yyyy HH:mm")
+        : DateTime.fromJSDate(value).toFormat("dd-MMM-yyyy HH:mm");
+    } catch {
+      return "-";
+    }
+  };
+
   const isSearching = searchQuery.trim().length > 0;
   const hasActiveFilters =
     selectedLanguage !== "all" ||
@@ -133,6 +145,19 @@ export function AdminSongsClient({
         const leftValue = left.languages.join(", ");
         const rightValue = right.languages.join(", ");
         return direction * collatorRef.current.compare(leftValue, rightValue);
+      }
+
+      if (sortKey === "createdAt") {
+        const toTs = (v?: string | Date | null) => {
+          if (!v) return 0;
+          const t = typeof v === "string" ? Date.parse(v) : v instanceof Date ? v.getTime() : Number(v);
+          return Number.isFinite(t) ? t : 0;
+        };
+
+        const leftTime = toTs(left.createdAt);
+        const rightTime = toTs(right.createdAt);
+
+        return direction * (leftTime - rightTime);
       }
 
       const leftValue = left.category ?? "";
@@ -285,6 +310,7 @@ export function AdminSongsClient({
         isPublished: result.is_published ?? null,
         title: result.title,
         languages: [result.matched_language],
+        createdAt: null,
         hasAudio: result.has_audio ?? false,
         hasYoutube: result.has_youtube ?? false,
       }));
@@ -627,6 +653,16 @@ export function AdminSongsClient({
                   {getSortIndicator("category")}
                 </button>
               </th>
+              <th className="px-4 py-3 text-left font-medium">
+                <button
+                  type="button"
+                  onClick={() => handleSort("createdAt")}
+                  className="inline-flex items-center gap-1.5 hover:text-foreground"
+                >
+                  <span>Created at</span>
+                  {getSortIndicator("createdAt")}
+                </button>
+              </th>
               <th className="px-4 py-3 text-center font-medium">Published</th>
               <th className="px-4 py-3 text-right font-medium">Actions</th>
             </tr>
@@ -664,6 +700,9 @@ export function AdminSongsClient({
                 <td className="px-4 py-3 text-muted-foreground">
                   {song.category ?? "-"}
                 </td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {formatCreatedAt(song.createdAt ?? null)}
+                </td>
                 <td className="px-4 py-3 text-center">
                   <Switch
                     checked={song.isPublished ?? false}
@@ -699,7 +738,7 @@ export function AdminSongsClient({
             ))}
             {songs.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
+                <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
                   {isSearching || hasActiveFilters ? (
                     "No songs match the current search or filters."
                   ) : (

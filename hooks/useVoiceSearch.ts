@@ -184,7 +184,7 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
         // Ensure UI shows listening state immediately rather than waiting
         // for the browser's onstart event (some engines delay that event).
         setState("listening");
-      } catch (err) {
+      } catch {
         setErrorMessage("Voice search failed to start.");
         setState("error");
         setTimeout(() => setState("idle"), 3000);
@@ -226,7 +226,7 @@ export function useVoiceSearch({ onResult, lang = "en-IN" }: UseVoiceSearchOptio
       setState("error");
       setTimeout(() => setState("idle"), 3000);
     }
-  }, [flushBufferedCandidates, isSupported, lang, stop, hasNativeBridge, isSpeechAPI]);
+  }, [flushBufferedCandidates, isSupported, lang, stop, isSpeechAPI]);
 
   useEffect(() => {
     // Install global callbacks so native hosts can call back into the page with results.

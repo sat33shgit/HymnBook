@@ -188,6 +188,7 @@ export async function getSongs({
           defaultLang: song.defaultLang,
           viewCount: song.viewCount,
           isPublished: song.isPublished,
+          createdAt: song.createdAt ? song.createdAt.toISOString() : null,
           title:
             deriveSongPrimaryTitle(songTrans, song.defaultLang) || "Untitled",
           localizedTitle,
