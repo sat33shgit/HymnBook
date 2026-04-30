@@ -506,24 +506,6 @@ export function AdminSongsClient({
         <div className="mb-3 flex items-center justify-between">
           <h1 className="font-heading text-3xl font-bold">Songs ({totalSongs})</h1>
           <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Enable Audio</span>
-              <Switch
-                checked={audioVisible}
-                onCheckedChange={handleToggleAudioVisibility}
-                disabled={audioToggleLoading}
-                aria-label="Toggle song audio visibility on main site"
-              />
-            </label>
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Enable YouTube</span>
-              <Switch
-                checked={youtubeVisible}
-                onCheckedChange={handleToggleYouTubeVisibility}
-                disabled={youtubeToggleLoading}
-                aria-label="Toggle song YouTube visibility on main site"
-              />
-            </label>
             <Link
               href="/admin/songs/export?autoprint=1"
               target="_blank"
