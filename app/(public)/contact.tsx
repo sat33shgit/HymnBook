@@ -237,7 +237,7 @@ export default function ContactPage() {
 
                 <div className="mt-auto md:mt-4 flex flex-col gap-2 md:gap-4 w-full">
                   <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 w-full">
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">Subscribe for updates</h3>
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">Subscribe to updates</h3>
                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Get notified when new song(s) are added.</p>
                     <form onSubmit={handleSubscribe} className="mt-3">
                       <div className="flex flex-col sm:flex-row gap-2 items-center">
