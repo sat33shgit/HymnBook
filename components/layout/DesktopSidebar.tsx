@@ -20,10 +20,8 @@ export function DesktopSidebar({
   const { favorites } = useFavorites();
   const publicNavItems = getPublicNavItems({ contactVisible });
 
-  const clientPathname = rawPathname ?? (typeof window !== "undefined" ? window.location.pathname : "/");
-
   const pathname = (() => {
-    const p = clientPathname ?? "/";
+    const p = rawPathname ?? "/";
     const withoutQuery = p.split("?")[0].split("#")[0];
     if (withoutQuery !== "/" && withoutQuery.endsWith("/")) {
       return withoutQuery.replace(/\/+$/, "");
