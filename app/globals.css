@@ -7,6 +7,7 @@
   --radius: 0.625rem;
   --font-heading-family: "Segoe UI", "Segoe UI Variable", Tahoma, Geneva, Verdana, sans-serif;
   --font-sans-family: "Segoe UI", "Segoe UI Variable", Tahoma, Geneva, Verdana, sans-serif;
+  --font-cinzel-family: var(--font-cinzel-src, "Cinzel Decorative", serif);
   /* Light theme — warm ivory background, soft indigo primary, golden accents */
   --background: #FFFFFF;
   --foreground: #1C1917;
@@ -130,6 +131,7 @@
   --gold-light: #DBEAFE;
   --font-heading-family: "Segoe UI", "Segoe UI Variable", Tahoma, Geneva, Verdana, sans-serif;
   --font-sans-family: "Segoe UI", "Segoe UI Variable", Tahoma, Geneva, Verdana, sans-serif;
+  --font-cinzel-family: var(--font-cinzel-src, "Cinzel Decorative", serif);
   --desktop-shell: #eef3f8;
   --desktop-sidebar: rgba(255, 255, 255, 0.84);
   --desktop-panel: #ffffff;
@@ -249,6 +251,7 @@
   --color-gold-light: var(--gold-light);
   --font-heading: var(--font-heading-family);
   --font-sans: var(--font-sans-family);
+  --font-cinzel: var(--font-cinzel-family);
 }
 
 body {

@@ -49,7 +49,7 @@ export function DesktopSidebar({
                 />
               </div>
               <div>
-                <p className="font-heading text-[1.15rem] font-semibold leading-[1.05] tracking-[-0.03em] text-foreground">
+                <p className="font-cinzel text-[1.1rem] leading-[1.05] text-foreground">
                   {publicSiteTitle}
                 </p>
               </div>

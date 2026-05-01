@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Cinzel_Decorative } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -8,6 +9,13 @@ import {
   publicSiteTitle,
   siteMetadataBase,
 } from "@/lib/site";
+
+const cinzelDecorative = Cinzel_Decorative({
+  weight: "900",
+  subsets: ["latin"],
+  variable: "--font-cinzel-src",
+  display: "swap",
+});
 
 const siteDescription =
   "Browse and read Christian song lyrics in multiple languages including English, Telugu, Hindi, Tamil and Malayalam.";
@@ -56,7 +64,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased" suppressHydrationWarning>
+      <body className={`font-sans antialiased ${cinzelDecorative.variable}`} suppressHydrationWarning>
         <Providers>
           {children}
           <Toaster richColors position="bottom-right" />

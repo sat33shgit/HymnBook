@@ -29,7 +29,7 @@ export function Header() {
             />
           </div>
           <div className="min-w-0">
-            <p className="truncate font-heading text-[1rem] font-semibold leading-[1.25] tracking-[-0.03em] text-foreground">
+            <p className="truncate font-cinzel text-[1rem] leading-[1.25] text-foreground">
               {publicSiteTitle}
             </p>
             <p className="mt-0.5 truncate text-[0.74rem] font-medium text-[var(--desktop-nav-muted)]">

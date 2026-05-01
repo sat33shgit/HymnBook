@@ -32,7 +32,7 @@ export function DesktopFooter({
               />
             </div>
             <div>
-              <p className="font-heading text-[1.1rem] font-semibold leading-tight tracking-[-0.03em] text-foreground">
+              <p className="font-cinzel text-[1.1rem] leading-tight text-foreground">
                 {publicSiteTitle}
               </p>
               <p className="text-[0.82rem] text-muted-foreground">{publicSiteSubtitle}</p>
