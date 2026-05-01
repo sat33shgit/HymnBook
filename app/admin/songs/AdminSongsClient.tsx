@@ -40,8 +40,6 @@ interface AdminSongsClientProps {
   totalSongs: number;
   availableLanguages: Array<{ code: string; label: string }>;
   availableCategories: string[];
-  initialAudioVisible: boolean;
-  initialYoutubeVisible?: boolean;
 }
 
 type AvailabilityFilter = "all" | "with" | "without";
@@ -61,15 +59,9 @@ export function AdminSongsClient({
   totalSongs,
   availableLanguages,
   availableCategories,
-  initialAudioVisible,
-  initialYoutubeVisible = true,
 }: AdminSongsClientProps) {
   const [allSongs, setAllSongs] = useState(initialSongs);
   const [searchResults, setSearchResults] = useState<SongListItem[] | null>(null);
-  const [audioVisible, setAudioVisible] = useState(initialAudioVisible);
-  const [audioToggleLoading, setAudioToggleLoading] = useState(false);
-  const [youtubeVisible, setYoutubeVisible] = useState(initialYoutubeVisible);
-  const [youtubeToggleLoading, setYoutubeToggleLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("all");
@@ -439,64 +431,6 @@ export function AdminSongsClient({
       toast.error("Failed to delete song");
     } finally {
       setDeleting(false);
-    }
-  };
-
-  const handleToggleAudioVisibility = async (checked: boolean) => {
-    const previous = audioVisible;
-    setAudioVisible(checked);
-    setAudioToggleLoading(true);
-
-    try {
-      const res = await fetch("/api/admin/site-settings/audio-visibility", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visible: checked }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to update audio visibility");
-      }
-
-      toast.success(
-        checked
-          ? "Audio enabled on main site"
-          : "Audio hidden on main site"
-      );
-    } catch {
-      setAudioVisible(previous);
-      toast.error("Failed to update audio visibility");
-    } finally {
-      setAudioToggleLoading(false);
-    }
-  };
-
-  const handleToggleYouTubeVisibility = async (checked: boolean) => {
-    const previous = youtubeVisible;
-    setYoutubeVisible(checked);
-    setYoutubeToggleLoading(true);
-
-    try {
-      const res = await fetch("/api/admin/site-settings/youtube-visibility", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visible: checked }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to update youtube visibility");
-      }
-
-      toast.success(
-        checked
-          ? "YouTube links enabled on main site"
-          : "YouTube links hidden on main site"
-      );
-    } catch {
-      setYoutubeVisible(previous);
-      toast.error("Failed to update YouTube visibility");
-    } finally {
-      setYoutubeToggleLoading(false);
     }
   };
 

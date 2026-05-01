@@ -81,31 +81,31 @@ export function DesktopSidebar({
           aria-label="Desktop navigation"
         >
           <div className="space-y-1.5">
-          {publicNavItems.map(({ href, label, icon: Icon, matches }) => {
-            const isActive = matches(pathname);
+            {publicNavItems.map(({ href, label, icon: Icon, matches }) => {
+              const isActive = matches(pathname);
 
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`flex items-center gap-3 rounded-[1.25rem] px-4 py-3 text-[1rem] font-semibold transition-all ${
-                  isActive
-                    ? "bg-[var(--desktop-nav-active)] text-[var(--desktop-nav-active-foreground)] shadow-[0_18px_34px_rgba(15,23,42,0.16)]"
-                    : "text-[var(--desktop-nav-muted)] hover:bg-[var(--desktop-panel-soft)] hover:text-foreground"
-                }`}
-              >
-                <Icon className="h-5 w-5" strokeWidth={1.9} />
-                <span>{label}</span>
-                {href === "/favorites" && favorites.length > 0 && (
-                  <span className="ml-auto rounded-full bg-white/12 px-2 py-0.5 text-[0.72rem] font-semibold text-current">
-                    {favorites.length}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center gap-3 rounded-[1.25rem] px-4 py-3 text-[1rem] font-semibold transition-all ${
+                    isActive
+                      ? "bg-[var(--desktop-nav-active)] text-[var(--desktop-nav-active-foreground)] shadow-[0_18px_34px_rgba(15,23,42,0.16)]"
+                      : "text-[var(--desktop-nav-muted)] hover:bg-[var(--desktop-panel-soft)] hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" strokeWidth={1.9} />
+                  <span>{label}</span>
+                  {href === "/favorites" && favorites.length > 0 && (
+                    <span className="ml-auto rounded-full bg-white/12 px-2 py-0.5 text-[0.72rem] font-semibold text-current">
+                      {favorites.length}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
       </div>
     </aside>
   );

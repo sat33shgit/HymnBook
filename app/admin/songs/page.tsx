@@ -2,20 +2,16 @@ import {
   getLanguages,
   getPublishedSongTranslationCount,
   getSongs,
-  isPublicSongAudioVisible,
-  isPublicSongYoutubeVisible,
 } from "@/lib/db/queries";
 import { AdminSongsClient } from "./AdminSongsClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSongsPage() {
-  const [result, publishedSongCount, languages, audioVisible, youtubeVisible] = await Promise.all([
+  const [result, publishedSongCount, languages] = await Promise.all([
     getSongs({ publishedOnly: false, limit: 100 }),
     getPublishedSongTranslationCount(),
     getLanguages(),
-    isPublicSongAudioVisible(),
-    isPublicSongYoutubeVisible(),
   ]);
 
   const songsData = result.data ?? [];
@@ -44,8 +40,6 @@ export default async function AdminSongsPage() {
       totalSongs={publishedSongCount}
       availableLanguages={availableLanguages}
       availableCategories={availableCategories}
-      initialAudioVisible={audioVisible}
-      initialYoutubeVisible={youtubeVisible}
     />
   );
 }

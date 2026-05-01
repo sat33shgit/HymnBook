@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { DesktopSidebar } from "@/components/layout/DesktopSidebar";
+import { DesktopFooter } from "@/components/layout/DesktopFooter";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { isPublicContactVisible } from "@/lib/db/queries";
 
@@ -17,6 +18,7 @@ export default async function PublicLayout({
         <DesktopSidebar contactVisible={contactVisible} />
         <main className="flex-1 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:min-w-0 md:px-8 md:py-7 md:pb-10 lg:px-10">
           {children}
+          <DesktopFooter contactVisible={contactVisible} />
         </main>
       </div>
       <MobileNav contactVisible={contactVisible} />
