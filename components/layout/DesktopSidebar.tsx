@@ -3,10 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Moon,
-  Sun,
-} from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useFavorites } from "@/hooks/useFavorites";

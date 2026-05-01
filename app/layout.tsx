@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   description: siteDescription,
   keywords: ["christian songs", "hymns", "lyrics", "worship", "praise"],
   icons: {
-    icon: "/favicon.svg",
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
+    apple: "/logo.jpg",
   },
   openGraph: {
     type: "website",
