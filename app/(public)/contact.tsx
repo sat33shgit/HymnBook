@@ -236,14 +236,9 @@ export default function ContactPage() {
                 </div>
 
                 <div className="mt-auto md:mt-4 flex flex-col gap-2 md:gap-4 w-full">
-                  <div className="rounded-3xl bg-slate-900 dark:bg-[#232b3d] px-5 py-5 text-white shadow-xl w-full text-center">
-                    <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Email us directly</div>
-                    <a href="mailto:singuntothelord@gmail.com" className="mt-2 inline-block text-base font-semibold text-white break-words">singuntothelord@gmail.com</a>
-                  </div>
-
                   <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 w-full">
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">Subscribe to updates</h3>
-                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Get an email when new songs are added.</p>
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">Subscribe for updates</h3>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Get notified when new song(s) are added.</p>
                     <form onSubmit={handleSubscribe} className="mt-3">
                       <div className="flex flex-col sm:flex-row gap-2 items-center">
                         <input
@@ -346,18 +341,41 @@ export default function ContactPage() {
 
                       <div>
                         <label className="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-200">Type of request</label>
-                        <div className="grid grid-cols-1 gap-1 sm:gap-3 sm:grid-cols-3">
+                        <div className="grid grid-cols-3 gap-2">
                           {CONTACT_REQUEST_TYPES.map((type) => (
                             <button
                               key={type}
                               type="button"
-                              className={`rounded-2xl border px-4 py-3 text-sm font-semibold text-left transition-all cursor-pointer
+                              className={`group relative w-full rounded-2xl border px-3 py-3 transition-all cursor-pointer flex flex-col items-center justify-center gap-2 text-center
                                 ${form.type === type
-                                  ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-400 dark:text-blue-300'
-                                  : 'bg-white border-slate-200 text-slate-700 dark:bg-[#232b3d] dark:border-slate-700 dark:text-slate-200'}`}
+                                  ? 'bg-blue-50 border-blue-400 dark:bg-[#1e293b] dark:border-blue-500'
+                                  : 'bg-white border-slate-200 dark:bg-[#232b3d] dark:border-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:hover:border-slate-500 dark:hover:bg-[#1e293b]/50'}`}
                               onClick={() => setForm((prev) => ({ ...prev, type }))}
                             >
-                              {type}
+                              {/* Radio circle */}
+                              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all
+                                ${form.type === type
+                                  ? 'border-blue-500 dark:border-blue-400'
+                                  : 'border-slate-300 dark:border-slate-500 group-hover:border-blue-400 dark:group-hover:border-blue-500'}`}
+                              >
+                                {form.type === type && (
+                                  <div className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400" />
+                                )}
+                              </div>
+
+                              {/* Label text */}
+                              <span className={`text-xs sm:text-sm font-medium leading-tight ${form.type === type ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                                {type}
+                              </span>
+
+                              {/* Selected checkmark badge */}
+                              {form.type === type && (
+                                <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 dark:bg-blue-400">
+                                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </span>
+                              )}
                             </button>
                           ))}
                         </div>
