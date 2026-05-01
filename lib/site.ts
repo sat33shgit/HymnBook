@@ -5,7 +5,7 @@ export const siteUrl =
 
 export const siteMetadataBase = new URL(siteUrl);
 
-export const defaultOgImagePath = "/opengraph-image";
+export const defaultOgImagePath = "/opengraph-image?v=2";
 
 export const publicSiteTitle = "Sing Unto The Lord";
 export const publicSiteSubtitle = "Worship songs library";
