@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BookOpenText,
   Moon,
   Sun,
 } from "lucide-react";
@@ -42,14 +42,14 @@ export function DesktopSidebar({
         <div className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div
-                className="flex size-12 items-center justify-center rounded-full aspect-square text-[var(--desktop-hero-foreground)] shadow-[0_18px_32px_rgba(6,78,59,0.24)]"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(135deg, var(--desktop-hero-start), var(--desktop-hero-end))",
-                }}
-              >
-                <BookOpenText className="h-5 w-5" />
+              <div className="size-12 overflow-hidden rounded-full shrink-0">
+                <Image
+                  src="/logo.jpg"
+                  alt="Sing Unto The Lord logo"
+                  width={48}
+                  height={48}
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div>
                 <p className="font-heading text-[1.15rem] font-semibold leading-[1.05] tracking-[-0.03em] text-foreground">
