@@ -40,9 +40,9 @@ export function buildContactConfirmationEmail(input: {
       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f7;">
         <tr>
           <td align="center">
-            <table width="760" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff; border-radius:10px; overflow:hidden;">
+            <table width="760" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff; border-radius:10px; overflow:hidden; border:1px solid #e6edf3;">
               <tr>
-                <td style="padding:24px 32px 16px; background-color:#ffffff; text-align:center;">
+                <td style="padding:14px 32px 16px; background-color:#ffffff; text-align:center;">
                   <img src="cid:emailHeader" alt="Sing Unto The Lord" width="600" style="width:100%; max-width:600px; height:auto; display:block; margin:0 auto;" />
                 </td>
               </tr>

@@ -13,7 +13,7 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
   const { songs, unsubscribeUrl } = input;
   const safeUnsubscribe = escapeHtml(/^https?:\/\//i.test(unsubscribeUrl) ? unsubscribeUrl : `${siteUrl.replace(/\/$/, "")}${unsubscribeUrl.startsWith("/") ? "" : "/"}${unsubscribeUrl}`);
 
-  const subject = `🎵 New Songs Added — Sing unto the Lord`;
+  const subject = `🎵 New Songs Added — SING UNTO THE LORD`;
 
   const songsHtml = songs
     .map((s) => {
@@ -45,7 +45,9 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
       </head>
-      <body style="font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Arial, sans-serif; font-size:15px; line-height:1.55; background:#f7fafc; margin:0; padding:12px 8px; color:#0f172a;">
+      <body style="font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Arial, sans-serif; font-size:15px; line-height:1.55; background:#f7fafc; margin:0; padding:0; color:#0f172a;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f7fafc; padding:12px 8px;">
+          <tr><td align="center">
         <div style="max-width:720px; width:100%; margin:0 auto; padding:0 4px;">
           <div style="background:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e6edf3;">
             <div style="padding:18px 14px;">
@@ -54,7 +56,7 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
               </div>
               <hr style="border:none; border-top:2px solid #1a1a1a; margin:0 0 16px;" />
 
-              <p style="margin:0 0 12px;">Dear Friend,</p>
+              <p style="margin:0 0 12px;">Hello,</p>
               <p style="margin:0 0 12px; color:#0b1220; font-size:20px;">🎶 ${songs.length} new ${songs.length === 1 ? "song has" : "songs have"} been added to the library</p>
               <p style="margin:8px 0 12px; color:#475569;">Explore the latest additions below:</p>
               <hr style="border:none; border-top:1px solid #eef2f6; margin:8px 0 18px;" />
@@ -71,6 +73,8 @@ export function buildNewSongsDigestEmail(input: { songs: { title: string; slug: 
             </div>
           </div>
         </div>
+          </td></tr>
+        </table>
       </body>
     </html>
   `.trim();
