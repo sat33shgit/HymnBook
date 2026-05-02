@@ -5,7 +5,7 @@ import { songs as songsTable, songTranslations as songTranslationsTable, subscri
 import { eq, and, gt, asc, desc, inArray } from "drizzle-orm";
 import { deriveSongDisplayTitle } from "../lib/song-utils";
 import { buildNewSongsDigestEmail } from "../lib/email-templates/new-songs-digest";
-import { sendEmail } from "../lib/email";
+import { sendEmail, getEmailHeaderAttachment } from "../lib/email";
 import { siteUrl } from "../lib/site";
 
 async function run() {
@@ -244,13 +244,14 @@ async function run() {
   // Send in batches to avoid overwhelming SMTP
   const BATCH_SIZE = Number(process.env.SEND_BATCH_SIZE ?? "50");
   let sent = 0;
+  const headerAttachment = await getEmailHeaderAttachment(false);
   for (let i = 0; i < subscriberRows.length; i += BATCH_SIZE) {
     const batch = subscriberRows.slice(i, i + BATCH_SIZE);
     await Promise.allSettled(batch.map(async (sub) => {
       try {
         const unsubscribeUrl = `${siteUrl.replace(/\/$/, "")}/api/subscribers/unsubscribe?token=${encodeURIComponent(sub.token)}`;
         const email = buildNewSongsDigestEmail({ songs: digestSongs, unsubscribeUrl });
-        await sendEmail({ to: sub.email, subject: email.subject, html: email.html, text: email.text, replyTo: process.env.GMAIL_SMTP_USER });
+        await sendEmail({ to: sub.email, subject: email.subject, html: email.html, text: email.text, replyTo: process.env.GMAIL_SMTP_USER, attachments: [headerAttachment] });
         sent += 1;
       } catch (err) {
         console.error("Failed to send digest to", sub.email, err);

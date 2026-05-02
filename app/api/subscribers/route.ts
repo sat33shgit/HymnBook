@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSubscriber, getSubscribers, getSubscriberByEmail } from "@/lib/db/queries";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, getEmailHeaderAttachment } from "@/lib/email";
 import { buildSubscriberWelcomeEmail } from "@/lib/email-templates/subscriber-welcome";
 import { auth } from "@/lib/auth";
 
@@ -46,12 +46,14 @@ export async function POST(request: NextRequest) {
       const welcome = buildSubscriberWelcomeEmail({ email: subscriber.email, unsubscribeUrl });
 
       try {
+        const headerAttachment = await getEmailHeaderAttachment(false);
         await sendEmail({
           to: subscriber.email,
           subject: welcome.subject,
           html: welcome.html,
           text: welcome.text,
           replyTo: process.env.GMAIL_SMTP_USER,
+          attachments: [headerAttachment],
         });
       } catch (err) {
         // log error but don't fail subscription

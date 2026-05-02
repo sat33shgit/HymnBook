@@ -35,11 +35,17 @@ export function buildNewSongNotificationEmail(input: { title: string; slug: stri
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
       </head>
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#f7fafc; margin:0; padding:12px 8px; color:#0f172a;">
         <div style="max-width:720px; width:100%; margin:0 auto; padding:0 4px;">
           <div style="background:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e6edf3;">
             <div style="padding:18px 14px;">
+              <div style="text-align:center; margin-bottom:20px;">
+                <img src="cid:emailHeader" alt="Sing Unto The Lord" width="600" style="width:100%; max-width:600px; height:auto; display:block; margin:0 auto;" />
+              </div>
+              <hr style="border:none; border-top:2px solid #1a1a1a; margin:0 0 16px;" />
+
               <p style="margin:0 0 12px;">Dear Friend,</p>
               <p style="margin:0 0 12px; color:#0b1220;">🎶 A new song has been added to the library:</p>
 

@@ -27,7 +27,7 @@ export function buildContactConfirmationEmail(input: {
   const { form, submittedAt } = input;
   const submittedLabel = formatSubmittedAt(submittedAt);
 
-  const subject = `Sing unto the Lord! We received your message - ${form.type}`;
+  const subject = `Sing Unto The Lord — We received your message: ${form.type}`;
 
   const html = `
     <!DOCTYPE html>
@@ -42,22 +42,20 @@ export function buildContactConfirmationEmail(input: {
           <td align="center">
             <table width="760" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff; border-radius:10px; overflow:hidden;">
               <tr>
-                <td bgcolor="#1f6f52" style="padding:34px 32px 30px; background-color:#1f6f52; color:#ffffff;">
-                  <p style="margin:0 0 18px; font-size:14px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">
-                    SING UNTO THE LORD!
-                  </p>
-                  <h1 style="margin:0 0 18px; font-size:30px; line-height:1.2; font-weight:700; color:#ffffff;">
-                    Your message has been received
-                  </h1>
-                  <p style="margin:0; font-size:14px; line-height:1.8; color:#f2f7f5;">
-                    Hello ${escapeHtml(
-                      form.name
-                    )}, thank you for contacting us. This email confirms that we received your request and shared it with our team.
-                  </p>
+                <td style="padding:24px 32px 16px; background-color:#ffffff; text-align:center;">
+                  <img src="cid:emailHeader" alt="Sing Unto The Lord" width="600" style="width:100%; max-width:600px; height:auto; display:block; margin:0 auto;" />
                 </td>
               </tr>
               <tr>
-                <td style="padding:30px 30px 42px; color:#333333;">
+                <td style="padding:20px 32px 10px; color:#333333;">
+                  <hr style="border:none; border-top:2px solid #1a1a1a; margin:0 0 20px;" />
+                  <h1 style="margin:0 0 12px; font-size:26px; line-height:1.2; font-weight:700; color:#1f6f52;">
+                    Your message has been received
+                  </h1>
+                  <p style="margin:0 0 20px; font-size:14px; line-height:1.8; color:#333333;">
+                    Hello ${escapeHtml(form.name)}, thank you for contacting us. This email confirms that we received your request and shared it with our team.
+                  </p>
+                  <hr style="border:none; border-top:1px solid #e2e8f0; margin:0 0 20px;" />
                   <p style="margin:0 0 16px; font-size:14px; line-height:1.7;">
                     A summary of your submission is below for your reference.
                   </p>
@@ -97,7 +95,7 @@ export function buildContactConfirmationEmail(input: {
                     </tr>
                   </table>
                   <p style="margin:24px 0 0; font-size:13px; line-height:1.7; color:#5b746b;">
-                    This is an automated confirmation from Sing unto the Lord.
+                    This is an automated confirmation from SING UNTO THE LORD.
                   </p>
                 </td>
               </tr>

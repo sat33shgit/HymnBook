@@ -3,7 +3,7 @@ import { revalidateTag } from "next/cache";
 import { createContactMessage } from "@/lib/db/queries";
 import { CACHE_TAGS } from "@/lib/cache";
 import { createContactMessageSchema } from "@/lib/validations/contact";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, getEmailHeaderAttachment } from "@/lib/email";
 import { buildContactConfirmationEmail } from "@/lib/email-templates/contact-confirmation";
 
 const headers = { "X-API-Version": "1" };
@@ -75,12 +75,14 @@ export async function POST(request: NextRequest) {
       submittedAt,
     });
 
+    const headerAttachment = await getEmailHeaderAttachment(false);
     await sendEmail({
       to: parsed.data.email,
       subject: confirmationEmail.subject,
       html: confirmationEmail.html,
       text: confirmationEmail.text,
       replyTo: process.env.GMAIL_SMTP_USER,
+      attachments: [headerAttachment],
     });
 
     revalidateTag(CACHE_TAGS.messages, "max");

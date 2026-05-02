@@ -17,7 +17,7 @@ export function buildSubscriberWelcomeEmail(input: { email: string; unsubscribeU
   const safeUnsubscribe = escapeHtml(unsubscribeFull);
   const safeSite = escapeHtml(siteUrl.replace(/\/$/, ""));
 
-  const subject = `Thanks for subscribing to Sing Unto The Lord`;
+  const subject = `Welcome to "Sing Unto The Lord" 🎵`;
 
   const html = `
     <!doctype html>
@@ -25,20 +25,22 @@ export function buildSubscriberWelcomeEmail(input: { email: string; unsubscribeU
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
       </head>
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#f7fafc; margin:0; padding:12px 8px; color:#0f172a;">
         <div style="max-width:720px; width:100%; margin:0 auto; padding:0 4px;">
           <div style="background:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e6edf3;">
             <div style="padding:14px 12px;">
-              <p style="margin:0 0 12px;">Dear Friend,</p>
-              <h1 style="margin:0 0 12px; font-size:20px;">Thank you for subscribing to <strong>Sing Unto The Lord</strong> 🙏</h1>
+              <div style="text-align:center; margin-bottom:20px;">
+                <img src="cid:emailHeader" alt="Sing Unto The Lord" width="600" style="width:100%; max-width:600px; height:auto; display:block; margin:0 auto;" />
+              </div>
+              <hr style="border:none; border-top:2px solid #1a1a1a; margin:0 0 16px;" />
+              <p style="margin:0 0 12px;">Hello,</p>
+              <h1 style="margin:0 0 12px; font-size:20px;">Thank you for subscribing. You're now part of <em>Sing Unto The Lord</em> 🙏</h1>
 
               <p style="margin:12px 0 18px;">You’ll now receive updates about:</p>
               <ul style="margin:0 0 16px 20px; padding:0; color:#0b1220;">
                 <li>New songs added to our library</li>
-                <li>Song corrections and improvements</li>
-                <li>New languages and collections</li>
-                <li>Special updates and features</li>
               </ul>
 
               <p style="margin:0 0 18px;">We’re glad to have you as part of this growing worship community.</p>
@@ -48,7 +50,7 @@ export function buildSubscriberWelcomeEmail(input: { email: string; unsubscribeU
               <h3 style="margin:0 0 10px; font-size:16px;">🎵 What you can do next</h3>
               <ul style="margin:8px 0 16px 20px; padding:0; color:#0b1220;">
                 <li>Explore songs in your preferred language</li>
-                <li>Save your favorite hymns</li>
+                <li>Save your favorite songs</li>
                 <li>Request new songs anytime</li>
               </ul>
 
@@ -73,7 +75,7 @@ export function buildSubscriberWelcomeEmail(input: { email: string; unsubscribeU
   const text = [
     `Hi ${email},`,
     "",
-    "Thank you for subscribing to Sing Unto The Lord!",
+    "Welcome to Sing Unto The Lord 🎵",
     "",
     "You’ll now receive updates about:",
     "- New songs added to our library",
