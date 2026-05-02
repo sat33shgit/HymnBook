@@ -37,7 +37,7 @@ export function buildContactConfirmationEmail(input: {
       <title>Email</title>
     </head>
     <body style="margin:0; padding:0; background-color:#f4f6f7; font-family:Arial, sans-serif;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f7;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f7; padding:12px 8px;">
         <tr>
           <td align="center">
             <table width="760" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff; border-radius:10px; overflow:hidden; border:1px solid #e6edf3;">
