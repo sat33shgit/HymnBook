@@ -238,7 +238,6 @@ export default function ContactPage() {
                 <div className="mt-auto md:mt-4 flex flex-col gap-2 md:gap-4 w-full">
                   <div className="rounded-2xl bg-white dark:bg-[#0b1220] p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 w-full">
                     <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">Subscribe to updates</h3>
-                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Get notified when new song(s) are added.</p>
                     <form onSubmit={handleSubscribe} className="mt-3">
                       <div className="flex flex-col sm:flex-row gap-2 items-center">
                         <input
@@ -285,7 +284,7 @@ export default function ContactPage() {
 
                   {submitted ? (
                     <div className="rounded-xl border border-green-200 bg-green-50 px-6 py-5 text-center font-semibold text-green-800 shadow-sm dark:border-emerald-800/70 dark:bg-emerald-950/55 dark:text-emerald-200 mt-4">
-                      <p>Thank you — we received your message and will reply soon.</p>
+                      <p>Thank you! We received your message and will reply soon.</p>
                       <div className="mt-4 flex justify-center">
                         <button
                           type="button"

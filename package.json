@@ -13,7 +13,8 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "npx tsx scripts/seed.ts",
     "send:notifications": "npx tsx scripts/send-song-notifications.ts",
-    "r2:cors:set": "node scripts/set-r2-cors.mjs"
+    "r2:cors:set": "node scripts/set-r2-cors.mjs",
+    "email:header": "node scripts/generate-email-header.mjs"
   },
   "dependencies": {
     "luxon": "^3.5.0",
