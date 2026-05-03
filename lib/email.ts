@@ -43,11 +43,13 @@ export async function sendEmail(options: {
   const user = getRequiredEnv("GMAIL_SMTP_USER");
   const fromName =
     process.env.CONTACT_EMAIL_FROM_NAME?.trim() || "HymnBook";
+  const fromAddress =
+    process.env.CONTACT_EMAIL_FROM_ADDRESS?.trim() || user;
 
   const transporter = createEmailTransport();
 
   await transporter.sendMail({
-    from: `"${fromName}" <${user}>`,
+    from: `"${fromName}" <${fromAddress}>`,
     to: options.to,
     subject: options.subject,
     html: options.html,

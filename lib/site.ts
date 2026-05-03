@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://hb.sateeshboggarapu.com";
+const DEFAULT_SITE_URL = "https://www.singuntothelord.net";
 
 export const siteUrl =
   process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") || DEFAULT_SITE_URL;

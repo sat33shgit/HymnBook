@@ -1040,6 +1040,7 @@ export async function searchSongs(
             )
           ) as has_youtube,
           s.category,
+          s.created_at,
           (
             CASE
               WHEN lower(st.title) = lower(${sanitized}) THEN 100
@@ -1087,6 +1088,7 @@ export async function searchSongs(
         has_audio: boolean;
         matched_text: string;
         category: string | null;
+        created_at: string | null;
       }[];
     },
     ["searchSongs", sanitized.toLowerCase(), lang ?? "all", includeUnpublished ? "1" : "0"],

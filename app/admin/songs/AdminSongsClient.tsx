@@ -21,6 +21,7 @@ import {
   Pencil,
   Plus,
   Trash2,
+  X,
   Youtube as YoutubeIcon,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -91,9 +92,18 @@ export function AdminSongsClient({
   const formatCreatedAt = (value?: string | Date | null) => {
     if (!value) return "-";
     try {
-      return typeof value === "string"
-        ? DateTime.fromISO(value).toFormat("dd-MMM-yyyy HH:mm")
-        : DateTime.fromJSDate(value).toFormat("dd-MMM-yyyy HH:mm");
+      let dt;
+      if (typeof value === "string") {
+        // ISO strings (from getSongs) include 'Z' so fromISO parses as UTC
+        dt = DateTime.fromISO(value);
+        if (!dt.isValid) {
+          // PostgreSQL format has no timezone — treat as UTC explicitly
+          dt = DateTime.fromSQL(value, { zone: "utc" });
+        }
+      } else {
+        dt = DateTime.fromJSDate(value);
+      }
+      return dt.isValid ? dt.toLocal().toFormat("dd-MMM-yyyy HH:mm") : "-";
     } catch {
       return "-";
     }
@@ -291,6 +301,7 @@ export function AdminSongsClient({
         has_audio?: boolean;
         has_youtube?: boolean;
         category?: string | null;
+        created_at?: string | null;
       }> = json.results ?? [];
 
       const mapped = results.map((result) => ({
@@ -302,7 +313,7 @@ export function AdminSongsClient({
         isPublished: result.is_published ?? null,
         title: result.title,
         languages: [result.matched_language],
-        createdAt: null,
+        createdAt: result.created_at ?? null,
         hasAudio: result.has_audio ?? false,
         hasYoutube: result.has_youtube ?? false,
       }));
@@ -457,17 +468,29 @@ export function AdminSongsClient({
         </div>
 
         <div className="flex items-center gap-2">
-          <input
-            ref={searchInputRef}
-            type="search"
-            value={searchQuery}
-            onChange={handleInputChange}
-            onKeyDown={handleInputKeyDown}
-            placeholder="Search by title or lyrics..."
-            className="w-full max-w-lg rounded-md border px-3 py-2"
-            disabled={searchLoading}
-            aria-label="Search songs"
-          />
+          <div className="relative w-full max-w-lg">
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={handleInputChange}
+              onKeyDown={handleInputKeyDown}
+              placeholder="Search by title or lyrics..."
+              className="w-full rounded-md border px-3 py-2 pr-8"
+              disabled={searchLoading}
+              aria-label="Search songs"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
 
           {summaryLabel && (
             <div className="ml-4 shrink-0 text-sm text-muted-foreground">

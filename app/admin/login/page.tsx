@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Music, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -45,9 +46,23 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mb-2 flex justify-center">
-            <Music className="h-10 w-10 text-primary" />
+          <div className="mb-3 flex justify-center">
+            <Image
+              src="/logo.jpg"
+              alt="Sing Unto The Lord"
+              width={56}
+              height={56}
+              className="rounded-full"
+              priority
+            />
           </div>
+          <p
+            className="whitespace-nowrap text-3xl font-bold leading-tight text-black dark:text-white"
+            style={{ fontFamily: "var(--font-cinzel)" }}
+          >
+            Sing Unto The Lord
+          </p>
+          <hr className="my-3 border-border" />
           <CardTitle className="font-heading text-2xl">Admin Login</CardTitle>
         </CardHeader>
         <CardContent>

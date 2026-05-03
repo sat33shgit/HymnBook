@@ -116,7 +116,7 @@ This repo includes a dashboard-ready Cloudflare R2 CORS policy file:
 
 It currently allows:
 
-- `https://hb.sateeshboggarapu.com`
+- `https://www.singuntothelord.net`
 - `http://localhost:3000`
 - `http://127.0.0.1:3000`
 

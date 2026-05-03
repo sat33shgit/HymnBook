@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Music, LayoutDashboard, Music2, Globe, Mail, Users } from "lucide-react";
+import { LayoutDashboard, Music2, Globe, Mail, Users } from "lucide-react";
 import { AdminSignOut } from "@/components/admin/AdminSignOut";
 
 export function AdminSidebar() {
@@ -30,9 +31,20 @@ export function AdminSidebar() {
 
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-muted/30 md:block">
-      <div className="flex h-16 items-center gap-2 border-b px-6">
-        <Music className="h-6 w-6 text-primary" />
-        <span className="font-heading text-lg font-bold">HymnBook</span>
+      <div className="flex h-16 items-center gap-2 border-b px-4">
+        <Image
+          src="/logo.jpg"
+          alt="Sing Unto The Lord"
+          width={36}
+          height={36}
+          className="rounded-full shrink-0"
+        />
+        <span
+          className="whitespace-nowrap text-base font-bold leading-tight"
+          style={{ fontFamily: "var(--font-cinzel)" }}
+        >
+          Sing Unto The Lord
+        </span>
       </div>
 
       <nav className="flex flex-col gap-1 p-4" role="navigation">
