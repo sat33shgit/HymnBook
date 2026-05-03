@@ -1,12 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   CONTACT_EMAIL_MAX,
   CONTACT_MESSAGE_MAX,
   CONTACT_NAME_MAX,
   CONTACT_REQUEST_TYPES,
 } from "@/lib/validations/contact";
+import { TurnstileWidget } from "@/components/security/TurnstileWidget";
+
+// CSRF: this header value must match REQUIRED_FORM_HEADER_NAME /
+// REQUIRED_FORM_HEADER_VALUE on the server. Keeping the literal here (rather
+// than importing the server module) avoids leaking server code into the
+// client bundle.
+const FORM_HEADER_NAME = "x-hymnbook-form";
+const FORM_HEADER_VALUE = "1";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -14,6 +22,10 @@ export default function ContactPage() {
   const [submitError, setSubmitError] = useState("");
   const [form, setForm] = useState({ name: "", email: "", message: "", type: "Song request", consent: true, subscribe: false });
   const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
+  // Hidden honeypot — kept in state so React owns the value. A real user
+  // never sees the input; bots that auto-fill every field will set it.
+  const [honeypot, setHoneypot] = useState<string>("");
 
   // Left-side subscribe controls
   const [subscribeEmail, setSubscribeEmail] = useState("");
@@ -107,8 +119,16 @@ export default function ContactPage() {
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        headers: {
+          "Content-Type": "application/json",
+          [FORM_HEADER_NAME]: FORM_HEADER_VALUE,
+        },
+        body: JSON.stringify({
+          ...form,
+          // Include Turnstile token + honeypot. Both are validated server-side.
+          turnstileToken: turnstileToken || undefined,
+          website: honeypot,
+        }),
       });
 
       if (!res.ok) {
@@ -121,7 +141,10 @@ export default function ContactPage() {
         try {
           const subRes = await fetch("/api/subscribers", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              [FORM_HEADER_NAME]: FORM_HEADER_VALUE,
+            },
             body: JSON.stringify({ email: emailToSubscribe }),
           });
           // ignore response details; subscription endpoint returns exists flag on duplicates
@@ -135,6 +158,8 @@ export default function ContactPage() {
       setSubmitted(true);
       setForm({ name: "", email: "", message: "", type: "Song request", consent: true, subscribe: false });
       setErrors({});
+      setTurnstileToken("");
+      setHoneypot("");
     } catch (error) {
       setSubmitError(
         error instanceof Error ? error.message : "Failed to send message"
@@ -143,6 +168,13 @@ export default function ContactPage() {
       setSubmitting(false);
     }
   };
+
+  const handleTurnstileToken = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken("");
+  }, []);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,7 +192,10 @@ export default function ContactPage() {
     try {
       const res = await fetch("/api/subscribers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          [FORM_HEADER_NAME]: FORM_HEADER_VALUE,
+        },
         body: JSON.stringify({ email }),
       });
 
@@ -400,6 +435,30 @@ export default function ContactPage() {
                         </div>
                       </div>
 
+                      {/* Honeypot — visually hidden, off the tab order, and
+                          marked autocomplete="off". A human won't fill it in. */}
+                      <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", top: "auto", width: 1, height: 1, overflow: "hidden" }}>
+                        <label htmlFor="hp-website">Website</label>
+                        <input
+                          id="hp-website"
+                          name="website"
+                          type="text"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={honeypot}
+                          onChange={(e) => setHoneypot(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="pt-1">
+                        <TurnstileWidget
+                          action="contact"
+                          onToken={handleTurnstileToken}
+                          onExpire={handleTurnstileExpire}
+                          onError={handleTurnstileExpire}
+                        />
+                      </div>
+
                       {submitError ? (
                         <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                           {submitError}
@@ -420,8 +479,8 @@ export default function ContactPage() {
                         <p className="text-sm text-slate-500 dark:text-slate-400">Response time: usually within a few days</p>
                         <button
                           type="submit"
-                          disabled={submitting}
-                          className="inline-flex items-center justify-center rounded-2xl bg-slate-950 dark:bg-[#0e2a43] px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:translate-y-[-1px] hover:shadow-xl hover:bg-blue-700 dark:hover:bg-[#0b2336] cursor-pointer whitespace-nowrap"
+                          disabled={submitting || (Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) && !turnstileToken)}
+                          className="inline-flex items-center justify-center rounded-2xl bg-slate-950 dark:bg-[#0e2a43] px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:translate-y-[-1px] hover:shadow-xl hover:bg-blue-700 dark:hover:bg-[#0b2336] cursor-pointer whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {submitting ? <span className="whitespace-nowrap">Sending...</span> : <><span className="hidden md:inline whitespace-nowrap">Send message</span><span className="md:hidden whitespace-nowrap">Send</span></>}
                         </button>

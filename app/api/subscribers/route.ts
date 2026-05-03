@@ -3,17 +3,52 @@ import { createSubscriber, getSubscribers, getSubscriberByEmail } from "@/lib/db
 import { sendEmail, getEmailHeaderAttachment } from "@/lib/email";
 import { buildSubscriberWelcomeEmail } from "@/lib/email-templates/subscriber-welcome";
 import { auth } from "@/lib/auth";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import {
+  containsHeaderInjection,
+  hasRequiredFormHeader,
+  originIsTrusted,
+  stripLineBreaks,
+} from "@/lib/request-security";
 
 const headers = { "X-API-Version": "1" };
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  // CSRF: same defenses as the contact form.
+  if (!originIsTrusted(request) || !hasRequiredFormHeader(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403, headers });
+  }
+
+  // Rate limit: 10 subscribe attempts per IP per hour. Subscribe is even
+  // cheaper to spam than contact since there's no recipient choice.
+  const ip = getClientIp(request);
+  const rl = await rateLimit({
+    key: `subscribe:${ip}`,
+    limit: 10,
+    windowSeconds: 3600,
+  });
+  if (!rl.ok) {
+    const retryAfter = Math.max(1, Math.ceil((rl.resetAt - Date.now()) / 1000));
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429, headers: { ...headers, "Retry-After": String(retryAfter) } }
+    );
+  }
+
   try {
     const body = await request.json();
-    const email = typeof body?.email === "string" ? body.email.trim() : "";
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+    const rawEmail = typeof body?.email === "string" ? body.email.trim() : "";
+    // Reject email-header injection attempts before doing anything else.
+    if (
+      !rawEmail ||
+      !/^\S+@\S+\.\S+$/.test(rawEmail) ||
+      containsHeaderInjection(rawEmail) ||
+      rawEmail.length > 254
+    ) {
       return NextResponse.json({ error: "Invalid email" }, { status: 400, headers });
     }
+    const email = stripLineBreaks(rawEmail);
 
     // derive country/location from headers (best-effort)
     function readFirstHeader(names: string[]) {

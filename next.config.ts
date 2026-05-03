@@ -16,13 +16,15 @@ import type { NextConfig } from "next";
 // - frame-ancestors 'none' is the modern equivalent of X-Frame-Options: DENY.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
+  "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "media-src 'self' blob: https:",
-  "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
-  "frame-src 'self'",
+  "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com https://challenges.cloudflare.com",
+  // Turnstile renders its challenge inside an iframe served from
+  // challenges.cloudflare.com — must be explicitly allowed.
+  "frame-src 'self' https://challenges.cloudflare.com",
   "frame-ancestors 'none'",
   "form-action 'self'",
   "base-uri 'self'",
