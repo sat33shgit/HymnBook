@@ -1,5 +1,14 @@
 import type { CreateContactMessageInput } from "@/lib/validations/contact";
 
+// The template only consumes the user-visible fields, not the honeypot or
+// the Turnstile token, so we narrow the input type. This lets callers pass
+// the post-strip "persistable" object without TS complaining about missing
+// honeypot/captcha fields.
+type ContactEmailFields = Pick<
+  CreateContactMessageInput,
+  "name" | "email" | "type" | "message" | "consent"
+>;
+
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -21,7 +30,7 @@ function formatSubmittedAt(submittedAt: Date) {
 }
 
 export function buildContactConfirmationEmail(input: {
-  form: CreateContactMessageInput;
+  form: ContactEmailFields;
   submittedAt: Date;
 }) {
   const { form, submittedAt } = input;
