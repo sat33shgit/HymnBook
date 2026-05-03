@@ -18,8 +18,8 @@ const cinzelDecorative = Cinzel_Decorative({
 });
 
 const siteDescription =
-  "Browse and read Christian song lyrics in multiple languages including English, Telugu, Hindi, Tamil and Malayalam.";
-const defaultSiteTitle = `${publicSiteTitle} - Christian Song Lyrics`;
+  "Browse and read Christian song lyrics in a wide range of languages—including English, Telugu, Hindi, Tamil, Malayalam, and many more.";
+const defaultSiteTitle = `${publicSiteTitle} | Christian Songs Library`;
 
 export const metadata: Metadata = {
   metadataBase: siteMetadataBase,
