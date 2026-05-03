@@ -76,4 +76,6 @@ jobs:
           SONG_NOTIFICATIONS_MINUTE: '30'
           SEND_BATCH_SIZE: '50'
           FORCE_SEND: ${{ github.event.inputs.force || '0' }}
+          CONTACT_EMAIL_FROM_NAME: ${{ secrets.CONTACT_EMAIL_FROM_NAME }}
+          CONTACT_EMAIL_FROM_ADDRESS: ${{ secrets.CONTACT_EMAIL_FROM_ADDRESS }}
         run: npm run send:notifications
