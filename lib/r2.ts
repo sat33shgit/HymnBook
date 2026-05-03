@@ -71,9 +71,24 @@ function validateSongAudioUpload(params: {
   return extension;
 }
 
-function getPublicR2ObjectUrl(key: string) {
+function getPublicR2BaseUrl(): string {
   const publicBaseUrl = getRequiredEnv("R2_PUBLIC_BASE_URL").replace(/\/$/, "");
-  return `${publicBaseUrl}/${key}`;
+  // Refuse http:// in production so audio URLs rendered into https pages don't
+  // trigger mixed-content blocking. Localhost is allowed for local dev.
+  if (
+    process.env.NODE_ENV === "production" &&
+    publicBaseUrl.startsWith("http://") &&
+    !/^http:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(publicBaseUrl)
+  ) {
+    throw new Error(
+      `R2_PUBLIC_BASE_URL must use https:// in production (got "${publicBaseUrl}").`
+    );
+  }
+  return publicBaseUrl;
+}
+
+function getPublicR2ObjectUrl(key: string) {
+  return `${getPublicR2BaseUrl()}/${key}`;
 }
 
 export async function createSongAudioUploadUrl(params: {
