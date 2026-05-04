@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
@@ -30,16 +30,24 @@ export function DesktopSidebar({
   const { favorites } = useFavorites();
   const publicNavItems = getPublicNavItems({ contactVisible });
 
-  // After hydration, sync the active state with the actual browser URL.
-  // This guards against cases where the Next.js router state diverges from
-  // window.location (e.g. when Cloudflare serves a cached response that
-  // embeds stale flight/hydration data for a different path).
-  const [clientPathname, setClientPathname] = useState<string | null>(null);
+  // On first mount: if the Next.js router state diverges from the real browser
+  // URL (can happen when Cloudflare caches stale hydration data), override with
+  // window.location.pathname. On subsequent rawPathname changes (client-side
+  // navigation), the router is always correct so clear the override.
+  const [pathnameOverride, setPathnameOverride] = useState<string | null>(null);
+  const isFirstMount = useRef(true);
   useEffect(() => {
-    setClientPathname(window.location.pathname);
-  }, []);
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      if (rawPathname !== window.location.pathname) {
+        setPathnameOverride(window.location.pathname);
+      }
+    } else {
+      setPathnameOverride(null);
+    }
+  }, [rawPathname]);
 
-  const pathname = normalizePathname(clientPathname ?? rawPathname);
+  const pathname = normalizePathname(pathnameOverride ?? rawPathname);
 
   if (pathname.startsWith("/admin")) return null;
 
