@@ -154,16 +154,16 @@ export async function getSongs({
         .orderBy(desc(songs.createdAt));
 
       const songIds = songRows.map((s) => s.id);
+      // Use Drizzle's parameterized `inArray` rather than building a raw
+      // ARRAY[...] literal. The IDs are server-derived integers, so this is
+      // not currently exploitable, but parameterized form removes any
+      // chance of regression if the upstream source ever changes.
       const translations =
         songIds.length > 0
           ? await db
               .select()
               .from(songTranslations)
-              .where(
-                sql`${songTranslations.songId} = ANY(${sql.raw(
-                  `ARRAY[${songIds.join(",")}]`
-                )})`
-              )
+              .where(inArray(songTranslations.songId, songIds))
           : [];
 
       const data = songRows.map((song) => {

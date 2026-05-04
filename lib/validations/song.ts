@@ -47,8 +47,32 @@ export const updateLanguageSchema = z.object({
 });
 
 export const searchSchema = z.object({
-  q: z.string().min(1, "Search query is required").max(200),
-  lang: z.string().optional(),
+  q: z.string().trim().min(1, "Search query is required").max(200),
+  // Same shape as a language code in createLanguageSchema. Restricting the
+  // character set means a malicious value can't break the SQL search by
+  // shape (Drizzle parameterizes anyway, so this is defense-in-depth).
+  lang: z
+    .string()
+    .trim()
+    .regex(/^[a-z]{2,10}$/, "Invalid language code")
+    .optional(),
+  // Server-side only honors this when the caller is authenticated; a public
+  // caller passing it is silently ignored. We accept "1" / "true" so the
+  // existing admin client keeps working.
+  includeUnpublished: z
+    .union([z.literal("1"), z.literal("true"), z.literal("0"), z.literal("false")])
+    .optional(),
+});
+
+export const songsListQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).max(10000).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(15),
+  category: z.string().trim().min(1).max(50).optional(),
+  language: z
+    .string()
+    .trim()
+    .regex(/^[a-z]{2,10}$/, "Invalid language code")
+    .optional(),
 });
 
 export const favoriteSchema = z.object({

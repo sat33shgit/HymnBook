@@ -1,31 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSongs, createSong, ensureUniqueSongSlug } from "@/lib/db/queries";
-import { createSongSchema } from "@/lib/validations/song";
+import {
+  createSongSchema,
+  songsListQuerySchema,
+} from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
 import { deriveSongDefaultLanguage, deriveSongSlug } from "@/lib/song-utils";
 import { revalidateSongMutationCaches } from "@/lib/song-cache-revalidation";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { jsonError, jsonServerError } from "@/lib/api/errors";
 // Individual new-song email notifications removed — batch digest handles notifications now.
 
 const headers = { "X-API-Version": "1" };
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
+  // Rate limit catalog browsing the same way as search to deter scrapers
+  // that page through the entire dataset.
+  const ip = getClientIp(request);
+  const rl = await rateLimit({
+    key: `songs-list:${ip}`,
+    limit: 120,
+    windowSeconds: 60,
+  });
+  if (!rl.ok) {
+    const retryAfter = Math.max(1, Math.ceil((rl.resetAt - Date.now()) / 1000));
+    return jsonError(429, "Too many requests. Please slow down.", {
+      "Retry-After": String(retryAfter),
+    });
+  }
+
   try {
     const { searchParams } = request.nextUrl;
-    const page = parseInt(searchParams.get("page") ?? "1", 10);
-    const limit = Math.min(parseInt(searchParams.get("limit") ?? "15", 10), 100);
-    const category = searchParams.get("category") ?? undefined;
-    const language = searchParams.get("language") ?? undefined;
+    const parsed = songsListQuerySchema.safeParse({
+      page: searchParams.get("page") ?? undefined,
+      limit: searchParams.get("limit") ?? undefined,
+      category: searchParams.get("category") ?? undefined,
+      language: searchParams.get("language") ?? undefined,
+    });
+    if (!parsed.success) {
+      return jsonError(400, "Invalid query parameters");
+    }
 
-    const result = await getSongs({ page, limit, category, language });
+    const result = await getSongs(parsed.data);
 
     return NextResponse.json(result, { headers });
   } catch (error) {
-    console.error("GET /api/songs error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch songs" },
-      { status: 500, headers }
-    );
+    return jsonServerError("GET /api/songs", error, headers);
   }
 }
 
