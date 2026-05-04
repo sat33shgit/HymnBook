@@ -8,15 +8,20 @@ import type { NextConfig } from "next";
 //   styles emitted by Next/Tailwind. (Switching to per-request nonces would
 //   require a custom proxy middleware that injects them; left as a future
 //   improvement.)
+// - 'unsafe-eval' is added in development only. React dev mode uses eval() to
+//   reconstruct error callstacks for better DX. React never uses eval() in
+//   production, so the directive is intentionally omitted from production builds.
 // - https://va.vercel-scripts.com is the host for @vercel/analytics.
 // - https://vitals.vercel-insights.com receives analytics beacons.
 // - img-src and media-src allow https: so audio/images served from the
 //   configurable R2 public base URL (and any other CDN) keep working without
 //   hard-coding a domain.
 // - frame-ancestors 'none' is the modern equivalent of X-Frame-Options: DENY.
+const isDev = process.env.NODE_ENV === "development";
+
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://challenges.cloudflare.com",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://challenges.cloudflare.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",

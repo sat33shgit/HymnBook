@@ -1,12 +1,26 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSongBySlug, getLanguages, getAllSlugs, isPublicSongAudioVisible } from "@/lib/db/queries";
 import { LyricsViewer } from "@/components/lyrics/LyricsViewer";
-import type { Metadata } from "next";
 import { truncate } from "@/lib/utils";
-import { defaultOgImagePath, publicSiteTitle } from "@/lib/site";
+import { defaultOgImagePath, publicSiteTitle, siteUrl } from "@/lib/site";
 import { deriveSongDisplayTitle, deriveSongPrimaryTitle } from "@/lib/song-utils";
 
 export const revalidate = 300;
+
+type Translation = { languageCode: string; title: string | null; lyrics: string | null };
+
+/** Returns the best translation to use for SEO copy — prefers English, then default lang, then first. */
+function getPreferredTranslation(
+  translations: Translation[],
+  defaultLang: string | null | undefined
+): Translation | undefined {
+  return (
+    translations.find((t) => t.languageCode === "en") ??
+    translations.find((t) => t.languageCode === (defaultLang ?? "en")) ??
+    translations[0]
+  );
+}
 
 export async function generateStaticParams() {
   try {
@@ -26,40 +40,49 @@ export async function generateMetadata({
   const song = await getSongBySlug(slug);
   if (!song) return { title: "Song Not Found" };
 
-  const englishTranslation = song.translations.find(
-    (t) => t.languageCode === "en"
-  );
-  const defaultTranslation = song.translations.find(
-    (t) => t.languageCode === (song.defaultLang ?? "en")
-  );
-  const preferredTranslation = englishTranslation ?? defaultTranslation ?? song.translations[0];
+  const preferredTranslation = getPreferredTranslation(song.translations, song.defaultLang);
   const title =
     deriveSongPrimaryTitle(song.translations, song.defaultLang) ||
     preferredTranslation?.title ||
     "Song";
-  const lyricsPreview = truncate(preferredTranslation?.lyrics ?? "", 100);
+  const lyricsPreview = truncate(preferredTranslation?.lyrics ?? "", 160);
+  const description = lyricsPreview
+    ? `${lyricsPreview} — ${title} lyrics on ${publicSiteTitle}`
+    : `Read the lyrics of "${title}" on ${publicSiteTitle}`;
+
+  const languageNames = song.translations.map((t) => t.languageCode);
+  const songUrl = `/songs/${slug}`;
 
   return {
     title,
-    description: lyricsPreview,
+    description,
+    keywords: [
+      title,
+      `${title} lyrics`,
+      `${title} christian song`,
+      ...languageNames.map((l) => `${title} ${l} lyrics`),
+      "christian song lyrics",
+      publicSiteTitle,
+    ],
+    alternates: { canonical: songUrl },
     openGraph: {
       title: `${title} | ${publicSiteTitle}`,
-      description: lyricsPreview,
-      url: `/songs/${slug}`,
+      description,
+      url: songUrl,
       type: "article",
       images: [
         {
           url: defaultOgImagePath,
           width: 1200,
           height: 630,
-          alt: `${publicSiteTitle} preview image`,
+          alt: `${title} — ${publicSiteTitle}`,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
       title: `${title} | ${publicSiteTitle}`,
-      description: lyricsPreview,
+      description,
       images: [defaultOgImagePath],
     },
   };
@@ -105,8 +128,30 @@ export default async function SongDetailPage({
     .map((l) => ({ code: l.code, nativeName: l.nativeName }));
   const mobileSummary = `${new Intl.NumberFormat("en-US").format(song.viewCount ?? 0)} views / Available in ${songLanguages.length} ${songLanguages.length === 1 ? "language" : "languages"}`;
 
+  const preferredTranslation = getPreferredTranslation(song.translations, song.defaultLang);
+  const lyricsSnippet = truncate(preferredTranslation?.lyrics ?? "", 200);
+
+  const songJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MusicComposition",
+    name: title,
+    url: `${siteUrl}/songs/${song.slug}`,
+    description: lyricsSnippet || undefined,
+    ...(song.category ? { genre: song.category } : {}),
+    inLanguage: songLanguages.map((l) => l.code),
+    publisher: {
+      "@type": "Organization",
+      name: publicSiteTitle,
+      url: siteUrl,
+    },
+  };
+
   return (
     <article className="px-4 py-5 pb-14 md:px-0 md:py-0 md:pb-0 overflow-x-hidden max-w-full">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(songJsonLd) }}
+      />
       <header className="mb-5 md:hidden">
         <div
           className="rounded-[1.8rem] px-4 py-6 text-[var(--desktop-hero-foreground)] shadow-[0_28px_60px_rgba(6,78,59,0.22)] overflow-x-hidden overflow-y-visible min-h-[7rem] md:min-h-0 max-w-full"

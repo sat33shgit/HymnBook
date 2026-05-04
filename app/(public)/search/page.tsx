@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import { getSongs, getCategories, getPublishedSongTranslationCount } from "@/lib/db/queries";
 import { SearchPageClient } from "./SearchClient";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Search Songs",
-  description: "Search for Christian song lyrics across multiple languages.",
+  description:
+    "Search our full library of Christian hymn and worship song lyrics in English, Telugu, Hindi, Tamil, Malayalam, and more.",
+  keywords: [
+    "search christian songs",
+    "find hymn lyrics",
+    "search worship songs",
+    "christian song search",
+    "hymn search engine",
+  ],
+  alternates: { canonical: "/search" },
 };
 
 export const revalidate = 300;

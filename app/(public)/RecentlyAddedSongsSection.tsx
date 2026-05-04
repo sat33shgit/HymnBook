@@ -25,7 +25,7 @@ async function RecentlyAddedSongsSection({
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
           <h2 className="font-heading text-[1.45rem] font-semibold leading-[1.06] tracking-[-0.04em] text-foreground md:text-[1.85rem] md:leading-[1.05]">
-            Newly Added Songs
+            Newly added songs
           </h2>
         </div>
         <Link

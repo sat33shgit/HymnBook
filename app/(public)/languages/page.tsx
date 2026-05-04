@@ -1,10 +1,23 @@
+import type { Metadata } from "next";
 import { getLanguages, getPublishedLanguageSongCounts, getSongs } from "@/lib/db/queries";
 import type { LanguageOverviewItem } from "@/components/languages/BrowseByLanguageSection";
 import { LanguagesClient } from "./LanguagesClient";
 
-export const metadata = {
-  title: "Languages",
-  description: "Browse Christian songs by available language.",
+export const metadata: Metadata = {
+  title: "Browse by Language",
+  description:
+    "Browse our Christian hymn and worship songs by language — English, Telugu, Hindi, Tamil, Malayalam, and many more.",
+  keywords: [
+    "christian songs by language",
+    "Telugu christian songs",
+    "Hindi christian songs",
+    "Tamil christian songs",
+    "Malayalam christian songs",
+    "multilingual hymns",
+    "worship songs in Telugu",
+    "browse hymns by language",
+  ],
+  alternates: { canonical: "/languages" },
 };
 
 export const revalidate = 300;

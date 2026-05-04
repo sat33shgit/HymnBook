@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
+import { Suspense } from "react";
 import {
   getCategories,
   getLanguages,
   getPublishedLanguageSongCounts,
 } from "@/lib/db/queries";
-import { Suspense } from "react";
+import { defaultOgImagePath, publicSiteTitle, siteUrl } from "@/lib/site";
 import { HomeClient } from "./HomeClient";
 import {
   DesktopMostViewedSongsSkeleton,
@@ -19,6 +21,57 @@ import {
 } from "./RecentlyAddedSongsSection";
 
 export const revalidate = 300;
+
+const homeTitle = `${publicSiteTitle} | Christian Songs Library`;
+const homeDescription =
+  "Browse and read Christian hymn and worship song lyrics in English, Telugu, Hindi, Tamil, Malayalam, and more. Free multilingual Christian songs library.";
+
+export const metadata: Metadata = {
+  title: homeTitle,
+  description: homeDescription,
+  alternates: { canonical: "/" },
+  keywords: [
+    "christian songs library",
+    "hymn lyrics online",
+    "worship song lyrics",
+    "Telugu christian songs",
+    "Hindi christian songs",
+    "Tamil christian songs",
+    "Malayalam christian songs",
+    "multilingual hymns",
+    "free christian lyrics",
+    "online hymn book",
+  ],
+  openGraph: {
+    type: "website",
+    url: "/",
+    title: homeTitle,
+    description: homeDescription,
+    images: [{ url: defaultOgImagePath, width: 1200, height: 630, alt: `${publicSiteTitle} — Christian Songs Library` }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: homeTitle,
+    description: homeDescription,
+    images: [defaultOgImagePath],
+  },
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: publicSiteTitle,
+  url: siteUrl,
+  description: homeDescription,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${siteUrl}/search?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
 
 export default async function HomePage() {
   let totalSongs = 0;
@@ -58,31 +111,37 @@ export default async function HomePage() {
   }
 
   return (
-    <HomeClient
-      totalSongs={totalSongs}
-      totalLanguages={totalLanguages}
-      totalCategories={totalCategories}
-      languageOverview={languageOverview}
-      mobileRecentlyAddedSongsSection={
-        <Suspense fallback={<MobileRecentlyAddedSongsSkeleton />}>
-          <MobileRecentlyAddedSongsSection />
-        </Suspense>
-      }
-      desktopRecentlyAddedSongsSection={
-        <Suspense fallback={<DesktopRecentlyAddedSongsSkeleton />}>
-          <DesktopRecentlyAddedSongsSection />
-        </Suspense>
-      }
-      mobileMostViewedSongsSection={
-        <Suspense fallback={<MobileMostViewedSongsSkeleton />}>
-          <MobileMostViewedSongsSection />
-        </Suspense>
-      }
-      desktopMostViewedSongsSection={
-        <Suspense fallback={<DesktopMostViewedSongsSkeleton />}>
-          <DesktopMostViewedSongsSection />
-        </Suspense>
-      }
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
+      <HomeClient
+        totalSongs={totalSongs}
+        totalLanguages={totalLanguages}
+        totalCategories={totalCategories}
+        languageOverview={languageOverview}
+        mobileRecentlyAddedSongsSection={
+          <Suspense fallback={<MobileRecentlyAddedSongsSkeleton />}>
+            <MobileRecentlyAddedSongsSection />
+          </Suspense>
+        }
+        desktopRecentlyAddedSongsSection={
+          <Suspense fallback={<DesktopRecentlyAddedSongsSkeleton />}>
+            <DesktopRecentlyAddedSongsSection />
+          </Suspense>
+        }
+        mobileMostViewedSongsSection={
+          <Suspense fallback={<MobileMostViewedSongsSkeleton />}>
+            <MobileMostViewedSongsSection />
+          </Suspense>
+        }
+        desktopMostViewedSongsSection={
+          <Suspense fallback={<DesktopMostViewedSongsSkeleton />}>
+            <DesktopMostViewedSongsSection />
+          </Suspense>
+        }
+      />
+    </>
   );
 }

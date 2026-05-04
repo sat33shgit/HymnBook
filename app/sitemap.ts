@@ -1,15 +1,22 @@
 import type { MetadataRoute } from "next";
-import { getAllSlugs } from "@/lib/db/queries";
+import { getAllSlugsWithDates, isPublicContactVisible } from "@/lib/db/queries";
+import { siteUrl } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yourdomain.com";
+  const now = new Date();
 
   let songEntries: MetadataRoute.Sitemap = [];
+  let contactVisible = false;
+
   try {
-    const slugs = await getAllSlugs();
+    const [slugs, contactIsVisible] = await Promise.all([
+      getAllSlugsWithDates(),
+      isPublicContactVisible(),
+    ]);
+    contactVisible = contactIsVisible;
     songEntries = slugs.map((s) => ({
-      url: `${baseUrl}/songs/${s.slug}`,
-      lastModified: new Date(),
+      url: `${siteUrl}/songs/${s.slug}`,
+      lastModified: s.updatedAt ?? now,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     }));
@@ -17,25 +24,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB not available at build time
   }
 
-  return [
+  const staticEntries: MetadataRoute.Sitemap = [
     {
-      url: baseUrl,
-      lastModified: new Date(),
+      url: siteUrl,
+      lastModified: now,
       changeFrequency: "daily",
-      priority: 1,
+      priority: 1.0,
     },
     {
-      url: `${baseUrl}/search`,
-      lastModified: new Date(),
+      url: `${siteUrl}/search`,
+      lastModified: now,
       changeFrequency: "daily",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/languages`,
+      lastModified: now,
+      changeFrequency: "weekly",
       priority: 0.7,
     },
-    {
-      url: `${baseUrl}/favorites`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.5,
-    },
-    ...songEntries,
   ];
+
+  if (contactVisible) {
+    staticEntries.push({
+      url: `${siteUrl}/contact`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    });
+  }
+
+  return [...staticEntries, ...songEntries];
 }

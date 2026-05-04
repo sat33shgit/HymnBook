@@ -811,6 +811,22 @@ export async function getAllSlugs() {
   )();
 }
 
+export async function getAllSlugsWithDates() {
+  return unstable_cache(
+    async () => {
+      return db
+        .select({ slug: songs.slug, updatedAt: songs.updatedAt })
+        .from(songs)
+        .where(eq(songs.isPublished, true));
+    },
+    ["getAllSlugsWithDates"],
+    {
+      revalidate: CACHE_TTL.slugs,
+      tags: [CACHE_TAGS.slugs, CACHE_TAGS.songs],
+    }
+  )();
+}
+
 export async function isPublicSongAudioVisible() {
   return unstable_cache(
     async () => {
