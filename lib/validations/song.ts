@@ -76,13 +76,16 @@ export const songsListQuerySchema = z.object({
 });
 
 export const favoriteSchema = z.object({
-  userId: z.string().min(1),
+  // Enforce UUID format so arbitrary strings can't be used as userId values.
+  userId: z.string().uuid("userId must be a valid UUID"),
   songId: z.number().int().positive(),
 });
 
 export const syncFavoritesSchema = z.object({
-  userId: z.string().min(1),
-  songIds: z.array(z.number().int().positive()),
+  // Enforce UUID format so arbitrary strings can't be used as userId values.
+  userId: z.string().uuid("userId must be a valid UUID"),
+  // Cap the array so a single sync request can't flood the DB with rows.
+  songIds: z.array(z.number().int().positive()).max(500, "Too many song IDs"),
 });
 
 export type CreateSongInput = z.infer<typeof createSongSchema>;
