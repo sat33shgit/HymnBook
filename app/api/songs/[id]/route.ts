@@ -11,14 +11,29 @@ import { updateSongSchema } from "@/lib/validations/song";
 import { auth } from "@/lib/auth";
 import { deriveSongDefaultLanguage, deriveSongSlug } from "@/lib/song-utils";
 import { revalidateSongMutationCaches } from "@/lib/song-cache-revalidation";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const headers = { "X-API-Version": "1" };
 export const runtime = "nodejs";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const ip = getClientIp(request);
+  const rl = await rateLimit({
+    key: `song-by-id:${ip}`,
+    limit: 120,
+    windowSeconds: 60,
+  });
+  if (!rl.ok) {
+    const retryAfter = Math.max(1, Math.ceil((rl.resetAt - Date.now()) / 1000));
+    return NextResponse.json(
+      { error: "Too many requests. Please slow down." },
+      { status: 429, headers: { ...headers, "Retry-After": String(retryAfter) } }
+    );
+  }
+
   try {
     const { id } = await params;
     const songId = parseInt(id, 10);

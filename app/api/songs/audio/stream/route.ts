@@ -1,10 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Readable } from "node:stream";
 import { extractR2ObjectKeyFromUrl, getSongAudioObjectFromR2 } from "@/lib/r2";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
+  // Tighter limit than the catalog API — each request proxies a full audio
+  // file through R2, so unchecked bulk access would be expensive.
+  const ip = getClientIp(request);
+  const rl = await rateLimit({
+    key: `audio-stream:${ip}`,
+    limit: 30,
+    windowSeconds: 60,
+  });
+  if (!rl.ok) {
+    const retryAfter = Math.max(1, Math.ceil((rl.resetAt - Date.now()) / 1000));
+    return NextResponse.json(
+      { error: "Too many requests. Please slow down." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
   try {
     const urlParam = request.nextUrl.searchParams.get("url");
     if (!urlParam) {
