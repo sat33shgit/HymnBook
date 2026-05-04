@@ -502,7 +502,7 @@ export function LyricsViewer({
         </section>
 
         <section className="rounded-[2.25rem] border border-[var(--desktop-panel-border)] bg-[var(--desktop-panel)] p-7 shadow-[0_20px_42px_rgba(15,23,42,0.07)] dark:shadow-[0_20px_42px_rgba(2,6,23,0.28)]">
-          <div className="grid gap-6 items-start xl:grid-cols-1">
+          <div className="grid gap-6 items-start md:grid-cols-[1fr_280px]">
             {/* desktop aside moved into Reader tools card */}
 
               <div className="rounded-[1.85rem] bg-[var(--desktop-panel-soft)] p-5 order-1 xl:order-1">
