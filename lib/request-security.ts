@@ -2,12 +2,24 @@ import { siteUrl } from "@/lib/site";
 
 /**
  * Returns the set of origins the app considers same-origin. In production
- * this is just the canonical site URL; in dev it also allows localhost.
+ * this is the canonical site URL plus its www/non-www counterpart so that a
+ * mismatch between NEXT_PUBLIC_BASE_URL and the actual browser origin (e.g.
+ * env var set to the bare domain but user visits via www, or vice-versa)
+ * doesn't produce a spurious 403. In dev it also allows localhost.
  */
 function getAllowedOrigins(): Set<string> {
   const allowed = new Set<string>();
   try {
-    allowed.add(new URL(siteUrl).origin);
+    const url = new URL(siteUrl);
+    allowed.add(url.origin);
+
+    // Add the www ↔ non-www counterpart so either variant is accepted.
+    const host = url.hostname;
+    if (host.startsWith("www.")) {
+      allowed.add(`${url.protocol}//${host.slice(4)}${url.port ? `:${url.port}` : ""}`);
+    } else {
+      allowed.add(`${url.protocol}//www.${host}${url.port ? `:${url.port}` : ""}`);
+    }
   } catch {
     // ignore — siteUrl validation runs elsewhere
   }

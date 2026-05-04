@@ -3,12 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useFavorites } from "@/hooks/useFavorites";
 import { publicSiteTitle } from "@/lib/site";
 import { getPublicNavItems } from "./publicNavItems";
+
+function normalizePathname(p: string | null | undefined): string {
+  const raw = p ?? "/";
+  const withoutQuery = raw.split("?")[0].split("#")[0];
+  if (withoutQuery !== "/" && withoutQuery.endsWith("/")) {
+    return withoutQuery.replace(/\/+$/, "");
+  }
+  return withoutQuery || "/";
+}
 
 export function DesktopSidebar({
   contactVisible = true,
@@ -20,14 +30,16 @@ export function DesktopSidebar({
   const { favorites } = useFavorites();
   const publicNavItems = getPublicNavItems({ contactVisible });
 
-  const pathname = (() => {
-    const p = rawPathname ?? "/";
-    const withoutQuery = p.split("?")[0].split("#")[0];
-    if (withoutQuery !== "/" && withoutQuery.endsWith("/")) {
-      return withoutQuery.replace(/\/+$/, "");
-    }
-    return withoutQuery || "/";
-  })();
+  // After hydration, sync the active state with the actual browser URL.
+  // This guards against cases where the Next.js router state diverges from
+  // window.location (e.g. when Cloudflare serves a cached response that
+  // embeds stale flight/hydration data for a different path).
+  const [clientPathname, setClientPathname] = useState<string | null>(null);
+  useEffect(() => {
+    setClientPathname(window.location.pathname);
+  }, []);
+
+  const pathname = normalizePathname(clientPathname ?? rawPathname);
 
   if (pathname.startsWith("/admin")) return null;
 
