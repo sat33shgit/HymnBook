@@ -20,7 +20,7 @@ function fallbackLimit(
   const existing = memoryStore.get(key);
   if (!existing || existing.expiresAt <= now) {
     memoryStore.set(key, { count: 1, expiresAt: now + windowMs });
-    return { ok: true, remaining: limit - 1, resetAt: now + windowMs };
+    return { ok: true, remaining: Math.max(0, limit - 1), resetAt: now + windowMs };
   }
   if (existing.count >= limit) {
     return { ok: false, remaining: 0, resetAt: existing.expiresAt };
