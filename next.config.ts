@@ -26,7 +26,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "media-src 'self' blob: https:",
-  "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com https://challenges.cloudflare.com",
+  "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com https://challenges.cloudflare.com https://*.r2.cloudflarestorage.com",
   // Turnstile renders its challenge inside an iframe served from
   // challenges.cloudflare.com — must be explicitly allowed.
   "frame-src 'self' https://challenges.cloudflare.com",

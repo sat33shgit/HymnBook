@@ -343,7 +343,6 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
     (langCode: string) => {
       if (translations.some((t) => t.languageCode === langCode)) return;
       setTranslations((prev) => [
-        ...prev,
         {
           languageCode: langCode,
           title: "",
@@ -352,6 +351,7 @@ export function SongForm({ languages, initialData, mode }: SongFormProps) {
           audioUrl: null,
           youtubeUrl: null,
         },
+        ...prev,
       ]);
     },
     [translations]
