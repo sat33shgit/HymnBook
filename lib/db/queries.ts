@@ -1294,6 +1294,11 @@ export async function getSubscribers() {
   return db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
 }
 
+export async function getSubscribersCount() {
+  const result = await db.select({ count: sql<number>`count(*)` }).from(subscribers);
+  return result[0]?.count ?? 0;
+}
+
 export async function getSongsAddedSince(since: Date) {
   const songRows = await db
     .select()

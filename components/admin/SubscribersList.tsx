@@ -20,7 +20,7 @@ interface Subscriber {
   createdAt: string;
 }
 
-export function SubscribersList() {
+export function SubscribersListClient() {
   const [subs, setSubs] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,34 +76,30 @@ export function SubscribersList() {
     }
   }
 
-  if (loading) return <div>Loading subscribers…</div>;
-  if (error) return <div className="text-rose-600">Error: {error}</div>;
+  if (loading) return <div className="text-xs sm:text-sm text-muted-foreground">Loading subscribers…</div>;
+  if (error) return <div className="text-xs sm:text-sm text-rose-600">Error: {error}</div>;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Subscribers</h2>
-        <div className="text-sm text-muted-foreground">{subs.length} total</div>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="overflow-x-auto rounded-lg border">
+        <table className="w-full text-left text-xs sm:text-sm">
           <thead>
-            <tr className="text-sm text-muted-foreground">
-              <th className="py-2">Email</th>
-              <th className="py-2">Location</th>
-              <th className="py-2">Subscribed</th>
-              <th className="py-2">Actions</th>
+            <tr className="border-b bg-muted/50 text-xs sm:text-sm text-muted-foreground">
+              <th className="px-2 sm:px-4 py-2 sm:py-3 font-medium">Email</th>
+              <th className="hidden sm:table-cell px-4 py-3 font-medium">Location</th>
+              <th className="hidden md:table-cell px-4 py-3 font-medium">Subscribed</th>
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-right font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {subs.map((s) => (
-              <tr key={s.id} className="border-t">
-                <td className="py-3 text-sm">{s.email}</td>
-                <td className="py-3 text-sm">{s.location ?? "—"}</td>
-                <td className="py-3 text-sm">{new Date(s.createdAt).toLocaleString()}</td>
-                <td className="py-3">
+              <tr key={s.id} className="border-b last:border-0 hover:bg-muted/30">
+                <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm truncate max-w-[150px] sm:max-w-none">{s.email}</td>
+                <td className="hidden sm:table-cell px-4 py-3 text-sm text-muted-foreground">{s.location ?? "—"}</td>
+                <td className="hidden md:table-cell px-4 py-3 text-sm text-muted-foreground whitespace-nowrap">{new Date(s.createdAt).toLocaleString()}</td>
+                <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
                   <button
-                    className={buttonVariants({ variant: 'outline', size: 'sm' })}
+                    className={buttonVariants({ variant: 'outline', size: 'sm' }) + " text-xs sm:text-sm h-8 sm:h-9"}
                     onClick={() => handleDeleteEmail(s.email, s.id)}
                     disabled={deletingId === s.id}
                   >

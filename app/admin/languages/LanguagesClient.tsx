@@ -183,48 +183,49 @@ export function LanguagesClient({ initialLanguages }: LanguagesClientProps) {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-heading text-3xl font-bold">Languages</h1>
-        <Button onClick={() => { resetForm(); setShowAdd(true); }}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Language
+      <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="font-heading text-2xl sm:text-3xl font-bold">Languages ({languages.length})</h1>
+        <Button onClick={() => { resetForm(); setShowAdd(true); }} className="w-full sm:w-auto text-xs sm:text-sm gap-1 sm:gap-2">
+          <Plus className="h-3 sm:h-4 w-3 sm:w-4" />
+          <span className="hidden sm:inline">Add Language</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </div>
 
       {/* Add form */}
       {showAdd && (
-        <div className="mb-6 space-y-3 rounded-lg border p-4">
-          <h3 className="font-medium">Add New Language</h3>
-          <div className="grid gap-3 sm:grid-cols-2">
+        <div className="mb-4 sm:mb-6 space-y-2 sm:space-y-3 rounded-lg border p-3 sm:p-4">
+          <h3 className="font-medium text-sm sm:text-base">Add New Language</h3>
+          <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2">
             <div>
-              <Label>Code</Label>
-              <Input value={formCode} onChange={(e) => setFormCode(e.target.value)} placeholder="e.g. ko" className="mt-1" />
-              {formErrors.code && <p className="mt-1 text-sm text-destructive">{formErrors.code}</p>}
+              <Label className="text-xs sm:text-sm">Code</Label>
+              <Input value={formCode} onChange={(e) => setFormCode(e.target.value)} placeholder="e.g. ko" className="mt-1 text-xs sm:text-sm h-8 sm:h-9" />
+              {formErrors.code && <p className="mt-1 text-xs text-destructive">{formErrors.code}</p>}
             </div>
             <div>
-              <Label>Name</Label>
-              <Input value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="e.g. Korean" className="mt-1" />
-              {formErrors.name && <p className="mt-1 text-sm text-destructive">{formErrors.name}</p>}
+              <Label className="text-xs sm:text-sm">Name</Label>
+              <Input value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="e.g. Korean" className="mt-1 text-xs sm:text-sm h-8 sm:h-9" />
+              {formErrors.name && <p className="mt-1 text-xs text-destructive">{formErrors.name}</p>}
             </div>
             <div>
-              <Label>Native Name</Label>
-              <Input value={formNative} onChange={(e) => setFormNative(e.target.value)} placeholder="e.g. 한국어" className="mt-1" />
-              {formErrors.native && <p className="mt-1 text-sm text-destructive">{formErrors.native}</p>}
+              <Label className="text-xs sm:text-sm">Native Name</Label>
+              <Input value={formNative} onChange={(e) => setFormNative(e.target.value)} placeholder="e.g. 한국어" className="mt-1 text-xs sm:text-sm h-8 sm:h-9" />
+              {formErrors.native && <p className="mt-1 text-xs text-destructive">{formErrors.native}</p>}
             </div>
             <div>
-              <Label>Font Stack</Label>
-              <Input value={formFont} onChange={(e) => setFormFont(e.target.value)} placeholder="Optional" className="mt-1" />
+              <Label className="text-xs sm:text-sm">Font Stack</Label>
+              <Input value={formFont} onChange={(e) => setFormFont(e.target.value)} placeholder="Optional" className="mt-1 text-xs sm:text-sm h-8 sm:h-9" />
             </div>
             <div>
-              <Label>Sort Order</Label>
-              <Input type="number" value={formSort} onChange={(e) => setFormSort(parseInt(e.target.value, 10) || 0)} className="mt-1" />
+              <Label className="text-xs sm:text-sm">Sort Order</Label>
+              <Input type="number" value={formSort} onChange={(e) => setFormSort(parseInt(e.target.value, 10) || 0)} className="mt-1 text-xs sm:text-sm h-8 sm:h-9" />
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={handleAdd} disabled={formSaving} size="sm" className="gap-1">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-2 pt-2">
+            <Button onClick={handleAdd} disabled={formSaving} size="sm" className="gap-1 text-xs sm:text-sm h-8 sm:h-9 w-full sm:w-auto">
               <Save className="h-3 w-3" /> Save
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setShowAdd(false)} className="gap-1">
+            <Button variant="outline" size="sm" onClick={() => setShowAdd(false)} className="gap-1 text-xs sm:text-sm h-8 sm:h-9 w-full sm:w-auto">
               <X className="h-3 w-3" /> Cancel
             </Button>
           </div>
@@ -233,65 +234,65 @@ export function LanguagesClient({ initialLanguages }: LanguagesClientProps) {
 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs sm:text-sm">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="px-4 py-3 text-left font-medium">Code</th>
-              <th className="px-4 py-3 text-left font-medium">Name</th>
-              <th className="px-4 py-3 text-left font-medium">Native Name</th>
-              <th className="px-4 py-3 text-center font-medium">Sort</th>
-              <th className="px-4 py-3 text-center font-medium">Active</th>
-              <th className="px-4 py-3 text-right font-medium">Actions</th>
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium">Code</th>
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium">Name</th>
+              <th className="hidden sm:table-cell px-4 py-3 text-left font-medium">Native Name</th>
+              <th className="hidden md:table-cell px-4 py-3 text-center font-medium">Sort</th>
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-center font-medium">Active</th>
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-right font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {languages.map((lang) =>
               editCode === lang.code ? (
                 <tr key={lang.code} className="border-b bg-muted/20">
-                  <td className="px-4 py-3 font-mono">{lang.code}</td>
-                  <td className="px-4 py-3">
-                    <Input size={1} value={formName} onChange={(e) => setFormName(e.target.value)} className="h-8" />
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 font-mono text-xs sm:text-sm">{lang.code}</td>
+                  <td className="px-2 sm:px-4 py-2 sm:py-3">
+                    <Input size={1} value={formName} onChange={(e) => setFormName(e.target.value)} className="h-7 sm:h-8 text-xs" />
                   </td>
-                  <td className="px-4 py-3">
-                    <Input size={1} value={formNative} onChange={(e) => setFormNative(e.target.value)} className="h-8" />
+                  <td className="hidden sm:table-cell px-4 py-3">
+                    <Input size={1} value={formNative} onChange={(e) => setFormNative(e.target.value)} className="h-7 sm:h-8 text-xs" />
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <Input type="number" value={formSort} onChange={(e) => setFormSort(parseInt(e.target.value, 10) || 0)} className="h-8 w-16 mx-auto text-center" />
+                  <td className="hidden md:table-cell px-4 py-3 text-center">
+                    <Input type="number" value={formSort} onChange={(e) => setFormSort(parseInt(e.target.value, 10) || 0)} className="h-7 sm:h-8 w-14 mx-auto text-center text-xs" />
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
                     <Switch checked={lang.isActive ?? true} disabled />
                   </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button size="sm" onClick={handleUpdate} disabled={formSaving}>Save</Button>
-                      <Button size="sm" variant="outline" onClick={() => setEditCode(null)}>Cancel</Button>
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
+                    <div className="flex justify-end gap-0.5 sm:gap-1">
+                      <Button size="sm" onClick={handleUpdate} disabled={formSaving} className="h-7 sm:h-8 text-xs">Save</Button>
+                      <Button size="sm" variant="outline" onClick={() => setEditCode(null)} className="h-7 sm:h-8 text-xs">Cancel</Button>
                     </div>
                   </td>
                 </tr>
               ) : (
-                <tr key={lang.code} className="border-b last:border-0">
-                  <td className="px-4 py-3 font-mono">{lang.code}</td>
-                  <td className="px-4 py-3">{lang.name}</td>
-                  <td className="px-4 py-3">{lang.nativeName}</td>
-                  <td className="px-4 py-3 text-center">{lang.sortOrder}</td>
-                  <td className="px-4 py-3 text-center">
+                <tr key={lang.code} className="border-b last:border-0 hover:bg-muted/30">
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 font-mono text-xs sm:text-sm">{lang.code}</td>
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">{lang.name}</td>
+                  <td className="hidden sm:table-cell px-4 py-3 text-sm">{lang.nativeName}</td>
+                  <td className="hidden md:table-cell px-4 py-3 text-center text-sm">{lang.sortOrder}</td>
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
                     <Switch
                       checked={lang.isActive ?? true}
                       onCheckedChange={(checked) => handleToggleActive(lang.code, checked)}
                     />
                   </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => startEdit(lang)}>
-                        <Pencil className="h-4 w-4" />
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
+                    <div className="flex justify-end gap-0.5 sm:gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => startEdit(lang)} className="h-7 w-7 sm:h-9 sm:w-9">
+                        <Pencil className="h-3 sm:h-4 w-3 sm:w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => setDeleteCode(lang.code)}
-                        className="text-destructive hover:text-destructive"
+                        className="text-destructive hover:text-destructive h-7 w-7 sm:h-9 sm:w-9"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 sm:h-4 w-3 sm:w-4" />
                       </Button>
                     </div>
                   </td>

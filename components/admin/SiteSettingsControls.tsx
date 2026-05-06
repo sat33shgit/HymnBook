@@ -94,45 +94,53 @@ export function SiteSettingsControls({ initialAudioVisible, initialYoutubeVisibl
   }
 
   return (
-    <div className="flex items-start gap-6 md:flex-col md:items-start md:gap-4">
-      <label className="flex items-center gap-2 text-sm text-muted-foreground md:justify-between md:w-72 lg:w-80">
+    <div className="flex flex-col gap-3 sm:gap-4">
+      <label className="flex items-center justify-between sm:grid sm:grid-cols-2 gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground rounded-md p-2 sm:p-3 hover:bg-muted/30 transition-colors">
         <span>Enable Contact Page</span>
-        <Switch
-          checked={contactVisible}
-          onCheckedChange={(v) => toggleContact(Boolean(v))}
-          disabled={loadingContact}
-          aria-label="Toggle contact page visibility on main site"
-        />
+        <div className="flex justify-end">
+          <Switch
+            checked={contactVisible}
+            onCheckedChange={(v) => toggleContact(Boolean(v))}
+            disabled={loadingContact}
+            aria-label="Toggle contact page visibility on main site"
+          />
+        </div>
       </label>
 
-      <label className="flex items-center gap-2 text-sm text-muted-foreground md:justify-between md:w-72 lg:w-80">
+      <label className="flex items-center justify-between sm:grid sm:grid-cols-2 gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground rounded-md p-2 sm:p-3 hover:bg-muted/30 transition-colors">
         <span>Enable Audio</span>
-        <Switch
-          checked={audioVisible}
-          onCheckedChange={(v) => toggleAudio(Boolean(v))}
-          disabled={loadingAudio}
-          aria-label="Toggle song audio visibility on main site"
-        />
+        <div className="flex justify-end">
+          <Switch
+            checked={audioVisible}
+            onCheckedChange={(v) => toggleAudio(Boolean(v))}
+            disabled={loadingAudio}
+            aria-label="Toggle song audio visibility on main site"
+          />
+        </div>
       </label>
 
-      <label className="flex items-center gap-2 text-sm text-muted-foreground md:justify-between md:w-72 lg:w-80">
+      <label className="flex items-center justify-between sm:grid sm:grid-cols-2 gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground rounded-md p-2 sm:p-3 hover:bg-muted/30 transition-colors">
         <span>Enable YouTube</span>
-        <Switch
-          checked={youtubeVisible}
-          onCheckedChange={(v) => toggleYoutube(Boolean(v))}
-          disabled={loadingYoutube}
-          aria-label="Toggle song YouTube visibility on main site"
-        />
+        <div className="flex justify-end">
+          <Switch
+            checked={youtubeVisible}
+            onCheckedChange={(v) => toggleYoutube(Boolean(v))}
+            disabled={loadingYoutube}
+            aria-label="Toggle song YouTube visibility on main site"
+          />
+        </div>
       </label>
 
-      <label className="flex items-center gap-2 text-sm text-muted-foreground md:justify-between md:w-72 lg:w-80">
+      <label className="flex items-center justify-between sm:grid sm:grid-cols-2 gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground rounded-md p-2 sm:p-3 hover:bg-muted/30 transition-colors">
         <span>Enable Song Notifications</span>
-        <Switch
-          checked={songNotificationsEnabled}
-          onCheckedChange={(v) => toggleSongNotifications(Boolean(v))}
-          disabled={loadingSongNotifications}
-          aria-label="Toggle song notifications to subscribers"
-        />
+        <div className="flex justify-end">
+          <Switch
+            checked={songNotificationsEnabled}
+            onCheckedChange={(v) => toggleSongNotifications(Boolean(v))}
+            disabled={loadingSongNotifications}
+            aria-label="Toggle song notifications to subscribers"
+          />
+        </div>
       </label>
     </div>
   );

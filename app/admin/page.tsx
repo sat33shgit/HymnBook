@@ -90,13 +90,13 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="font-heading text-3xl font-bold">Dashboard</h1>
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="font-heading text-2xl sm:text-3xl font-bold">Dashboard</h1>
         <Link
           href="/admin/songs/new"
           className={buttonVariants({
             className:
-              "h-9 rounded-[0.95rem] bg-indigo-600 px-3.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(79,70,229,0.24)] hover:bg-indigo-700",
+              "h-9 rounded-[0.95rem] bg-indigo-600 px-3.5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(79,70,229,0.24)] hover:bg-indigo-700 w-full sm:w-auto",
           })}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -104,41 +104,41 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {summaryCards.map(({ label, value, icon: Icon }) => (
           <section
             key={label}
-            className="rounded-[2rem] border bg-card px-5 py-5 shadow-[0_18px_38px_rgba(15,23,42,0.06)]"
+            className="rounded-[2rem] border bg-card px-4 sm:px-5 py-4 sm:py-5 shadow-[0_18px_38px_rgba(15,23,42,0.06)]"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex size-11 items-center justify-center rounded-[1.1rem] bg-muted text-muted-foreground">
-                <Icon className="h-5 w-5" />
+            <div className="flex items-start sm:items-center gap-2 sm:gap-3">
+              <div className="flex size-10 sm:size-11 items-center justify-center rounded-[1.1rem] bg-muted text-muted-foreground flex-shrink-0">
+                <Icon className="h-4 sm:h-5 w-4 sm:w-5" />
               </div>
-              <p className="text-[0.82rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              <p className="text-[0.7rem] sm:text-[0.82rem] font-semibold uppercase tracking-[0.15em] sm:tracking-[0.22em] text-muted-foreground line-clamp-2">
                 {label}
               </p>
             </div>
-            <p className="mt-7 font-heading text-[2.4rem] font-semibold leading-none tracking-[-0.05em] text-foreground">
+            <p className="mt-4 sm:mt-7 font-heading text-xl sm:text-[2.4rem] font-semibold leading-none tracking-[-0.05em] text-foreground">
               {value}
             </p>
           </section>
         ))}
       </div>
 
-      
 
-      <section className="mt-8 rounded-[2rem] border bg-card p-5 shadow-[0_18px_38px_rgba(15,23,42,0.06)]">
+
+      <section className="mt-6 sm:mt-8 rounded-[2rem] border bg-card p-4 sm:p-5 shadow-[0_18px_38px_rgba(15,23,42,0.06)] sm:max-w-sm">
         <div className="flex flex-col gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <MessageSquareMore className="h-5 w-5 text-muted-foreground" />
-              <h2 className="font-heading text-xl font-semibold">Site Settings</h2>
+              <MessageSquareMore className="h-4 sm:h-5 w-4 sm:w-5 text-muted-foreground flex-shrink-0" />
+              <h2 className="font-heading text-lg sm:text-xl font-semibold">Site Settings</h2>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
               Control which public pages appear in the app navigation.
             </p>
 
-            <div className="mt-4 max-w-lg">
+            <div className="mt-4 w-full">
               <SiteSettingsControls
                 initialAudioVisible={audioVisible}
                 initialYoutubeVisible={youtubeVisible}

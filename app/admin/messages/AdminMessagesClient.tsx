@@ -143,43 +143,43 @@ export function AdminMessagesClient({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-4 sm:mb-6 flex flex-col">
         <div>
-          <h1 className="font-heading text-3xl font-bold">
+          <h1 className="font-heading text-2xl sm:text-3xl font-bold">
             Messages ({messages.length})
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
             Review contact requests, reply by email, or remove messages.
           </p>
         </div>
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs sm:text-sm">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="px-4 py-3 text-left font-medium">
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium">
                 <button
                   type="button"
                   onClick={() => handleSort("sender")}
-                  className="inline-flex items-center gap-1.5 hover:text-foreground"
+                  className="inline-flex items-center gap-1 hover:text-foreground"
                 >
                   <span>Sender</span>
                   {getSortIndicator("sender")}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium">
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium">
                 <button
                   type="button"
                   onClick={() => handleSort("requestType")}
-                  className="inline-flex items-center gap-1.5 hover:text-foreground"
+                  className="inline-flex items-center gap-1 hover:text-foreground"
                 >
                   <span>Request</span>
                   {getSortIndicator("requestType")}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium">Preview</th>
-              <th className="px-4 py-3 text-left font-medium">
+              <th className="hidden sm:table-cell px-4 py-3 text-left font-medium">Preview</th>
+              <th className="hidden md:table-cell px-4 py-3 text-left font-medium">
                 <button
                   type="button"
                   onClick={() => handleSort("received")}
@@ -189,7 +189,7 @@ export function AdminMessagesClient({
                   {getSortIndicator("received")}
                 </button>
               </th>
-              <th className="px-4 py-3 text-center font-medium">
+              <th className="hidden lg:table-cell px-4 py-3 text-center font-medium">
                 <button
                   type="button"
                   onClick={() => handleSort("consent")}
@@ -199,34 +199,35 @@ export function AdminMessagesClient({
                   {getSortIndicator("consent")}
                 </button>
               </th>
-              <th className="px-4 py-3 text-right font-medium">Actions</th>
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-right font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sortedMessages.map((message) => (
-              <tr key={message.id} className="border-b last:border-0">
-                <td className="px-4 py-3 align-top">
-                  <div className="font-medium">{message.name}</div>
-                  <div className="text-muted-foreground">{message.email}</div>
+              <tr key={message.id} className="border-b last:border-0 hover:bg-muted/30">
+                <td className="px-2 sm:px-4 py-2 sm:py-3 align-top text-xs sm:text-sm">
+                  <div className="font-medium line-clamp-1">{message.name}</div>
+                  <div className="text-muted-foreground text-[10px] sm:text-xs truncate">{message.email}</div>
                 </td>
-                <td className="px-4 py-3 align-top">
-                  <Badge variant="outline">{message.requestType}</Badge>
+                <td className="px-2 sm:px-4 py-2 sm:py-3 align-top">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs whitespace-nowrap">{message.requestType}</Badge>
                 </td>
-                <td className="max-w-md px-4 py-3 align-top text-muted-foreground">
-                  <p className="whitespace-pre-wrap">{getPreview(message.message)}</p>
+                <td className="hidden sm:table-cell max-w-xs lg:max-w-md px-4 py-3 align-top text-muted-foreground text-sm">
+                  <p className="whitespace-pre-wrap line-clamp-3">{getPreview(message.message)}</p>
                 </td>
-                <td className="px-4 py-3 align-top text-muted-foreground">
+                <td className="hidden md:table-cell px-4 py-3 align-top text-muted-foreground text-sm whitespace-nowrap">
                   {formatDate(message.createdAt)}
                 </td>
-                <td className="px-4 py-3 text-center align-top">
+                <td className="hidden lg:table-cell px-4 py-3 text-center align-top">
                   <Badge
                     variant={message.consentToContact ? "secondary" : "outline"}
+                    className="text-xs"
                   >
                     {message.consentToContact ? "Yes" : "No"}
                   </Badge>
                 </td>
-                <td className="px-4 py-3 text-right align-top">
-                  <div className="flex justify-end gap-1">
+                <td className="px-2 sm:px-4 py-2 sm:py-3 text-right align-top">
+                  <div className="flex justify-end gap-0.5 sm:gap-1">
                     <Tooltip>
                       <TooltipTrigger
                         render={
@@ -235,11 +236,12 @@ export function AdminMessagesClient({
                             className={buttonVariants({
                               variant: "ghost",
                               size: "icon",
-                            })}
+                            }) + " h-7 w-7 sm:h-9 sm:w-9"}
+                            title="View message"
                           />
                         }
                       >
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-3 sm:h-4 w-3 sm:w-4" />
                         <span className="sr-only">
                           View message from {message.name}
                         </span>
@@ -254,11 +256,12 @@ export function AdminMessagesClient({
                             className={buttonVariants({
                               variant: "ghost",
                               size: "icon",
-                            })}
+                            }) + " h-7 w-7 sm:h-9 sm:w-9"}
+                            title="Reply to sender"
                           />
                         }
                       >
-                        <Mail className="h-4 w-4" />
+                        <Mail className="h-3 sm:h-4 w-3 sm:w-4" />
                         <span className="sr-only">Reply to {message.name}</span>
                       </TooltipTrigger>
                       <TooltipContent>Reply</TooltipContent>
@@ -270,11 +273,12 @@ export function AdminMessagesClient({
                             variant="ghost"
                             size="icon"
                             onClick={() => setDeleteId(message.id)}
-                            className="text-destructive hover:text-destructive"
+                            className="text-destructive hover:text-destructive h-7 w-7 sm:h-9 sm:w-9"
+                            title="Delete message"
                           />
                         }
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 sm:h-4 w-3 sm:w-4" />
                         <span className="sr-only">
                           Delete message from {message.name}
                         </span>
@@ -289,7 +293,7 @@ export function AdminMessagesClient({
               <tr>
                 <td
                   colSpan={6}
-                  className="px-4 py-12 text-center text-muted-foreground"
+                  className="px-4 py-12 text-center text-xs sm:text-sm text-muted-foreground"
                 >
                   No contact messages yet.
                 </td>

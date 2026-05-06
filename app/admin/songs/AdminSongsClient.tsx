@@ -16,6 +16,10 @@ import {
 import {
   ArrowUp,
   ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   FileDown,
   Music as MusicIcon,
   Pencil,
@@ -35,6 +39,8 @@ const LANGUAGE_BADGES: Record<string, string> = {
   ml: "ML",
   kn: "KN",
 };
+
+const PAGE_SIZE = 20;
 
 interface AdminSongsClientProps {
   songs: SongListItem[];
@@ -74,6 +80,7 @@ export function AdminSongsClient({
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [showTop, setShowTop] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -173,9 +180,17 @@ export function AdminSongsClient({
         }`
       : null;
 
+  // Pagination logic
+  const totalPages = Math.ceil(songs.length / PAGE_SIZE);
+  const validPage = Math.max(1, Math.min(currentPage, totalPages || 1));
+  const startIndex = (validPage - 1) * PAGE_SIZE;
+  const endIndex = startIndex + PAGE_SIZE;
+  const paginatedSongs = songs.slice(startIndex, endIndex);
+
   const clearSearch = () => {
     setSearchQuery("");
     setSearchResults(null);
+    setCurrentPage(1);
     searchInputRef.current?.focus();
   };
 
@@ -184,6 +199,7 @@ export function AdminSongsClient({
     setSelectedCategory("all");
     setAudioFilter("all");
     setYoutubeFilter("all");
+    setCurrentPage(1);
   };
 
   const handleSort = (nextKey: SortKey) => {
@@ -447,28 +463,30 @@ export function AdminSongsClient({
 
   return (
     <div>
-      <div className="mb-6">
-        <div className="mb-3 flex items-center justify-between">
-          <h1 className="font-heading text-3xl font-bold">Songs ({totalSongs})</h1>
-          <div className="flex items-center gap-4">
+      <div className="mb-4 sm:mb-6">
+        <div className="mb-3 sm:mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="font-heading text-2xl sm:text-3xl font-bold">Songs ({totalSongs})</h1>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <Link
               href="/admin/songs/export?autoprint=1"
               target="_blank"
               rel="noopener noreferrer"
-              className={buttonVariants({ variant: "outline" })}
+              className={buttonVariants({ variant: "outline" }) + " w-full sm:w-auto text-xs sm:text-sm"}
             >
-              <FileDown className="mr-2 h-4 w-4" />
-              Export PDF
+              <FileDown className="mr-2 h-3 sm:h-4 w-3 sm:w-4" />
+              <span className="hidden sm:inline">Export PDF</span>
+              <span className="sm:hidden">Export</span>
             </Link>
-            <Link href="/admin/songs/new" className={buttonVariants()}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Song
+            <Link href="/admin/songs/new" className={buttonVariants() + " w-full sm:w-auto text-xs sm:text-sm"}>
+              <Plus className="mr-2 h-3 sm:h-4 w-3 sm:w-4" />
+              <span className="hidden sm:inline">Add Song</span>
+              <span className="sm:hidden">Add</span>
             </Link>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="relative w-full max-w-lg">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+          <div className="relative w-full sm:max-w-lg">
             <input
               ref={searchInputRef}
               type="text"
@@ -476,7 +494,7 @@ export function AdminSongsClient({
               onChange={handleInputChange}
               onKeyDown={handleInputKeyDown}
               placeholder="Search by title or lyrics..."
-              className="w-full rounded-md border px-3 py-2 pr-8"
+              className="w-full rounded-md border px-3 py-2 pr-8 text-sm"
               disabled={searchLoading}
               aria-label="Search songs"
             />
@@ -493,17 +511,17 @@ export function AdminSongsClient({
           </div>
 
           {summaryLabel && (
-            <div className="ml-4 shrink-0 text-sm text-muted-foreground">
+            <div className="shrink-0 text-xs sm:text-sm text-muted-foreground">
               {summaryLabel}
             </div>
           )}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
           <select
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
-            className="h-10 rounded-md border bg-background px-3 text-sm"
+            className="h-9 sm:h-10 rounded-md border bg-background px-2 sm:px-3 text-xs sm:text-sm"
             aria-label="Filter songs by language"
           >
             <option value="all">All languages</option>
@@ -517,7 +535,7 @@ export function AdminSongsClient({
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="h-10 rounded-md border bg-background px-3 text-sm"
+            className="h-9 sm:h-10 rounded-md border bg-background px-2 sm:px-3 text-xs sm:text-sm"
             aria-label="Filter songs by category"
           >
             <option value="all">All categories</option>
@@ -531,10 +549,10 @@ export function AdminSongsClient({
           <select
             value={audioFilter}
             onChange={(e) => setAudioFilter(e.target.value as AvailabilityFilter)}
-            className="h-10 rounded-md border bg-background px-3 text-sm"
+            className="h-9 sm:h-10 rounded-md border bg-background px-2 sm:px-3 text-xs sm:text-sm"
             aria-label="Filter songs by audio availability"
           >
-            <option value="all">All audio states</option>
+            <option value="all">All audio</option>
             <option value="with">With audio</option>
             <option value="without">Without audio</option>
           </select>
@@ -542,16 +560,16 @@ export function AdminSongsClient({
           <select
             value={youtubeFilter}
             onChange={(e) => setYoutubeFilter(e.target.value as AvailabilityFilter)}
-            className="h-10 rounded-md border bg-background px-3 text-sm"
+            className="h-9 sm:h-10 rounded-md border bg-background px-2 sm:px-3 text-xs sm:text-sm"
             aria-label="Filter songs by YouTube availability"
           >
-            <option value="all">All YouTube states</option>
-            <option value="with">With YouTube URL</option>
-            <option value="without">Without YouTube URL</option>
+            <option value="all">All YouTube</option>
+            <option value="with">With URL</option>
+            <option value="without">Without URL</option>
           </select>
 
           {hasActiveFilters && (
-            <Button variant="outline" size="sm" onClick={clearFilters}>
+            <Button variant="outline" size="sm" onClick={clearFilters} className="col-span-2 sm:col-span-auto text-xs sm:text-sm h-9 sm:h-10">
               Clear Filters
             </Button>
           )}
@@ -559,20 +577,21 @@ export function AdminSongsClient({
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs sm:text-sm">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="px-4 py-3 text-left font-medium">
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-left font-medium">
                 <button
                   type="button"
                   onClick={() => handleSort("title")}
-                  className="inline-flex items-center gap-1.5 hover:text-foreground"
+                  className="inline-flex items-center gap-1 hover:text-foreground"
                 >
-                  <span>Title</span>
+                  <span className="hidden sm:inline">Title</span>
+                  <span className="sm:hidden">Title</span>
                   {getSortIndicator("title")}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium">
+              <th className="hidden sm:table-cell px-4 py-3 text-left font-medium">
                 <button
                   type="button"
                   onClick={() => handleSort("languages")}
@@ -582,7 +601,7 @@ export function AdminSongsClient({
                   {getSortIndicator("languages")}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium">
+              <th className="hidden md:table-cell px-4 py-3 text-left font-medium">
                 <button
                   type="button"
                   onClick={() => handleSort("category")}
@@ -592,7 +611,7 @@ export function AdminSongsClient({
                   {getSortIndicator("category")}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium">
+              <th className="hidden lg:table-cell px-4 py-3 text-left font-medium">
                 <button
                   type="button"
                   onClick={() => handleSort("createdAt")}
@@ -602,47 +621,48 @@ export function AdminSongsClient({
                   {getSortIndicator("createdAt")}
                 </button>
               </th>
-              <th className="px-4 py-3 text-center font-medium">Published</th>
-              <th className="px-4 py-3 text-right font-medium">Actions</th>
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-center font-medium">Pub.</th>
+              <th className="px-2 sm:px-4 py-2 sm:py-3 text-right font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {songs.map((song, idx) => (
-              <tr key={`${song.id}-${idx}`} className="border-b last:border-0">
-                <td className="px-4 py-3 font-medium">
-                  <div className="flex items-center gap-2">
-                    <span>{getDisplayTitle(song)}</span>
+            {paginatedSongs.map((song, idx) => (
+              <tr key={`${song.id}-${idx}`} className="border-b last:border-0 hover:bg-muted/30">
+                <td className="px-2 sm:px-4 py-2 sm:py-3 font-medium">
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                    <span className="line-clamp-2 text-xs sm:text-sm">{getDisplayTitle(song)}</span>
                     {song.hasAudio && (
                       <MusicIcon
-                        className="h-4 w-4 text-muted-foreground"
+                        className="h-3 sm:h-4 w-3 sm:w-4 text-muted-foreground flex-shrink-0"
                         aria-hidden
+                        title="Has audio"
                       />
                     )}
                     {song.hasYoutube && (
-                      <YoutubeIcon className="h-4 w-4 text-red-600" aria-hidden />
+                      <YoutubeIcon className="h-3 sm:h-4 w-3 sm:w-4 text-red-600 flex-shrink-0" aria-hidden title="Has YouTube" />
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3">
-                  <div className="flex gap-1">
+                <td className="hidden sm:table-cell px-4 py-3">
+                  <div className="flex gap-1 flex-wrap">
                     {song.languages.map((lang) => (
                       <Badge
                         key={lang}
                         variant="outline"
-                        className="px-1.5 py-0 text-[10px]"
+                        className="px-1.5 py-0 text-[8px] sm:text-[10px]"
                       >
                         {LANGUAGE_BADGES[lang] ?? lang.toUpperCase()}
                       </Badge>
                     ))}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  {song.category ?? "-"}
+                <td className="hidden md:table-cell px-4 py-3 text-muted-foreground text-sm">
+                  <span className="line-clamp-1">{song.category ?? "-"}</span>
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  {formatCreatedAt(song.createdAt ?? null)}
+                <td className="hidden lg:table-cell px-4 py-3 text-muted-foreground text-sm">
+                  <span className="whitespace-nowrap">{formatCreatedAt(song.createdAt ?? null)}</span>
                 </td>
-                <td className="px-4 py-3 text-center">
+                <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
                   <Switch
                     checked={song.isPublished ?? false}
                     onCheckedChange={(checked) =>
@@ -653,22 +673,24 @@ export function AdminSongsClient({
                     } ${getDisplayTitle(song)}`}
                   />
                 </td>
-                <td className="px-4 py-3 text-right">
-                  <div className="flex justify-end gap-1">
+                <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
+                  <div className="flex justify-end gap-0.5 sm:gap-1">
                     <Link
                       href={`/admin/songs/${song.id}/edit`}
-                      className={buttonVariants({ variant: "ghost", size: "icon" })}
+                      className={buttonVariants({ variant: "ghost", size: "icon" }) + " h-8 w-8 sm:h-9 sm:w-9"}
+                      title="Edit song"
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Pencil className="h-3 sm:h-4 w-3 sm:w-4" />
                       <span className="sr-only">Edit {getDisplayTitle(song)}</span>
                     </Link>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => setDeleteId(song.id)}
-                      className="text-destructive hover:text-destructive"
+                      className="text-destructive hover:text-destructive h-8 w-8 sm:h-9 sm:w-9"
+                      title="Delete song"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 sm:h-4 w-3 sm:w-4" />
                       <span className="sr-only">Delete {getDisplayTitle(song)}</span>
                     </Button>
                   </div>
@@ -677,7 +699,7 @@ export function AdminSongsClient({
             ))}
             {songs.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
+                <td colSpan={6} className="px-4 py-12 text-center text-xs sm:text-sm text-muted-foreground">
                   {isSearching || hasActiveFilters ? (
                     "No songs match the current search or filters."
                   ) : (
@@ -694,6 +716,63 @@ export function AdminSongsClient({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="mt-4 sm:mt-6 flex items-center justify-center gap-1 sm:gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(1)}
+            disabled={validPage === 1}
+            className="h-8 sm:h-9 px-2 sm:px-3"
+            title="First page"
+          >
+            <ChevronsLeft className="h-4 w-4" />
+            <span className="ml-1 hidden sm:inline text-xs">First</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(validPage - 1)}
+            disabled={validPage === 1}
+            className="h-8 sm:h-9 px-2 sm:px-3"
+            title="Previous page"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span className="ml-1 hidden sm:inline text-xs">Prev</span>
+          </Button>
+
+          <div className="px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium">
+            Page {validPage} of {totalPages}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(validPage + 1)}
+            disabled={validPage === totalPages}
+            className="h-8 sm:h-9 px-2 sm:px-3"
+            title="Next page"
+          >
+            <span className="mr-1 hidden sm:inline text-xs">Next</span>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={validPage === totalPages}
+            className="h-8 sm:h-9 px-2 sm:px-3"
+            title="Last page"
+          >
+            <span className="mr-1 hidden sm:inline text-xs">Last</span>
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
       <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
         <DialogContent>
