@@ -635,11 +635,10 @@ export function AdminSongsClient({
                       <MusicIcon
                         className="h-3 sm:h-4 w-3 sm:w-4 text-muted-foreground flex-shrink-0"
                         aria-hidden
-                        title="Has audio"
                       />
                     )}
                     {song.hasYoutube && (
-                      <YoutubeIcon className="h-3 sm:h-4 w-3 sm:w-4 text-red-600 flex-shrink-0" aria-hidden title="Has YouTube" />
+                      <YoutubeIcon className="h-3 sm:h-4 w-3 sm:w-4 text-red-600 flex-shrink-0" aria-hidden />
                     )}
                   </div>
                 </td>
